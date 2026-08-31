@@ -18,12 +18,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
   const customDesktop = propHeroMedia?.filter(m => m.device !== 'mobile').sort((a,b) => (a.order || 0) - (b.order || 0)).map(m => m.url) || [];
   const customMobile = propHeroMedia?.filter(m => m.device !== 'desktop').sort((a,b) => (a.order || 0) - (b.order || 0)).map(m => m.url) || [];
   
-  // If propHeroMedia is completely empty (no setup yet), fallback to defaults. 
-  // But if they uploaded exactly 1 image, it won't loop!
-  const isSetup = propHeroMedia && propHeroMedia.length > 0;
-  
-  const desktopImages = isSetup ? customDesktop : ['/hero1.jpg', '/hero2.jpg'];
-  const mobileImages = isSetup ? customMobile : [];
+  // Directly use uploaded media. No hardcoded fallbacks.
+  const desktopImages = customDesktop;
+  const mobileImages = customMobile;
   
   React.useEffect(() => {
     if (desktopImages.length <= 1 || cmsSettings?.heroDesktopLoopEnabled === false) return;
