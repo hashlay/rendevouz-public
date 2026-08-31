@@ -112,7 +112,13 @@ async function getMongoDb() {
 
   try {
     if (!cachedClient) {
-      cachedClient = new MongoClient(mongoUri, { serverSelectionTimeoutMS: 5000 });
+      cachedClient = new MongoClient(mongoUri, {
+        maxPoolSize: 20,
+        minPoolSize: 2,
+        maxIdleTimeMS: 30000,
+        connectTimeoutMS: 5000,
+        serverSelectionTimeoutMS: 5000
+      });
       await cachedClient.connect();
     }
     const dbPath = mongoUri.includes('/') ? mongoUri.split('/').pop()?.split('?')[0] : null;
