@@ -51,7 +51,51 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings }) => {
   };
 
   return (
-    <footer className="bg-[#080808] text-white pt-20 pb-12 relative overflow-hidden border-t border-white/10">
+    <>
+      {/* Developer Banner (Zenith Software) */}
+      <div className="bg-[#111111] py-8 sm:py-10 border-t border-b border-white/5 relative z-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-6">
+          
+          <div className="flex flex-col sm:flex-row items-center gap-5 sm:gap-6">
+            {/* Zenith Logo with CSS Background Removal */}
+            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-black/40 rounded-2xl flex items-center justify-center p-3 border border-white/5 shadow-inner">
+              <img 
+                src="/zenith_logo.jpg" 
+                alt="Zenith Software" 
+                className="w-full h-full object-contain"
+                // This CSS instantly removes the white background and turns the logo into a sleek white/transparent watermark!
+                style={{ mixBlendMode: 'screen', filter: 'grayscale(1) invert(1) contrast(2)' }}
+              />
+            </div>
+            
+            {/* Zenith Text */}
+            <div className="space-y-1">
+              <h3 className="text-sm font-bold text-white uppercase tracking-widest flex items-center justify-center sm:justify-start gap-2">
+                <Sparkles className="w-4 h-4" style={{ color: 'var(--color-primary-accent)' }} />
+                Developed by Zenith Software
+              </h3>
+              <p className="text-[11px] sm:text-xs text-zinc-400 max-w-lg leading-relaxed">
+                For complete software solutions, web development, graphic design, and professional video editing, reach out to our expert team.
+              </p>
+            </div>
+          </div>
+          
+          {/* Zenith Contact */}
+          <div className="flex flex-col sm:items-end gap-2 text-[11px] sm:text-xs font-mono text-zinc-300">
+            <a href="tel:+917483138340" className="flex items-center gap-2 hover:text-white transition-colors cursor-pointer group">
+              <Phone className="w-3.5 h-3.5 transition-transform group-hover:scale-110" style={{ color: 'var(--color-primary-accent)' }} />
+              +91 74831 38340
+            </a>
+            <a href="mailto:contact@zenithsoftware.com" className="flex items-center gap-2 hover:text-white transition-colors cursor-pointer group">
+              <Mail className="w-3.5 h-3.5 transition-transform group-hover:scale-110" style={{ color: 'var(--color-primary-accent)' }} />
+              zenithsoftware@gmail.com
+            </a>
+          </div>
+          
+        </div>
+      </div>
+
+      <footer className="bg-[#080808] text-white pt-20 pb-12 relative overflow-hidden border-t border-white/10">
       {/* Background Watermark Wave Logo */}
       <div className="absolute -bottom-10 right-0 opacity-5 pointer-events-none select-none">
         <Logo size="xl" variant="icon" />
@@ -140,35 +184,6 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings }) => {
           </div>
         </div>
 
-        {/* Developer Credit Banner - Zenith Software */}
-        <div className="mt-12 mb-6">
-          <div className="bg-gradient-to-r from-zinc-900/80 via-black to-zinc-900/80 border border-white/10 rounded-2xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl group-hover:bg-indigo-500/20 transition-all duration-700 pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
-            
-            <div className="flex flex-col items-center md:items-start text-center md:text-left z-10 space-y-2.5">
-              <h3 className="text-xs font-bold text-white flex items-center gap-2 tracking-widest uppercase">
-                <Sparkles className="w-4 h-4 text-indigo-400" />
-                Designed & Developed by Zenith Software
-              </h3>
-              <p className="text-xs text-zinc-400 max-w-xl leading-relaxed">
-                Elevate your digital presence. We deliver premium softwares, modern web designs, professional graphic designs, and cinematic video editing.
-              </p>
-            </div>
-            
-            <div className="flex flex-col sm:flex-row items-center gap-3 z-10 w-full md:w-auto shrink-0">
-              <a href="tel:7483138340" className="w-full sm:w-auto px-5 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-[11px] sm:text-xs font-mono font-medium text-white flex items-center justify-center gap-2 transition-all cursor-pointer hover:border-white/20">
-                <Phone className="w-3.5 h-3.5 text-indigo-400" />
-                +91 74831 38340
-              </a>
-              <a href="mailto:contact@zenithsoftware.com" className="w-full sm:w-auto px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-[11px] sm:text-xs font-bold text-white flex items-center justify-center gap-2 transition-all shadow-lg shadow-indigo-900/30 cursor-pointer hover:-translate-y-0.5">
-                <Mail className="w-3.5 h-3.5" />
-                Email Us
-              </a>
-            </div>
-          </div>
-        </div>
-
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-zinc-500">
           <p>{cmsSettings?.footerText || '© 2025 Kulliyathu Imam Rabbani (Markaz Garden Off-Campus). All rights reserved.'}</p>
@@ -185,6 +200,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings }) => {
           </button>
         </div>
       </div>
-    </footer>
+      </footer>
+    </>
   );
 };
