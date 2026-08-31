@@ -198,6 +198,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
             <span>Watch Live Stream</span>
           </button>
         </div>
+        </div>
       </div>
     </section>
   );
