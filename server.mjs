@@ -219,6 +219,8 @@ const DEFAULT_DRAG_BLOCKS = [
 app.get('/api/public/settings', async (req, res) => {
   const dbState = await getDbState();
   const settings = dbState.eventSettings || dbState.settings || {};
+  if (dbState.posterTemplateConfig) settings.posterTemplateConfig = dbState.posterTemplateConfig;
+  if (dbState.certificateTemplateConfig) settings.certificateTemplateConfig = dbState.certificateTemplateConfig;
   res.json(settings);
 });
 
