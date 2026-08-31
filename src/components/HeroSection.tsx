@@ -109,18 +109,20 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
       )}
 
       <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 w-full z-20 text-center">
-        <div className="flex justify-center mb-4 sm:mb-6">
-          <div className="scale-75 sm:scale-100 flex items-center justify-center p-4">
-            <Logo 
-              size="xl" 
-              variant="full" 
-              title={cmsSettings?.heroLogoTitle} 
-              subtitle={cmsSettings?.heroLogoSubtitle} 
-              badge={cmsSettings?.heroLogoBadge} 
-              customIconUrl={cmsSettings?.heroLogo}
-            />
+        {!cmsSettings?.heroHideLogo && (
+          <div className="flex justify-center mb-4 sm:mb-6">
+            <div className="scale-75 sm:scale-100 flex items-center justify-center p-4">
+              <Logo 
+                size="xl" 
+                variant="full" 
+                title={cmsSettings?.heroLogoTitle} 
+                subtitle={cmsSettings?.heroLogoSubtitle} 
+                badge={cmsSettings?.heroLogoBadge} 
+                customIconUrl={cmsSettings?.heroLogo}
+              />
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Dynamic Titles from CMS or fallback */}
         <div className="flex flex-col items-center">
@@ -162,24 +164,17 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
             <span>{cmsSettings?.heroInstitutionRight || INSTITUTION.tagline}</span>
           </p>
           
-          {cmsSettings?.heroSubtitle && (
-            <div className="inline-flex items-center justify-center bg-black/60 backdrop-blur-xl border border-white/10 px-5 sm:px-8 py-2 sm:py-3 rounded-full shadow-2xl mb-8 sm:mb-10 w-[90%] sm:w-auto">
-              <span className="text-xs sm:text-base md:text-lg text-zinc-300 font-mono tracking-widest uppercase truncate max-w-full">
-                {cmsSettings?.heroSubtitle}
-              </span>
+        <div className="flex justify-center mb-10 sm:mb-12">
+          <div className="inline-flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 bg-black/60 backdrop-blur-xl border border-white/10 px-6 sm:px-8 py-3 rounded-full shadow-2xl">
+            <div className="flex items-center gap-2 text-zinc-300 font-mono text-[10px] sm:text-xs">
+              <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4" style={{ color: 'var(--color-primary-accent)' }} />
+              <span>{cmsSettings?.heroDate || INSTITUTION.dates}</span>
             </div>
-          )}
-        </div>
-
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 mb-10 sm:mb-12">
-          <div className="flex items-center gap-2 text-zinc-400 font-mono text-[10px] sm:text-xs">
-            <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4" style={{ color: 'var(--color-primary-accent)' }} />
-            <span>{cmsSettings?.heroDate || INSTITUTION.dates}</span>
-          </div>
-          <div className="hidden sm:block w-1.5 h-1.5 rounded-full opacity-40" style={{ backgroundColor: 'var(--color-primary-accent)' }} />
-          <div className="flex items-center gap-2 text-zinc-400 font-mono text-[10px] sm:text-xs">
-            <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4" style={{ color: 'var(--color-primary-accent)' }} />
-            <span>{cmsSettings?.heroLocation || INSTITUTION.location}</span>
+            <div className="hidden sm:block w-1.5 h-1.5 rounded-full opacity-40" style={{ backgroundColor: 'var(--color-primary-accent)' }} />
+            <div className="flex items-center gap-2 text-zinc-300 font-mono text-[10px] sm:text-xs">
+              <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4" style={{ color: 'var(--color-primary-accent)' }} />
+              <span>{cmsSettings?.heroLocation || INSTITUTION.location}</span>
+            </div>
           </div>
         </div>
 
