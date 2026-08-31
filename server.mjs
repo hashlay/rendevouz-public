@@ -144,6 +144,9 @@ app.get('/api/public/categories', (req, res) => res.json(ssfDataset.categories))
 app.get('/api/public/units', (req, res) => res.json(ssfDataset.units));
 app.get('/api/public/competitions', (req, res) => res.json(ssfDataset.competitions));
 app.get('/api/public/standings', (req, res) => res.json([]));
+app.get('/api/public/highlights', (req, res) => res.json(ssfDataset.videoHighlights || []));
+app.get('/api/public/gallery', (req, res) => res.json(ssfDataset.gallery || []));
+app.get('/api/public/cms', (req, res) => res.json({ dragBlocks: [], heroMedia: [], cmsSettings: {} }));
 
 app.post('/api/auth/login', (req, res) => {
   const { username, password } = req.body;
