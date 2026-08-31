@@ -154,17 +154,11 @@ async function getDbState() {
   if (!db) return state;
 
   try {
-    const globalStateDoc = await db.collection('app_state').findOne({ _id: 'global_state' }).catch(() => null);
-    if (globalStateDoc) {
-      const { _id, ...rest } = globalStateDoc;
-      state = { ...state, ...rest };
-    }
-
     // Overlay dedicated collections for 100% real-time accuracy
     const [
       settingsDocs, unitsDocs, categoriesDocs, competitionsDocs,
       participantsDocs, teamsDocs, resultsDocs, chestDocs,
-      galleryDocs, videoDocs
+      galleryDocs, videoDocs, dragBlocksDocs, heroMediaDocs
     ] = await Promise.all([
       db.collection('settings').find({}).toArray().catch(() => []),
       db.collection('units').find({}).toArray().catch(() => []),
@@ -175,7 +169,9 @@ async function getDbState() {
       db.collection('results').find({}).toArray().catch(() => []),
       db.collection('chestNumbers').find({}).toArray().catch(() => []),
       db.collection('gallery').find({}).toArray().catch(() => []),
-      db.collection('videoHighlights').find({}).toArray().catch(() => [])
+      db.collection('videoHighlights').find({}).toArray().catch(() => []),
+      db.collection('dragBlocks').find({}).toArray().catch(() => []),
+      db.collection('heroMedia').find({}).toArray().catch(() => [])
     ]);
 
     settingsDocs.forEach(s => {
@@ -194,6 +190,8 @@ async function getDbState() {
     if (chestDocs.length > 0) state.chestNumbers = chestDocs.map(ch => ({ id: ch.id || ch._id, ...ch }));
     if (galleryDocs.length > 0) state.gallery = galleryDocs.map(g => ({ id: g.id || g._id, ...g }));
     if (videoDocs.length > 0) state.videoHighlights = videoDocs.map(v => ({ id: v.id || v._id, ...v }));
+    if (dragBlocksDocs.length > 0) state.dragBlocks = dragBlocksDocs.map(d => ({ id: d.id || d._id, ...d }));
+    if (heroMediaDocs.length > 0) state.heroMedia = heroMediaDocs.map(h => ({ id: h.id || h._id, ...h }));
 
   } catch (err) {
     console.error('Error assembling DB state from MongoDB:', err.message);
