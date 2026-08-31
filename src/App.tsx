@@ -124,7 +124,7 @@ function PublicWebsiteContent({ onSwitchToApp }: { onSwitchToApp: (mode: 'worksp
       }
     };
 
-    swrFetch(`/api/public/cms?t=${Date.now()}`, undefined, applyCMSData)
+    swrFetch(`/api/public/cms?t=${Date.now()}`, { pollInterval: 2500 }, applyCMSData)
       .then(applyCMSData)
       .catch(err => console.error('Failed to load CMS data:', err));
   }, []);

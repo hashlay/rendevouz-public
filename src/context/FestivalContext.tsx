@@ -207,10 +207,10 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const fetchPublicData = async () => {
       try {
         const [resResults, resSettings, resCategories] = await Promise.all([
-          swrFetch<any[]>(`/api/public/results?t=${Date.now()}`, undefined, (data) => {
+          swrFetch<any[]>(`/api/public/results?t=${Date.now()}`, { pollInterval: 5000 }, (data) => {
             if (Array.isArray(data)) setResults(data);
           }),
-          swrFetch<any>(`/api/public/settings?t=${Date.now()}`, undefined, (data) => {
+          swrFetch<any>(`/api/public/settings?t=${Date.now()}`, { pollInterval: 10000 }, (data) => {
             if (data) setEventSettings(data);
           }),
           swrFetch<any[]>(`/api/public/categories?t=${Date.now()}`, undefined, (data) => {
