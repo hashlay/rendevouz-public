@@ -17,7 +17,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   const [errorMsg, setErrorMsg] = useState('');
   const dateInputRef = React.useRef<HTMLInputElement>(null);
 
-  const criteriaMode = eventSettings?.participantLoginCriteria || 'dob';
+  const criteriaMode = eventSettings?.participantLoginCriteria || 'class';
   const classStart = eventSettings?.classRangeStart ?? 1;
   const classEnd = eventSettings?.classRangeEnd ?? 10;
   const availableClasses: string[] = eventSettings?.availableClasses || Array.from({ length: Math.max(1, classEnd - classStart + 1) }, (_, i) => `Class ${classStart + i}`);
