@@ -250,7 +250,7 @@ function PublicWebsiteContent({ onSwitchToApp }: { onSwitchToApp: (mode: 'worksp
                 .map((block: any) => {
                   switch (block.type) {
                     case 'hero':
-                      return <HeroSection key="hero" onNavigate={handleNavigate} cmsSettings={cmsData.cmsSettings} heroMedia={cmsData.heroMedia} />;
+                      return <HeroSection key="hero" onNavigate={handleNavigate} cmsSettings={cmsData.cmsSettings} heroMedia={cmsData.heroMedia} dragBlocks={cmsData.dragBlocks} />;
                     case 'about':
                       return <AboutSection key="about" onOpenConceptModal={() => setIsConceptModalOpen(true)} cmsSettings={cmsData.cmsSettings} />;
                     case 'results':
@@ -271,7 +271,7 @@ function PublicWebsiteContent({ onSwitchToApp }: { onSwitchToApp: (mode: 'worksp
                 })
             ) : (
               <>
-                <HeroSection onNavigate={handleNavigate} cmsSettings={cmsData?.cmsSettings} heroMedia={cmsData?.heroMedia} />
+                <HeroSection onNavigate={handleNavigate} cmsSettings={cmsData?.cmsSettings} heroMedia={cmsData?.heroMedia} dragBlocks={cmsData?.dragBlocks} />
                 <AboutSection onOpenConceptModal={() => setIsConceptModalOpen(true)} cmsSettings={cmsData?.cmsSettings} />
                 <ResultsSection onNavigate={handleNavigate} />
                 <SmilePhotoPortal cmsSettings={cmsData?.cmsSettings} />

@@ -8,9 +8,10 @@ interface HeroSectionProps {
   onNavigate: (sectionId: string) => void;
   cmsSettings?: any;
   heroMedia?: any[];
+  dragBlocks?: any[];
 }
 
-export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSettings, heroMedia: propHeroMedia }) => {
+export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSettings, heroMedia: propHeroMedia, dragBlocks }) => {
   const { authUser, setActiveModalView } = useFestival();
   const [desktopIndex, setDesktopIndex] = React.useState(0);
   const [mobileIndex, setMobileIndex] = React.useState(0);
@@ -194,13 +195,23 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
             <ChevronRight className="w-3.5 h-3.5" />
           </button>
 
-          <button
-            onClick={() => onNavigate('live')}
-            className="w-full sm:w-auto px-6 py-3 bg-black/60 hover:bg-black/80 border border-white/30 hover:border-white/60 text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl backdrop-blur-lg transition-all duration-300 flex items-center justify-center gap-2 transform hover:-translate-y-0.5 cursor-pointer"
-          >
-            <Radio className="w-4 h-4 animate-pulse" style={{ color: 'var(--color-primary-accent)' }} />
-            <span>Watch Live Stream</span>
-          </button>
+          {dragBlocks && dragBlocks.find((b: any) => b.type === 'live_stages' || b.type === 'live_stream')?.enabled === false ? (
+            <button
+              onClick={() => onNavigate('standings')}
+              className="w-full sm:w-auto px-6 py-3 bg-black/60 hover:bg-black/80 border border-white/30 hover:border-white/60 text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl backdrop-blur-lg transition-all duration-300 flex items-center justify-center gap-2 transform hover:-translate-y-0.5 cursor-pointer"
+            >
+              <Trophy className="w-4 h-4" style={{ color: 'var(--color-primary-accent)' }} />
+              <span>View Team Standings</span>
+            </button>
+          ) : (
+            <button
+              onClick={() => onNavigate('live')}
+              className="w-full sm:w-auto px-6 py-3 bg-black/60 hover:bg-black/80 border border-white/30 hover:border-white/60 text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl backdrop-blur-lg transition-all duration-300 flex items-center justify-center gap-2 transform hover:-translate-y-0.5 cursor-pointer"
+            >
+              <Radio className="w-4 h-4 animate-pulse" style={{ color: 'var(--color-primary-accent)' }} />
+              <span>Watch Live Stream</span>
+            </button>
+          )}
         </div>
         </div>
       </div>
