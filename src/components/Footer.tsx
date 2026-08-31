@@ -140,6 +140,35 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings }) => {
           </div>
         </div>
 
+        {/* Developer Credit Banner - Zenith Software */}
+        <div className="mt-12 mb-6">
+          <div className="bg-gradient-to-r from-zinc-900/80 via-black to-zinc-900/80 border border-white/10 rounded-2xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl group-hover:bg-indigo-500/20 transition-all duration-700 pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
+            
+            <div className="flex flex-col items-center md:items-start text-center md:text-left z-10 space-y-2.5">
+              <h3 className="text-xs font-bold text-white flex items-center gap-2 tracking-widest uppercase">
+                <Sparkles className="w-4 h-4 text-indigo-400" />
+                Designed & Developed by Zenith Software
+              </h3>
+              <p className="text-xs text-zinc-400 max-w-xl leading-relaxed">
+                Elevate your digital presence. We deliver premium softwares, modern web designs, professional graphic designs, and cinematic video editing.
+              </p>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row items-center gap-3 z-10 w-full md:w-auto shrink-0">
+              <a href="tel:7483138340" className="w-full sm:w-auto px-5 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-[11px] sm:text-xs font-mono font-medium text-white flex items-center justify-center gap-2 transition-all cursor-pointer hover:border-white/20">
+                <Phone className="w-3.5 h-3.5 text-indigo-400" />
+                +91 74831 38340
+              </a>
+              <a href="mailto:contact@zenithsoftware.com" className="w-full sm:w-auto px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-[11px] sm:text-xs font-bold text-white flex items-center justify-center gap-2 transition-all shadow-lg shadow-indigo-900/30 cursor-pointer hover:-translate-y-0.5">
+                <Mail className="w-3.5 h-3.5" />
+                Email Us
+              </a>
+            </div>
+          </div>
+        </div>
+
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-zinc-500">
           <p>{cmsSettings?.footerText || '© 2025 Kulliyathu Imam Rabbani (Markaz Garden Off-Campus). All rights reserved.'}</p>
