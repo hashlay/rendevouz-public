@@ -105,25 +105,27 @@ function PublicWebsiteContent({ onSwitchToApp }: { onSwitchToApp: (mode: 'worksp
   } = useFestival();
 
   React.useEffect(() => {
-    swrFetch(`/api/public/cms?t=${Date.now()}`)
-      .then(data => {
-        setCmsData(data);
-        const theme = data?.cmsSettings?.colorTheme;
-        if (theme) {
-          // Set root CSS custom properties for CMS color theme
-          const root = document.documentElement;
-          if (theme.primaryAccent) root.style.setProperty('--color-primary-accent', theme.primaryAccent);
-          if (theme.bodyBg) root.style.setProperty('--color-body-bg', theme.bodyBg);
-          if (theme.cardBg) root.style.setProperty('--color-card-bg', theme.cardBg);
-          if (theme.cardElevatedBg) root.style.setProperty('--color-card-elevated-bg', theme.cardElevatedBg);
-          if (theme.borderSubtle) root.style.setProperty('--color-border-subtle', theme.borderSubtle);
-          if (theme.textPrimary) root.style.setProperty('--color-text-primary', theme.textPrimary);
-          if (theme.textSecondary) root.style.setProperty('--color-text-secondary', theme.textSecondary);
-          if (theme.textMuted) root.style.setProperty('--color-text-muted', theme.textMuted);
-          if (theme.goldAccent) root.style.setProperty('--color-gold-accent', theme.goldAccent);
-          if (theme.successAccent) root.style.setProperty('--color-success-accent', theme.successAccent);
-        }
-      })
+    const applyCMSData = (data: any) => {
+      setCmsData(data);
+      const theme = data?.cmsSettings?.colorTheme;
+      if (theme) {
+        // Set root CSS custom properties for CMS color theme
+        const root = document.documentElement;
+        if (theme.primaryAccent) root.style.setProperty('--color-primary-accent', theme.primaryAccent);
+        if (theme.bodyBg) root.style.setProperty('--color-body-bg', theme.bodyBg);
+        if (theme.cardBg) root.style.setProperty('--color-card-bg', theme.cardBg);
+        if (theme.cardElevatedBg) root.style.setProperty('--color-card-elevated-bg', theme.cardElevatedBg);
+        if (theme.borderSubtle) root.style.setProperty('--color-border-subtle', theme.borderSubtle);
+        if (theme.textPrimary) root.style.setProperty('--color-text-primary', theme.textPrimary);
+        if (theme.textSecondary) root.style.setProperty('--color-text-secondary', theme.textSecondary);
+        if (theme.textMuted) root.style.setProperty('--color-text-muted', theme.textMuted);
+        if (theme.goldAccent) root.style.setProperty('--color-gold-accent', theme.goldAccent);
+        if (theme.successAccent) root.style.setProperty('--color-success-accent', theme.successAccent);
+      }
+    };
+
+    swrFetch(`/api/public/cms?t=${Date.now()}`, undefined, applyCMSData)
+      .then(applyCMSData)
       .catch(err => console.error('Failed to load CMS data:', err));
   }, []);
 

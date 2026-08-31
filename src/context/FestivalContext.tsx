@@ -207,9 +207,15 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const fetchPublicData = async () => {
       try {
         const [resResults, resSettings, resCategories] = await Promise.all([
-          swrFetch<any[]>(`/api/public/results?t=${Date.now()}`),
-          swrFetch<any>(`/api/public/settings?t=${Date.now()}`),
-          swrFetch<any[]>(`/api/public/categories?t=${Date.now()}`).catch(() => {
+          swrFetch<any[]>(`/api/public/results?t=${Date.now()}`, undefined, (data) => {
+            if (Array.isArray(data)) setResults(data);
+          }),
+          swrFetch<any>(`/api/public/settings?t=${Date.now()}`, undefined, (data) => {
+            if (data) setEventSettings(data);
+          }),
+          swrFetch<any[]>(`/api/public/categories?t=${Date.now()}`, undefined, (data) => {
+            if (Array.isArray(data)) setCategories(data);
+          }).catch(() => {
             const cached = localStorage.getItem('swr_cache_/api/public/categories');
             return cached ? JSON.parse(cached) : [];
           })
