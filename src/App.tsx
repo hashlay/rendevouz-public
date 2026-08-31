@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FestivalProvider, useFestival } from './context/FestivalContext';
 import { Category } from './types';
+import { swrFetch } from './utils/swrFetch';
 
 import { Header } from './components/Header';
 import { HeroSection } from './components/HeroSection';
@@ -104,8 +105,7 @@ function PublicWebsiteContent({ onSwitchToApp }: { onSwitchToApp: (mode: 'worksp
   } = useFestival();
 
   React.useEffect(() => {
-    fetch(`/api/public/cms?t=${Date.now()}`)
-      .then(res => res.json())
+    swrFetch(`/api/public/cms?t=${Date.now()}`)
       .then(data => {
         setCmsData(data);
         const theme = data?.cmsSettings?.colorTheme;
