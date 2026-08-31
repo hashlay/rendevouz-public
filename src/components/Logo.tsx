@@ -23,9 +23,9 @@ export const Logo: React.FC<LogoProps> = ({
   showIcon = true,
   customIconUrl = '',
 }) => {
-  const displayTitle = (title !== undefined && title !== null && title !== '') ? title : 'RENDEZVOUS';
-  const displaySubtitle = (subtitle !== undefined && subtitle !== null && subtitle !== '') ? subtitle : 'Silver Edition';
-  const displayBadge = (badge !== undefined && badge !== null && badge !== '') ? badge : 'KULLIYATHU IMAM RABBANI';
+  const displayTitle = (title !== undefined && title !== null && title !== '') ? title : 'NOORUL ISLAM';
+  const displaySubtitle = (subtitle !== undefined && subtitle !== null && subtitle !== '') ? subtitle : 'MADRASA JEPPU';
+  const displayBadge = (badge !== undefined && badge !== null && badge !== '') ? badge : 'ESTD';
   // Dimension scales
   const scales = {
     sm: { iconWidth: 42, iconHeight: 24, textSize: 'text-sm', subTextSize: 'text-[9px]' },
@@ -55,13 +55,13 @@ export const Logo: React.FC<LogoProps> = ({
     <div className={`flex items-center gap-3 select-none ${className}`}>
       {/* Wave Icon */}
       {showIcon && (
-        <div className="relative group shrink-0">
-          {customIconUrl ? (
+        <div className="relative group shrink-0 flex items-center justify-center">
+          {customIconUrl || '/madrasa_logo.png' ? (
             <img 
-              src={customIconUrl} 
+              src={customIconUrl || '/madrasa_logo.png'} 
               alt="Logo Icon" 
-              className="object-contain" 
-              style={{ width: iconWidth, height: iconHeight }} 
+              className="object-contain drop-shadow-2xl transition-transform duration-500 group-hover:scale-105" 
+              style={{ width: iconWidth, height: iconHeight, borderRadius: '50%' }} 
             />
           ) : (
             <svg
