@@ -1,4 +1,9 @@
 
+function getBgHash(url: string): string {
+  if (!url) return '';
+  return `hash_${url.length}_${url.slice(-30)}`;
+}
+
 export function getDefaultThemeConfig(): any {
 
   return {

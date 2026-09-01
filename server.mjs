@@ -181,17 +181,26 @@ async function getDbState() {
       if (s._id === 'certificateTemplateConfig') state.certificateTemplateConfig = s;
     });
 
-    if (unitsDocs.length > 0) state.units = unitsDocs.map(u => ({ id: u.id || u._id, ...u }));
-    if (categoriesDocs.length > 0) state.categories = categoriesDocs.map(c => ({ id: c.id || c._id, ...c }));
-    if (competitionsDocs.length > 0) state.competitions = competitionsDocs.map(c => ({ id: c.id || c._id, ...c }));
-    if (participantsDocs.length > 0) state.participants = participantsDocs.map(p => ({ id: p.id || p._id, ...p }));
-    if (teamsDocs.length > 0) state.teams = teamsDocs.map(t => ({ id: t.id || t._id, ...t }));
-    if (resultsDocs.length > 0) state.results = resultsDocs.map(r => ({ id: r.id || r._id, ...r }));
-    if (chestDocs.length > 0) state.chestNumbers = chestDocs.map(ch => ({ id: ch.id || ch._id, ...ch }));
-    if (galleryDocs.length > 0) state.gallery = galleryDocs.map(g => ({ id: g.id || g._id, ...g }));
-    if (videoDocs.length > 0) state.videoHighlights = videoDocs.map(v => ({ id: v.id || v._id, ...v }));
-    if (dragBlocksDocs.length > 0) state.dragBlocks = dragBlocksDocs.map(d => ({ id: d.id || d._id, ...d }));
-    if (heroMediaDocs.length > 0) state.heroMedia = heroMediaDocs.map(h => ({ id: h.id || h._id, ...h }));
+    const dedupeDocs = (docs) => {
+      const map = new Map();
+      docs.forEach(d => {
+        const docId = d.id || d._id;
+        if (docId) map.set(docId.toString(), { id: docId, ...d });
+      });
+      return Array.from(map.values());
+    };
+
+    if (unitsDocs.length > 0) state.units = dedupeDocs(unitsDocs);
+    if (categoriesDocs.length > 0) state.categories = dedupeDocs(categoriesDocs);
+    if (competitionsDocs.length > 0) state.competitions = dedupeDocs(competitionsDocs);
+    if (participantsDocs.length > 0) state.participants = dedupeDocs(participantsDocs);
+    if (teamsDocs.length > 0) state.teams = dedupeDocs(teamsDocs);
+    if (resultsDocs.length > 0) state.results = dedupeDocs(resultsDocs);
+    if (chestDocs.length > 0) state.chestNumbers = dedupeDocs(chestDocs);
+    if (galleryDocs.length > 0) state.gallery = dedupeDocs(galleryDocs);
+    if (videoDocs.length > 0) state.videoHighlights = dedupeDocs(videoDocs);
+    if (dragBlocksDocs.length > 0) state.dragBlocks = dedupeDocs(dragBlocksDocs);
+    if (heroMediaDocs.length > 0) state.heroMedia = dedupeDocs(heroMediaDocs);
 
   } catch (err) {
     console.error('Error assembling DB state from MongoDB:', err.message);
@@ -214,6 +223,14 @@ const DEFAULT_DRAG_BLOCKS = [
 // =========================================================================
 // 🌐 PUBLIC WEBSITE API ENDPOINTS
 // =========================================================================
+
+// Prevent browser/proxy HTTP caching on public endpoints so fresh data always serves
+app.use('/api/public', (req, res, next) => {
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  next();
+});
 
 // Public Event Settings
 app.get('/api/public/settings', async (req, res) => {
@@ -377,33 +394,65 @@ app.post('/api/public/auth/participant-login', async (req, res) => {
   const { chestNumber, dob } = req.body;
   const dbState = await getDbState();
   const { chestNumbers = [], participants = [] } = dbState;
+  const cleanChest = (chestNumber || '').toString().trim();
 
-  const cNum = chestNumbers.find(c => c.chestNumber?.toString() === chestNumber?.toString() || c.codeNumber === chestNumber);
-  if (!cNum) return res.status(401).json({ error: 'Invalid Chest Number' });
+  const cNum = chestNumbers.find(c => c.chestNumber?.toString() === cleanChest || c.codeNumber === cleanChest);
+  let participant = participants.find(p => (cNum && (p.id === cNum.participantId || p.id === cNum.entityId)) || p.profilePhoto === cleanChest || p.id === cleanChest);
+  if (participant && participant.deletedAt) participant = null;
 
-  const participant = participants.find(p => (p.id === cNum.participantId || p.id === cNum.entityId) && !p.deletedAt);
-  if (!participant) return res.status(401).json({ error: 'Participant not found' });
-
-  if (dob && participant.dob !== dob) return res.status(401).json({ error: 'Incorrect Date of Birth' });
+  if (!participant) return res.status(401).json({ error: 'Invalid Chest Number' });
+  if (dob && participant.dob && participant.dob !== dob) return res.status(401).json({ error: 'Incorrect Date of Birth' });
 
   res.json({ token: `token_${participant.id}_${Date.now()}`, participant });
 });
 
 app.get('/api/public/participant/by-chest/:chestNo', async (req, res) => {
   const { chestNo } = req.params;
+  const cleanChest = (chestNo || '').toString().trim();
   const dbState = await getDbState();
-  const { chestNumbers = [], participants = [], competitions = [], results = [] } = dbState;
+  const { chestNumbers = [], participants = [], competitions = [], results = [], registrations = [], teams = [], units = [], categories = [] } = dbState;
 
-  const cNum = chestNumbers.find(c => c.chestNumber?.toString() === chestNo || c.codeNumber === chestNo);
-  if (!cNum) return res.status(404).json({ error: 'Chest number not found' });
+  const cNum = chestNumbers.find(c => c.chestNumber?.toString() === cleanChest || c.codeNumber === cleanChest);
+  let participant = participants.find(p => (cNum && (p.id === cNum.participantId || p.id === cNum.entityId)) || p.profilePhoto === cleanChest || p.id === cleanChest);
 
-  const participant = participants.find(p => (p.id === cNum.participantId || p.id === cNum.entityId) && !p.deletedAt);
-  if (!participant) return res.status(404).json({ error: 'Participant details not found' });
+  if (!participant || participant.deletedAt) {
+    return res.status(404).json({ error: 'Participant not found for this chest number' });
+  }
 
-  const registeredComps = competitions.filter(c => participant.registeredEvents?.includes(c.id));
-  const participantResults = results.filter(r => r.participantId === participant.id && !r.deletedAt);
+  // Find registered competitions from registrations list or registeredEvents property
+  const regRecord = registrations.find(r => r.participantId === participant.id && !r.deletedAt);
+  const indCompIds = regRecord?.selectedIndividualCompetitionIds || participant.registeredEvents || [];
+  const groupCompIds = regRecord?.selectedGroupTeamIds || [];
 
-  res.json({ participant, registeredComps, participantResults });
+  // Also include competitions from teams where candidate is a member
+  const candidateTeams = teams.filter(t => Array.isArray(t.memberIds) && t.memberIds.includes(participant.id) && !t.deletedAt);
+  candidateTeams.forEach(t => {
+    if (t.competitionId && !groupCompIds.includes(t.competitionId)) {
+      groupCompIds.push(t.competitionId);
+    }
+  });
+
+  const allCompIds = Array.from(new Set([...indCompIds, ...groupCompIds]));
+  const registeredComps = competitions.filter(c => allCompIds.includes(c.id));
+
+  // Results for candidate (both individual and team results)
+  const candidateTeamIds = candidateTeams.map(t => t.id);
+  const participantResults = results.filter(r => 
+    !r.deletedAt && (r.participantId === participant.id || candidateTeamIds.includes(r.teamId))
+  );
+
+  const unit = units.find(u => u.id === participant.unitId);
+  const category = categories.find(c => c.id === participant.selectedCategoryId);
+
+  const enrichedParticipant = {
+    ...participant,
+    chestNumber: cNum ? (cNum.chestNumber || cNum.codeNumber) : (participant.profilePhoto || cleanChest),
+    unitName: unit ? unit.name : participant.unitName || 'Main Unit',
+    categoryName: category ? category.name : participant.categoryName || 'General',
+    candidateTeams
+  };
+
+  res.json({ participant: enrichedParticipant, registeredComps, participantResults });
 });
 
 // CLOUDINARY MEDIA UPLOAD ENDPOINTS
