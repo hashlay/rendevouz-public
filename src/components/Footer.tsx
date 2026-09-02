@@ -45,24 +45,25 @@ const SocialLink = ({ href, label, children }: { href: string; label: string; ch
 };
 
 export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings, dragBlocks }) => {
-  const isTypeEnabled = (type: string): boolean => {
+  const isTypeEnabled = (types: string | string[]): boolean => {
     const blocks = dragBlocks || cmsSettings?.dragBlocks || cmsSettings?.eventSettings?.dragBlocks;
+    const typeList = Array.isArray(types) ? types : [types];
     if (Array.isArray(blocks) && blocks.length > 0) {
-      const found = blocks.find((b: any) => b.type === type);
+      const found = blocks.find((b: any) => typeList.includes(b.type));
       if (found !== undefined) return !!found.enabled;
     }
     return true;
   };
 
-  const showHero = isTypeEnabled('hero') && cmsSettings?.showHero !== false;
-  const showAbout = isTypeEnabled('about') && cmsSettings?.showAbout !== false;
-  const showResults = isTypeEnabled('results') && cmsSettings?.showResults !== false;
-  const showTeamPoints = isTypeEnabled('results') && cmsSettings?.showTeamPoints !== false;
-  const showPosters = isTypeEnabled('announcements') && cmsSettings?.showPosters !== false;
-  const showPhotoHub = (isTypeEnabled('smile') || isTypeEnabled('photohub')) && cmsSettings?.showPhotoHub !== false && cmsSettings?.showSmile !== false;
-  const showLiveStream = (isTypeEnabled('live_stages') || isTypeEnabled('live_stream')) && cmsSettings?.showLiveStream !== false && cmsSettings?.showLive !== false;
-  const showGallery = isTypeEnabled('gallery') && cmsSettings?.showGallery !== false;
-  const showHighlights = isTypeEnabled('highlights') && cmsSettings?.showHighlights !== false && cmsSettings?.showVideoHighlights !== false;
+  const showHero = isTypeEnabled(['hero']) && cmsSettings?.showHero !== false;
+  const showAbout = isTypeEnabled(['about']) && cmsSettings?.showAbout !== false;
+  const showResults = isTypeEnabled(['announcements']) && cmsSettings?.showResults !== false;
+  const showTeamPoints = isTypeEnabled(['results']) && cmsSettings?.showTeamPoints !== false;
+  const showPosters = isTypeEnabled(['posters']) && cmsSettings?.showPosters !== false;
+  const showPhotoHub = isTypeEnabled(['smile', 'photohub']) && cmsSettings?.showPhotoHub !== false && cmsSettings?.showSmile !== false;
+  const showLiveStream = isTypeEnabled(['live_stages', 'live_stream']) && cmsSettings?.showLiveStream !== false && cmsSettings?.showLive !== false;
+  const showGallery = isTypeEnabled(['gallery']) && cmsSettings?.showGallery !== false;
+  const showHighlights = isTypeEnabled(['highlights']) && cmsSettings?.showHighlights !== false && cmsSettings?.showVideoHighlights !== false;
 
   const [topHovered, setTopHovered] = React.useState(false);
 
