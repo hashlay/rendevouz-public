@@ -101,13 +101,13 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings, dragBlo
 
           {/* Zenith Contact */}
           <div className="flex flex-col sm:items-end gap-1.5 text-[9px] sm:text-[10px] font-mono text-zinc-500">
-            <a href="tel:+917483138340" className="flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer group">
+            <a href="https://wa.me/917483138340" className="flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer group">
               <Phone className="w-3 h-3 transition-transform group-hover:scale-110 opacity-70" style={{ color: 'var(--color-primary-accent)' }} />
               +91 74831 38340
             </a>
-            <a href="mailto:contact@zenithsoftware.com" className="flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer group">
+            <a href="mailto:zenith.theorganizer@gmail.com" className="flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer group">
               <Mail className="w-3 h-3 transition-transform group-hover:scale-110 opacity-70" style={{ color: 'var(--color-primary-accent)' }} />
-              zenithsoftware@gmail.com
+              zenith.theorganizer@gmail.com
             </a>
           </div>
 
