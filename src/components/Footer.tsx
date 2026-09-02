@@ -44,6 +44,16 @@ const SocialLink = ({ href, label, children }: { href: string; label: string; ch
 };
 
 export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings }) => {
+  const showHero = cmsSettings?.showHero !== false;
+  const showAbout = cmsSettings?.showAbout !== false;
+  const showResults = cmsSettings?.showResults !== false;
+  const showTeamPoints = cmsSettings?.showTeamPoints !== false;
+  const showPosters = cmsSettings?.showPosters !== false;
+  const showPhotoHub = cmsSettings?.showPhotoHub !== false && cmsSettings?.showSmile !== false;
+  const showLiveStream = cmsSettings?.showLiveStream !== false && cmsSettings?.showLive !== false;
+  const showGallery = cmsSettings?.showGallery !== false;
+  const showHighlights = cmsSettings?.showHighlights !== false && cmsSettings?.showVideoHighlights !== false;
+
   const [topHovered, setTopHovered] = React.useState(false);
 
   const scrollToTop = () => {
@@ -118,7 +128,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings }) => {
               <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed max-w-md pt-2">
                 {cmsSettings?.footerDescription || (
                   <>
-                    <strong>Rendezvous Silver Edition</strong> is the flagship Imam Rabbani LIFE Festival organized by Kulliyathu Imam Rabbani, a premier off-campus institute of Markaz Garden, Poonoor.
+                    <strong>Tabassum Meelad Fest 2026</strong> is a vibrant celebration of talent, creativity, knowledge, and togetherness, proudly organized by Noorul Islam Madrasa, Jeppu, Mangalore.
                   </>
                 )}
               </p>
@@ -130,15 +140,15 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings }) => {
                 Quick Navigation
               </h4>
               <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-xs font-medium text-zinc-400">
-                <QuickLink id="hero" label="Festival Home" onNavigate={onNavigate} />
-                <QuickLink id="about" label="About & Concept" onNavigate={onNavigate} />
-                <QuickLink id="results" label="Results Standings" onNavigate={onNavigate} />
-                <QuickLink id="team-points" label="Team Points" onNavigate={onNavigate} />
-                <QuickLink id="posters" label="Winner Posters" onNavigate={onNavigate} />
-                <QuickLink id="smile" label="SMILE Photo Hub" onNavigate={onNavigate} />
-                <QuickLink id="live" label="Live Stream" onNavigate={onNavigate} />
-                <QuickLink id="gallery" label="Festival Gallery" onNavigate={onNavigate} />
-                <QuickLink id="highlights" label="Video Highlights" onNavigate={onNavigate} />
+                {showHero && <QuickLink id="hero" label="Festival Home" onNavigate={onNavigate} />}
+                {showAbout && <QuickLink id="about" label="About & Concept" onNavigate={onNavigate} />}
+                {showResults && <QuickLink id="results" label="Results Standings" onNavigate={onNavigate} />}
+                {showTeamPoints && <QuickLink id="team-points" label="Team Points" onNavigate={onNavigate} />}
+                {showPosters && <QuickLink id="posters" label="Winner Posters" onNavigate={onNavigate} />}
+                {showPhotoHub && <QuickLink id="smile" label="SMILE Photo Hub" onNavigate={onNavigate} />}
+                {showLiveStream && <QuickLink id="live" label="Live Stream" onNavigate={onNavigate} />}
+                {showGallery && <QuickLink id="gallery" label="Festival Gallery" onNavigate={onNavigate} />}
+                {showHighlights && <QuickLink id="highlights" label="Video Highlights" onNavigate={onNavigate} />}
               </ul>
             </div>
 

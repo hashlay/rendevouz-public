@@ -25,7 +25,6 @@ import {
   VIDEO_HIGHLIGHTS,
   NO_DP_AVATAR
 } from '../data/festivalData';
-import { swrFetch } from '../utils/swrFetch';
 
 const STORAGE_KEY = 'festival_cms_data_v2';
 
@@ -207,18 +206,9 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const fetchPublicData = async () => {
       try {
         const [resResults, resSettings, resCategories] = await Promise.all([
-          swrFetch<any[]>(`/api/public/results?t=${Date.now()}`, { pollInterval: 5000 }, (data) => {
-            if (Array.isArray(data)) setResults(data);
-          }),
-          swrFetch<any>(`/api/public/settings?t=${Date.now()}`, { pollInterval: 10000 }, (data) => {
-            if (data) setEventSettings(data);
-          }),
-          swrFetch<any[]>(`/api/public/categories?t=${Date.now()}`, undefined, (data) => {
-            if (Array.isArray(data)) setCategories(data);
-          }).catch(() => {
-            const cached = localStorage.getItem('swr_cache_/api/public/categories');
-            return cached ? JSON.parse(cached) : [];
-          })
+          fetch(`/api/public/results?t=${Date.now()}`).then(r => r.ok ? r.json() : []).catch(() => []),
+          fetch(`/api/public/settings?t=${Date.now()}`).then(r => r.ok ? r.json() : null).catch(() => null),
+          fetch(`/api/public/categories?t=${Date.now()}`).then(r => r.ok ? r.json() : []).catch(() => [])
         ]);
         
         if (Array.isArray(resResults)) setResults(resResults);
@@ -239,14 +229,8 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const computeHouseScores = async () => {
       try {
         const [resStandings, resUnits] = await Promise.all([
-          swrFetch<any[]>('/api/public/standings').catch(() => {
-            const cached = localStorage.getItem('swr_cache_/api/public/standings');
-            return cached ? JSON.parse(cached) : null;
-          }),
-          swrFetch<any[]>('/api/public/units').catch(() => {
-            const cached = localStorage.getItem('swr_cache_/api/public/units');
-            return cached ? JSON.parse(cached) : [];
-          })
+          fetch('/api/public/standings').then(r => r.ok ? r.json() : []).catch(() => []),
+          fetch('/api/public/units').then(r => r.ok ? r.json() : []).catch(() => [])
         ]);
 
         const units = Array.isArray(resUnits) ? resUnits : [];

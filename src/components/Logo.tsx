@@ -56,10 +56,16 @@ export const Logo: React.FC<LogoProps> = ({
       {/* Wave Icon */}
       {showIcon && (
         <div className="relative group shrink-0 flex items-center justify-center">
-          {customIconUrl || '/madrasa_logo.png' ? (
+          {customIconUrl || '/tabassum_logo.jpg' ? (
             <img 
-              src={customIconUrl || '/madrasa_logo.png'} 
-              alt="Logo Icon" 
+              src={customIconUrl || '/tabassum_logo.jpg'} 
+              alt="Tabassum Meelad Fest Logo" 
+              onError={(e) => {
+                const target = e.currentTarget;
+                if (target.src.includes('tabassum_logo.jpg')) {
+                  target.src = '/tabassum_logo.png';
+                }
+              }}
               className="object-contain drop-shadow-2xl transition-transform duration-500 group-hover:scale-105" 
               style={{ width: iconWidth, height: iconHeight, borderRadius: '50%' }} 
             />

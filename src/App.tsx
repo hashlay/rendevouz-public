@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { FestivalProvider, useFestival } from './context/FestivalContext';
 import { Category } from './types';
-import { swrFetch } from './utils/swrFetch';
 
 import { Header } from './components/Header';
 import { HeroSection } from './components/HeroSection';
@@ -124,9 +123,16 @@ function PublicWebsiteContent({ onSwitchToApp }: { onSwitchToApp: (mode: 'worksp
       }
     };
 
-    swrFetch(`/api/public/cms?t=${Date.now()}`, { pollInterval: 2500 }, applyCMSData)
-      .then(applyCMSData)
-      .catch(err => console.error('Failed to load CMS data:', err));
+    const fetchCMSData = () => {
+      fetch(`/api/public/cms?t=${Date.now()}`)
+        .then(res => res.ok ? res.json() : Promise.reject(res))
+        .then(applyCMSData)
+        .catch(err => console.error('Failed to load CMS data:', err));
+    };
+
+    fetchCMSData();
+    const interval = setInterval(fetchCMSData, 2500);
+    return () => clearInterval(interval);
   }, []);
 
   // Push history state whenever a modal opens so back gestures close the modal & return home
