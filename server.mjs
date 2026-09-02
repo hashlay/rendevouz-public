@@ -36,6 +36,8 @@ const configureCloudinary = () => {
 const uploadDir = os.tmpdir();
 const upload = multer({ dest: uploadDir, limits: { fileSize: 1024 * 1024 * 500 } });
 
+app.set('etag', false);
+
 // Enable CORS & HTTP caching headers for optimized asset delivery
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -45,7 +47,10 @@ app.use((req, res, next) => {
     if (req.url.match(/\.(jpg|jpeg|png|webp|svg|gif|mp4|webm|woff2)$/i)) {
       res.header('Cache-Control', 'public, max-age=31536000, immutable');
     } else if (req.url.startsWith('/api/')) {
-      res.header('Cache-Control', 'no-cache');
+      res.header('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+      res.header('Pragma', 'no-cache');
+      res.header('Expires', '0');
+      res.header('Surrogate-Control', 'no-store');
     }
   }
   if (req.method === 'OPTIONS') {
