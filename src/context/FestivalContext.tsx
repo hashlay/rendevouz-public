@@ -228,9 +228,10 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   useEffect(() => {
     const computeHouseScores = async () => {
       try {
+        const ts = Date.now();
         const [resStandings, resUnits] = await Promise.all([
-          fetch('/api/public/standings').then(r => r.ok ? r.json() : []).catch(() => []),
-          fetch('/api/public/units').then(r => r.ok ? r.json() : []).catch(() => [])
+          fetch(`/api/public/standings?t=${ts}`).then(r => r.ok ? r.json() : []).catch(() => []),
+          fetch(`/api/public/units?t=${ts}`).then(r => r.ok ? r.json() : []).catch(() => [])
         ]);
 
         const units = Array.isArray(resUnits) ? resUnits : [];
