@@ -69,14 +69,6 @@ app.use('/api', async (req, res, next) => {
   }
 
   const cleanAdminUrl = adminUrl.trim().replace(/\/$/, '');
-  const reqHost = (req.headers.host || '').toLowerCase();
-  const targetHost = cleanAdminUrl.replace(/^https?:\/\//, '').toLowerCase();
-
-  // Prevent self-proxying infinite loop
-  if (reqHost && (reqHost === targetHost || targetHost.includes(reqHost) || reqHost.includes(targetHost))) {
-    return next();
-  }
-
   const targetUrl = `${cleanAdminUrl}/api${req.url}`;
 
   try {
@@ -94,11 +86,6 @@ app.use('/api', async (req, res, next) => {
     }
 
     const proxyRes = await fetch(targetUrl, fetchOptions);
-    if (!proxyRes.ok && proxyRes.status >= 500) {
-      console.warn(`Vercel Proxy received ${proxyRes.status} from ${targetUrl}, falling back to local handler.`);
-      return next();
-    }
-
     res.status(proxyRes.status);
 
     proxyRes.headers.forEach((val, key) => {
