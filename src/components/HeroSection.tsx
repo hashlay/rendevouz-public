@@ -16,12 +16,23 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
   const [desktopIndex, setDesktopIndex] = React.useState(0);
   const [mobileIndex, setMobileIndex] = React.useState(0);
   
-  const customDesktop = propHeroMedia?.filter(m => m.device !== 'mobile').sort((a,b) => (a.order || 0) - (b.order || 0)).map(m => m.url) || [];
-  const customMobile = propHeroMedia?.filter(m => m.device !== 'desktop').sort((a,b) => (a.order || 0) - (b.order || 0)).map(m => m.url) || [];
+  const customDesktop = propHeroMedia?.filter(m => m.device !== 'mobile').sort((a,b) => (a.order || 0) - (b.order || 0)).map(m => m.url).filter((url): url is string => Boolean(url && typeof url === 'string' && url.trim().length > 0)) || [];
+  const customMobile = propHeroMedia?.filter(m => m.device !== 'desktop').sort((a,b) => (a.order || 0) - (b.order || 0)).map(m => m.url).filter((url): url is string => Boolean(url && typeof url === 'string' && url.trim().length > 0)) || [];
   
-  // Directly use uploaded media. No hardcoded fallbacks.
+  // Directly use uploaded media. Fallback to default responsive video if zero custom images.
   const desktopImages = customDesktop;
   const mobileImages = customMobile;
+  const hasCustomDesktop = desktopImages.length > 0;
+  const hasCustomMobile = mobileImages.length > 0;
+
+  const handleVideoRef = (el: HTMLVideoElement | null) => {
+    if (el) {
+      el.muted = true;
+      el.play().catch(() => {
+        // Autoplay restricted fallback - hero background remains visible
+      });
+    }
+  };
   
   React.useEffect(() => {
     if (desktopImages.length <= 1 || cmsSettings?.heroDesktopLoopEnabled === false) return;
@@ -43,45 +54,77 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
     <section id="hero" className="relative min-h-[85vh] sm:min-h-screen pt-20 sm:pt-28 pb-12 sm:pb-16 flex items-center justify-center overflow-hidden bg-[#0D0D0D]">
       {/* 
         Hero Background Layer:
-        - Mobile (<768px): Normal static background image fitted to screen (No looping/video on mobile as requested).
-        - Desktop (>=768px): Continuous cycling video/photo media loop.
+        - Priority 1: Admin-uploaded hero images / slideshow carousel
+        - Priority 2: Default responsive video background (Mobile <768px vs Desktop >=768px)
       */}
       
       {/* Mobile Background (<768px) */}
       <div className="block md:hidden absolute inset-0 z-0 overflow-hidden">
-        {mobileImages.map((url: string, index: number) => (
-          <div
-            key={url + index}
-            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-              index === mobileIndex ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
-            }`}
+        {hasCustomMobile ? (
+          mobileImages.map((url: string, index: number) => (
+            <div
+              key={url + index}
+              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                index === mobileIndex ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
+              }`}
+            >
+              <img
+                src={url}
+                alt="Festival Background Mobile"
+                className="w-full h-full object-cover object-center brightness-90 contrast-105"
+              />
+            </div>
+          ))
+        ) : (
+          <video
+            ref={handleVideoRef}
+            autoPlay
+            muted
+            loop
+            playsInline
+            controls={false}
+            preload="metadata"
+            className="w-full h-full object-cover object-center pointer-events-none brightness-90 contrast-105 motion-reduce:hidden"
+            style={{ pointerEvents: 'none' }}
           >
-            <img
-              src={url}
-              alt="Festival Background Mobile"
-              className="w-full h-full object-cover object-center brightness-90 contrast-105"
-            />
-          </div>
-        ))}
+            <source src="/videos/tabassum-hero-mobile.mp4" type="video/mp4" />
+          </video>
+        )}
         <div className="absolute inset-0 z-10 bg-gradient-to-t from-[#0D0D0D] via-[#0D0D0D]/60 to-black/30 pointer-events-none" />
       </div>
 
       {/* Desktop Cycling Media Loop (>=768px) */}
       <div className="hidden md:block absolute inset-0 z-0 overflow-hidden">
-        {desktopImages.map((url: string, index: number) => (
-          <div
-            key={url + index}
-            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-              index === desktopIndex ? 'opacity-100 scale-100 z-10' : 'opacity-0 scale-105 z-0 pointer-events-none'
-            }`}
+        {hasCustomDesktop ? (
+          desktopImages.map((url: string, index: number) => (
+            <div
+              key={url + index}
+              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                index === desktopIndex ? 'opacity-100 scale-100 z-10' : 'opacity-0 scale-105 z-0 pointer-events-none'
+              }`}
+            >
+              <img
+                src={url}
+                alt="Festival Background Desktop"
+                className="w-full h-full object-cover object-center brightness-100 opacity-100 transform scale-100 transition-transform duration-1000"
+              />
+            </div>
+          ))
+        ) : (
+          <video
+            ref={handleVideoRef}
+            autoPlay
+            muted
+            loop
+            playsInline
+            controls={false}
+            preload="metadata"
+            className="w-full h-full object-cover object-center pointer-events-none brightness-100 opacity-90 motion-reduce:hidden"
+            style={{ pointerEvents: 'none' }}
           >
-            <img
-              src={url}
-              alt="Festival Background Desktop"
-              className="w-full h-full object-cover object-center brightness-100 opacity-100 transform scale-100 transition-transform duration-1000"
-            />
-          </div>
-        ))}
+            <source src="/videos/tabassum-hero-desktop.mp4" type="video/mp4" />
+          </video>
+        )}
 
         {/* Minimal Bottom Vignette to Ensure Readable Text */}
         <div className="absolute inset-0 z-10 bg-gradient-to-t from-[#0D0D0D] via-[#0D0D0D]/30 to-black/20 pointer-events-none" />
