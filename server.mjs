@@ -175,10 +175,11 @@ async function getDbState() {
     ]);
 
     settingsDocs.forEach(s => {
-      if (s._id === 'eventSettings') state.eventSettings = { ...state.eventSettings, ...s };
-      if (s._id === 'cmsSettings') state.cmsSettings = { ...state.cmsSettings, ...s };
-      if (s._id === 'posterTemplateConfig') state.posterTemplateConfig = s;
-      if (s._id === 'certificateTemplateConfig') state.certificateTemplateConfig = s;
+      const { _id, ...rest } = s;
+      if (_id === 'eventSettings') state.eventSettings = { ...state.eventSettings, ...rest };
+      if (_id === 'cmsSettings') state.cmsSettings = { ...rest };
+      if (_id === 'posterTemplateConfig') state.posterTemplateConfig = { ...rest };
+      if (_id === 'certificateTemplateConfig') state.certificateTemplateConfig = { ...rest };
     });
 
     const dedupeDocs = (docs) => {
