@@ -44,15 +44,24 @@ const SocialLink = ({ href, label, children }: { href: string; label: string; ch
 };
 
 export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings }) => {
-  const showHero = cmsSettings?.showHero !== false;
-  const showAbout = cmsSettings?.showAbout !== false;
-  const showResults = cmsSettings?.showResults !== false;
-  const showTeamPoints = cmsSettings?.showTeamPoints !== false;
-  const showPosters = cmsSettings?.showPosters !== false;
-  const showPhotoHub = cmsSettings?.showPhotoHub !== false && cmsSettings?.showSmile !== false;
-  const showLiveStream = cmsSettings?.showLiveStream !== false && cmsSettings?.showLive !== false;
-  const showGallery = cmsSettings?.showGallery !== false;
-  const showHighlights = cmsSettings?.showHighlights !== false && cmsSettings?.showVideoHighlights !== false;
+  const isTypeEnabled = (type: string): boolean => {
+    const blocks = cmsSettings?.dragBlocks || cmsSettings?.eventSettings?.dragBlocks;
+    if (Array.isArray(blocks) && blocks.length > 0) {
+      const found = blocks.find((b: any) => b.type === type);
+      if (found !== undefined) return !!found.enabled;
+    }
+    return true;
+  };
+
+  const showHero = isTypeEnabled('hero') && cmsSettings?.showHero !== false;
+  const showAbout = isTypeEnabled('about') && cmsSettings?.showAbout !== false;
+  const showResults = isTypeEnabled('results') && cmsSettings?.showResults !== false;
+  const showTeamPoints = isTypeEnabled('results') && cmsSettings?.showTeamPoints !== false;
+  const showPosters = isTypeEnabled('announcements') && cmsSettings?.showPosters !== false;
+  const showPhotoHub = isTypeEnabled('smile') && cmsSettings?.showPhotoHub !== false && cmsSettings?.showSmile !== false;
+  const showLiveStream = isTypeEnabled('live_stages') && cmsSettings?.showLiveStream !== false && cmsSettings?.showLive !== false;
+  const showGallery = isTypeEnabled('gallery') && cmsSettings?.showGallery !== false;
+  const showHighlights = isTypeEnabled('highlights') && cmsSettings?.showHighlights !== false && cmsSettings?.showVideoHighlights !== false;
 
   const [topHovered, setTopHovered] = React.useState(false);
 
