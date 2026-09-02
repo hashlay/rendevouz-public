@@ -290,7 +290,7 @@ function PublicWebsiteContent({ onSwitchToApp }: { onSwitchToApp: (mode: 'worksp
         )}
       </main>
 
-      <Footer onNavigate={handleNavigate} cmsSettings={cmsData?.cmsSettings} />
+      <Footer onNavigate={handleNavigate} cmsSettings={cmsData?.cmsSettings} dragBlocks={cmsData?.dragBlocks} />
 
       <FullConceptModal
         isOpen={isConceptModalOpen}
