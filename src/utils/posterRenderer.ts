@@ -4,6 +4,46 @@ function getBgHash(url: string): string {
   return `hash_${url.length}_${url.slice(-30)}`;
 }
 
+/**
+ * Fixed team font colors for Posters Section:
+ * - Ash-shukr: Dark Blue (#2b2bc3)
+ * - As-sabr: Dark Green (#1b5e20)
+ * Applies across all themes by default.
+ */
+export const getPosterTeamColor = (unitOrTeamName?: string, defaultColor: string = '#34d399'): string => {
+  if (!unitOrTeamName) return defaultColor;
+  const str = unitOrTeamName.toString().trim().toLowerCase();
+  const normalized = str.replace(/[\s\-_]/g, '');
+
+  // Ash-shukr: Dark Blue #2b2bc3
+  if (
+    normalized.includes('shukr') ||
+    normalized.includes('shukur') ||
+    normalized.includes('shukoor') ||
+    normalized.includes('ശുക്') ||
+    normalized.includes('ശുക്കൂർ') ||
+    normalized === 'shk' ||
+    str === 'shk'
+  ) {
+    return '#2b2bc3';
+  }
+
+  // As-sabr: Dark Green #1b5e20
+  if (
+    normalized.includes('sabr') ||
+    normalized.includes('sabar') ||
+    normalized.includes('സ്വബ്') ||
+    normalized.includes('സബ്ർ') ||
+    normalized.includes('സ്വബർ') ||
+    normalized === 'sbr' ||
+    str === 'sbr'
+  ) {
+    return '#1b5e20';
+  }
+
+  return defaultColor;
+};
+
 export function getDefaultThemeConfig(): any {
 
   return {
@@ -160,6 +200,10 @@ export const renderPosterToCanvas = async (
 
   const getThemeIndexForResult = (resultNum: number, catName?: string, catId?: string): number => {
     const rule = themeRules.find((r: any) => {
+      if (r.type === 'singleResult' || r.type === 'single') {
+        const targetNum = Number(r.resultNumber ?? r.startResult);
+        return resultNum === targetNum;
+      }
       if (r.type === 'category' || r.categoryId || r.categoryName) {
         if (catId && r.categoryId && r.categoryId === catId) return true;
         if (catName && (r.categoryName || r.category)) {
@@ -319,85 +363,107 @@ export const renderPosterToCanvas = async (
     });
     addRegion('compName', compX - 10, compY - (c.compNameSize ?? 52) - 5, maxCompW + 20, (compLines.length * compGap) + 10);
 
-    // Draw each rank with per-rank positions
+    // Draw each rank with per-rank positions (supports multiple tied winners per rank)
     [1, 2, 3].forEach((rank) => {
-      const res = compResults.find(r => r.rank === rank);
+      const rankWinners = (compResults || []).filter(r => r.rank === rank);
+      const hasRank1Override = !!(c[`rank${rank}NameOverride`] || c[`rank${rank}UnitOverride`]);
+      const hasRank2Override = !!(c[`rank${rank}_2_NameOverride`] || c[`rank${rank}_2_UnitOverride`]);
 
-      const overrideName = c[`rank${rank}NameOverride`];
-      const hasNameOverride = overrideName !== undefined && overrideName !== '';
-      
-      const overrideUnit = c[`rank${rank}UnitOverride`];
-      const hasUnitOverride = overrideUnit !== undefined && overrideUnit !== '';
+      const winnerCount = Math.max(rankWinners.length, hasRank2Override ? 2 : hasRank1Override ? 1 : 0);
+      if (winnerCount === 0) return;
 
-      if (!res && !hasNameOverride && !hasUnitOverride) return;
+      for (let wIdx = 0; wIdx < Math.max(winnerCount, 1); wIdx++) {
+        const res = rankWinners[wIdx];
+        const isSecond = wIdx === 1;
+        const nameOverrideKey = isSecond ? `rank${rank}_2_NameOverride` : `rank${rank}NameOverride`;
+        const unitOverrideKey = isSecond ? `rank${rank}_2_UnitOverride` : `rank${rank}UnitOverride`;
 
-      const rawWinnerName = hasNameOverride ? overrideName : (res?.participantName || 'Participant Name');
-      const winnerName = c.winnerUppercase === false && !c.uppercaseNames ? rawWinnerName : rawWinnerName.toUpperCase();
+        const overrideName = c[nameOverrideKey];
+        const hasNameOverride = overrideName !== undefined && overrideName !== '';
+        
+        const overrideUnit = c[unitOverrideKey];
+        const hasUnitOverride = overrideUnit !== undefined && overrideUnit !== '';
 
-      const rawWinnerUnit = hasUnitOverride ? overrideUnit : (res?.department || res?.unitName || 'Unit Name');
-      const winnerUnit = c.unitUppercase !== false ? rawWinnerUnit.toUpperCase() : rawWinnerUnit;
+        if (!res && !hasNameOverride && !hasUnitOverride && wIdx > 0) continue;
 
-      const bx = c[`rank${rank}BadgeX`] ?? 140;
-      const by = c[`rank${rank}BadgeY`] ?? (460 + (rank - 1) * 180);
-      const nx = c[`rank${rank}NameX`] ?? 260;
-      const ny = c[`rank${rank}NameY`] ?? (448 + (rank - 1) * 180);
-      const ux = c[`rank${rank}UnitX`];
-      const uy = c[`rank${rank}UnitY`];
+        const rawWinnerName = hasNameOverride ? overrideName : (res?.participantName || 'Participant Name');
+        const winnerName = c.winnerUppercase === false && !c.uppercaseNames ? rawWinnerName : rawWinnerName.toUpperCase();
 
-      const rColor = rank === 1 ? c.rank1Color : rank === 2 ? c.rank2Color : c.rank3Color;
-      const rankText = rank === 1 ? c.rank1Text : rank === 2 ? c.rank2Text : c.rank3Text;
+        const rawWinnerUnit = hasUnitOverride ? overrideUnit : (res?.department || res?.unitName || 'Unit Name');
+        const winnerUnit = c.unitUppercase !== false ? rawWinnerUnit.toUpperCase() : rawWinnerUnit;
 
-      // Rank badge
-      ctx.font = `900 ${c.rankSize}px ${c.rankFont || c.fontFamily || 'sans-serif'}`;
-      const textWidth = ctx.measureText(rankText).width;
+        const defaultYOffset = isSecond ? 80 : 0;
+        const baseBadgeY = c[`rank${rank}BadgeY`] ?? (460 + (rank - 1) * 180);
+        const bx = isSecond ? (c[`rank${rank}_2_BadgeX`] ?? (c[`rank${rank}BadgeX`] ?? 140)) : (c[`rank${rank}BadgeX`] ?? 140);
+        const by = isSecond ? (c[`rank${rank}_2_BadgeY`] ?? (baseBadgeY + defaultYOffset)) : baseBadgeY;
 
-      if (c.rankBadgeShape !== 'none') {
-        ctx.fillStyle = rColor;
-        ctx.beginPath();
-        if (c.rankBadgeShape === 'pill') {
-          ctx.roundRect(bx - (textWidth / 2) - 20, by - 37, textWidth + 40, 50, 25);
-        } else if (c.rankBadgeShape === 'circle') {
-          ctx.arc(bx, by - 12, 40, 0, 2 * Math.PI);
-        } else {
-          ctx.rect(bx - (textWidth / 2) - 20, by - 37, textWidth + 40, 50);
+        const baseNameY = c[`rank${rank}NameY`] ?? (448 + (rank - 1) * 180);
+        const nx = isSecond ? (c[`rank${rank}_2_NameX`] ?? (c[`rank${rank}NameX`] ?? 260)) : (c[`rank${rank}NameX`] ?? 260);
+        const ny = isSecond ? (c[`rank${rank}_2_NameY`] ?? (baseNameY + defaultYOffset)) : baseNameY;
+
+        const baseUnitY = c[`rank${rank}UnitY`] ?? (483 + (rank - 1) * 180);
+        const ux = isSecond ? (c[`rank${rank}_2_UnitX`] ?? (c[`rank${rank}UnitX`] ?? 260)) : (c[`rank${rank}UnitX`] ?? 260);
+        const uy = isSecond ? (c[`rank${rank}_2_UnitY`] ?? (baseUnitY + defaultYOffset)) : baseUnitY;
+
+        const rColor = rank === 1 ? c.rank1Color : rank === 2 ? c.rank2Color : c.rank3Color;
+        const rankText = rank === 1 ? c.rank1Text : rank === 2 ? c.rank2Text : c.rank3Text;
+
+        const badgeRegionId = isSecond ? `rank${rank}_2_Badge` : `rank${rank}Badge`;
+        const nameRegionId = isSecond ? `rank${rank}_2_Name` : `rank${rank}Name`;
+        const unitRegionId = isSecond ? `rank${rank}_2_Unit` : `rank${rank}Unit`;
+
+        // Rank badge (drawn twice if tied, exactly like reference)
+        ctx.font = `900 ${c.rankSize}px ${c.rankFont || c.fontFamily || 'sans-serif'}`;
+        const textWidth = ctx.measureText(rankText).width;
+
+        if (c.rankBadgeShape !== 'none') {
+          ctx.fillStyle = rColor;
+          ctx.beginPath();
+          if (c.rankBadgeShape === 'pill') {
+            ctx.roundRect(bx - (textWidth / 2) - 20, by - 37, textWidth + 40, 50, 25);
+          } else if (c.rankBadgeShape === 'circle') {
+            ctx.arc(bx, by - 12, 40, 0, 2 * Math.PI);
+          } else {
+            ctx.rect(bx - (textWidth / 2) - 20, by - 37, textWidth + 40, 50);
+          }
+          ctx.fill();
         }
-        ctx.fill();
+
+        ctx.fillStyle = c.rankTextColor || '#000000';
+        ctx.textAlign = 'center';
+        ctx.fillText(rankText, bx, by);
+        addRegion(badgeRegionId, bx - textWidth / 2 - 25, by - 42, textWidth + 50, 60);
+
+        // Winner name (supports multi-line \n)
+        ctx.textAlign = 'left';
+        ctx.font = `800 ${c.winnerSize}px ${c.winnerFont || c.fontFamily || 'sans-serif'}`;
+        ctx.fillStyle = c.winnerColor;
+        const nameLines = winnerName.split('\n').filter(Boolean);
+        const nameGap = (c.winnerSize ?? 44) * 1.15;
+        let maxNameW = 0;
+        nameLines.forEach((line: string, i: number) => {
+          ctx.fillText(line, nx, ny + i * nameGap);
+          const w = ctx.measureText(line).width;
+          if (w > maxNameW) maxNameW = w;
+        });
+        addRegion(nameRegionId, nx - 5, ny - (c.winnerSize ?? 44) - 5, maxNameW + 10, (nameLines.length * nameGap) + 10);
+
+        // Unit name (supports multi-line \n)
+        ctx.font = `700 ${c.unitSize}px ${c.unitFont || 'monospace'}`;
+        ctx.fillStyle = getPosterTeamColor(rawWinnerUnit || winnerUnit, c.unitColor);
+        const unitText = winnerUnit;
+        const unitLines = unitText.split('\n').filter(Boolean);
+        const unitGap = (c.unitSize ?? 30) * 1.15;
+        const calcUx = nx; 
+        const calcUy = ny + (nameLines.length * nameGap) + 5;
+        let maxUnitW = 0;
+        unitLines.forEach((line: string, i: number) => {
+          ctx.fillText(line, ux ?? calcUx, (uy ?? calcUy) + i * unitGap);
+          const w = ctx.measureText(line).width;
+          if (w > maxUnitW) maxUnitW = w;
+        });
+        addRegion(unitRegionId, (ux ?? calcUx) - 5, (uy ?? calcUy) - (c.unitSize ?? 30) - 5, maxUnitW + 10, (unitLines.length * unitGap) + 10);
       }
-
-      ctx.fillStyle = c.rankTextColor || '#000000';
-      ctx.textAlign = 'center';
-      ctx.fillText(rankText, bx, by);
-      addRegion(`rank${rank}Badge`, bx - textWidth / 2 - 25, by - 42, textWidth + 50, 60);
-
-      // Winner name (supports multi-line \n)
-      ctx.textAlign = 'left';
-      ctx.font = `800 ${c.winnerSize}px ${c.winnerFont || c.fontFamily || 'sans-serif'}`;
-      ctx.fillStyle = c.winnerColor;
-      const nameLines = winnerName.split('\n').filter(Boolean);
-      const nameGap = (c.winnerSize ?? 44) * 1.15;
-      let maxNameW = 0;
-      nameLines.forEach((line: string, i: number) => {
-        ctx.fillText(line, nx, ny + i * nameGap);
-        const w = ctx.measureText(line).width;
-        if (w > maxNameW) maxNameW = w;
-      });
-      addRegion(`rank${rank}Name`, nx - 5, ny - (c.winnerSize ?? 44) - 5, maxNameW + 10, (nameLines.length * nameGap) + 10);
-
-      // Unit name (supports multi-line \n)
-      ctx.font = `700 ${c.unitSize}px ${c.unitFont || 'monospace'}`;
-      ctx.fillStyle = c.unitColor;
-      const unitText = winnerUnit;
-      const unitLines = unitText.split('\n').filter(Boolean);
-      const unitGap = (c.unitSize ?? 30) * 1.15;
-      const calcUx = nx; 
-      const calcUy = ny + (nameLines.length * nameGap) + 5;
-      let maxUnitW = 0;
-      unitLines.forEach((line: string, i: number) => {
-        ctx.fillText(line, ux ?? calcUx, (uy ?? calcUy) + i * unitGap);
-        const w = ctx.measureText(line).width;
-        if (w > maxUnitW) maxUnitW = w;
-      });
-      addRegion(`rank${rank}Unit`, (ux ?? calcUx) - 5, (uy ?? calcUy) - (c.unitSize ?? 30) - 5, maxUnitW + 10, (unitLines.length * unitGap) + 10);
     });
 
     // Footer

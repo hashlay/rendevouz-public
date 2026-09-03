@@ -10,6 +10,38 @@ const body2 = 'export function migrateOldConfig' + content.split('function migra
 const overlayLogicStr = content.split('const drawPosterOverlay = (ctx: CanvasRenderingContext2D, W: number, H: number, compIdx: number, themeIdx: number) => {')[1].split('hitRegions.current = regions;')[0];
 
 const finalFile = `
+export const getPosterTeamColor = (unitOrTeamName?: string, defaultColor: string = '#34d399'): string => {
+  if (!unitOrTeamName) return defaultColor;
+  const str = unitOrTeamName.toString().trim().toLowerCase();
+  const normalized = str.replace(/[\\s\\-_]/g, '');
+
+  if (
+    normalized.includes('shukr') ||
+    normalized.includes('shukur') ||
+    normalized.includes('shukoor') ||
+    normalized.includes('ശുക്') ||
+    normalized.includes('ശുക്കൂർ') ||
+    normalized === 'shk' ||
+    str === 'shk'
+  ) {
+    return '#2b2bc3';
+  }
+
+  if (
+    normalized.includes('sabr') ||
+    normalized.includes('sabar') ||
+    normalized.includes('സ്വബ്') ||
+    normalized.includes('സബ്ർ') ||
+    normalized.includes('സ്വബർ') ||
+    normalized === 'sbr' ||
+    str === 'sbr'
+  ) {
+    return '#1b5e20';
+  }
+
+  return defaultColor;
+};
+
 export function getDefaultThemeConfig(): any {
 ` + defaultThemeConfigBody + '\n' + body2 + `
 
