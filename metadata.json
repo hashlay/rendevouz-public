@@ -1,6 +1,8 @@
 {
-  "name": "Rendezvous Silver Edition - Imam Rabbani LIFE Festival",
-  "description": "Official festival portal for Rendezvous Silver Edition – Imam Rabbani LIFE Festival organized by Kulliyathu Imam Rabbani, Markaz Garden Poonoor.",
+  "name": "Tabassum Meelad Fest 2k26",
+  "description": "Official festival portal for Tabassum Meelad Fest 2k26",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }
