@@ -22,6 +22,8 @@ export const getPosterTeamColor = (unitOrTeamName?: string, defaultColor: string
     normalized.includes('shukoor') ||
     normalized.includes('ശുക്') ||
     normalized.includes('ശുക്കൂർ') ||
+    normalized.includes('شكر') ||
+    normalized.includes('الشكر') ||
     normalized === 'shk' ||
     str === 'shk'
   ) {
@@ -35,6 +37,8 @@ export const getPosterTeamColor = (unitOrTeamName?: string, defaultColor: string
     normalized.includes('സ്വബ്') ||
     normalized.includes('സബ്ർ') ||
     normalized.includes('സ്വബർ') ||
+    normalized.includes('صبر') ||
+    normalized.includes('الصبر') ||
     normalized === 'sbr' ||
     str === 'sbr'
   ) {
@@ -42,6 +46,45 @@ export const getPosterTeamColor = (unitOrTeamName?: string, defaultColor: string
   }
 
   return defaultColor;
+};
+
+export const getPosterDisplayUnitName = (unitOrTeamName?: string, config?: any): string => {
+  if (!unitOrTeamName) return '';
+  if (!config || config.unitLanguage !== 'ar') return unitOrTeamName;
+
+  const raw = unitOrTeamName.toString().trim();
+  const normalized = raw.toLowerCase().replace(/[\s\-_]/g, '');
+
+  const customNames = config.unitArabicNames || {};
+
+  // Exact custom override match
+  if (customNames[raw]) return customNames[raw];
+
+  // Shukr matching
+  if (
+    normalized.includes('shukr') ||
+    normalized.includes('shukur') ||
+    normalized.includes('shukoor') ||
+    normalized.includes('ശുക്') ||
+    normalized.includes('ശുക്കൂർ') ||
+    normalized === 'shk'
+  ) {
+    return customNames['Ash-Shukr'] || 'الشكر';
+  }
+
+  // Sabr matching
+  if (
+    normalized.includes('sabr') ||
+    normalized.includes('sabar') ||
+    normalized.includes('സ്വബ്') ||
+    normalized.includes('സബ്ർ') ||
+    normalized.includes('സ്വബർ') ||
+    normalized === 'sbr'
+  ) {
+    return customNames['As-Sabr'] || 'الصبر';
+  }
+
+  return raw;
 };
 
 export function getDefaultThemeConfig(): any {
@@ -114,6 +157,13 @@ export function getDefaultThemeConfig(): any {
     compNameUppercase: false,
     winnerUppercase: false,
     unitUppercase: true,
+
+    // Language / Arabic options for Units/Teams
+    unitLanguage: 'en', // 'en' | 'ar'
+    unitArabicNames: {
+      'Ash-Shukr': 'الشكر',
+      'As-Sabr': 'الصبر',
+    },
   };
 }
 
@@ -465,9 +515,12 @@ export const renderPosterToCanvas = async (
         addRegion(nameRegionId, nx - 5, ny - (c.winnerSize ?? 44) - 5, maxNameW + 10, (nameLines.length * nameGap) + 10);
 
         // Unit name (supports multi-line \n)
-        ctx.font = `700 ${c.unitSize}px ${c.unitFont || 'monospace'}`;
+        const isArabic = c.unitLanguage === 'ar';
+        const arabicFont = (c.unitFont && c.unitFont !== 'monospace') ? c.unitFont : 'Cairo, Amiri, sans-serif';
+        ctx.font = `700 ${c.unitSize}px ${isArabic ? arabicFont : (c.unitFont || 'monospace')}`;
         ctx.fillStyle = getPosterTeamColor(rawWinnerUnit || winnerUnit, c.unitColor);
-        const unitText = winnerUnit;
+        const displayUnitName = getPosterDisplayUnitName(rawWinnerUnit || winnerUnit, c);
+        const unitText = isArabic ? displayUnitName : (c.unitUppercase !== false ? displayUnitName.toUpperCase() : displayUnitName);
         const unitLines = unitText.split('\n').filter(Boolean);
         const unitGap = (c.unitSize ?? 30) * 1.15;
         const calcUx = nx; 
