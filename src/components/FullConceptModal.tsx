@@ -27,7 +27,7 @@ export const FullConceptModal: React.FC<FullConceptModalProps> = ({ isOpen, onCl
 
         {/* Header */}
         <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest mb-2" style={{ color: primaryColor }}>
-          <span>{cmsSettings?.conceptModalBadge || 'Theme Concept & Philosophy'}</span>
+          <span>{cmsSettings?.conceptModalBadge || (FULL_CONCEPT_TEXT as any).badge || 'Theme Concept & Philosophy'}</span>
         </div>
 
         <h2 className="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight mb-2">
@@ -51,7 +51,7 @@ export const FullConceptModal: React.FC<FullConceptModalProps> = ({ isOpen, onCl
         <div className="mt-8 pt-6 border-t border-white/10 flex flex-wrap items-center justify-between gap-4 text-xs font-mono text-zinc-400">
           <div className="flex items-center gap-2">
             <ShieldCheck className="w-4 h-4" style={{ color: primaryColor }} />
-            <span>{cmsSettings?.conceptModalFooter || 'Noorul Islam Madrasa, Jeppu'}</span>
+            <span>{cmsSettings?.conceptModalFooter || (FULL_CONCEPT_TEXT as any).footer || 'Tabassum Meelad Fest'}</span>
           </div>
           <button
             onClick={onClose}

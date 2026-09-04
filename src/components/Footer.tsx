@@ -26,11 +26,17 @@ const QuickLink = ({ id, label, onNavigate }: { id: string; label: string; onNav
   );
 };
 
+const ensureAbsoluteUrl = (url?: string) => {
+  if (!url) return '#';
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('//') || url.startsWith('mailto:') || url.startsWith('tel:')) return url;
+  return `https://${url}`;
+};
+
 const SocialLink = ({ href, label, children }: { href: string; label: string; children: React.ReactNode }) => {
   const [hovered, setHovered] = React.useState(false);
   return (
     <a
-      href={href}
+      href={ensureAbsoluteUrl(href)}
       target="_blank"
       rel="noreferrer"
       onMouseEnter={() => setHovered(true)}
@@ -129,19 +135,15 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings, dragBlo
                   <Logo
                     size="lg"
                     variant="full"
-                    title={cmsSettings?.footerLogoTitle}
-                    subtitle={cmsSettings?.footerLogoSubtitle}
-                    badge={cmsSettings?.footerLogoBadge}
-                    customIconUrl={cmsSettings?.footerLogo}
+                    title={cmsSettings?.footerLogoTitle || 'TABASSUM'}
+                    subtitle={cmsSettings?.footerLogoSubtitle || 'Meelad Fest'}
+                    badge={cmsSettings?.footerLogoBadge || 'NOORUL ISLAM MADRASA'}
+                    customIconUrl={cmsSettings?.footerLogo || '/tabassum_logo.jpg'}
                   />
                 </div>
               </div>
               <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed max-w-md pt-2">
-                {cmsSettings?.footerDescription || (
-                  <>
-                    <strong>Tabassum Meelad Fest 2026</strong> is a vibrant celebration of talent, creativity, knowledge, and togetherness, proudly organized by Noorul Islam Madrasa, Jeppu, Mangalore.
-                  </>
-                )}
+                {cmsSettings?.footerDescription || 'Tabassum Meelad Fest 2026 is a vibrant celebration of talent, creativity, knowledge, and togetherness, proudly organized by Noorul Islam Madrasa, Jeppu, Mangalore, bringing students together through meaningful learning, healthy competition, and shared values.'}
               </p>
             </div>
 
@@ -205,7 +207,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings, dragBlo
 
           {/* Bottom Bar */}
           <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-zinc-500">
-            <p>{cmsSettings?.footerText || '© 2025 Kulliyathu Imam Rabbani (Markaz Garden Off-Campus). All rights reserved.'}</p>
+            <p>{cmsSettings?.footerText || cmsSettings?.copyrightText || '© 2026 Noorul Islam Madrasa Jeppu. All rights reserved. Developed by Zenith.'}</p>
 
             <button
               onClick={scrollToTop}

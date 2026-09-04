@@ -25,7 +25,7 @@ export const Logo: React.FC<LogoProps> = ({
 }) => {
   const displayTitle = (title !== undefined && title !== null && title !== '') ? title : 'TABASSUM';
   const displaySubtitle = (subtitle !== undefined && subtitle !== null && subtitle !== '') ? subtitle : 'MEELAD FEST';
-  const displayBadge = (badge !== undefined && badge !== null && badge !== '') ? badge : 'Noorul Islam Madrasa, Jeppu';
+  const displayBadge = (badge !== undefined && badge !== null && badge !== '') ? badge : 'NOORUL ISLAM MADRASA';
   // Dimension scales
   const scales = {
     sm: { iconWidth: 42, iconHeight: 24, textSize: 'text-sm', subTextSize: 'text-[9px]' },
@@ -36,61 +36,25 @@ export const Logo: React.FC<LogoProps> = ({
 
   const { iconWidth, iconHeight, textSize, subTextSize } = scales[size];
 
-  // 17 vertical parallel wavy lines forming a solid rectangular block
-  const linesCount = 17;
-  const svgWidth = 120;
-  const svgHeight = 65;
-  const paddingX = 6;
-  const availableWidth = svgWidth - paddingX * 2;
-  const spacing = availableWidth / (linesCount - 1);
-
-  // Generate path d for vertical wave line
-  const generateWaveLine = (xIndex: number) => {
-    const x = paddingX + xIndex * spacing;
-    // Straight top section (barcode-like) then a slight wiggle at the bottom
-    return `M ${x} 3 L ${x} 40 C ${x + 3.5} 48, ${x - 3.5} 55, ${x} 62`;
-  };
-
   return (
     <div className={`flex items-center gap-3 select-none ${className}`}>
-      {/* Wave Icon */}
+      {/* Brand Icon */}
       {showIcon && (
         <div className="relative group shrink-0 flex items-center justify-center">
-          {customIconUrl || '/tabassum_logo.jpg' ? (
-            <img 
-              src={customIconUrl || '/tabassum_logo.jpg'} 
-              alt="Tabassum Meelad Fest Logo" 
-              onError={(e) => {
-                const target = e.currentTarget;
-                if (target.src.includes('tabassum_logo.jpg')) {
-                  target.src = '/tabassum_logo.png';
-                }
-              }}
-              className="object-contain drop-shadow-2xl transition-transform duration-500 group-hover:scale-105" 
-              style={{ width: iconWidth, height: iconHeight, borderRadius: '50%' }} 
-            />
-          ) : (
-            <svg
-              width={iconWidth}
-              height={iconHeight}
-              viewBox={`0 0 ${svgWidth} ${svgHeight}`}
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="transition-transform duration-300 group-hover:scale-105"
-            >
-              {Array.from({ length: linesCount }).map((_, i) => (
-                <path
-                  key={i}
-                  d={generateWaveLine(i)}
-                  stroke="#FF2B2B"
-                  strokeWidth="3.2"
-                  strokeLinecap="round"
-                />
-              ))}
-            </svg>
-          )}
-          {/* Subtle crimson ambient glow */}
-          <div className="absolute inset-0 bg-[#FF2B2B]/20 blur-lg rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+          <img 
+            src={customIconUrl || '/tabassum_logo.jpg'} 
+            alt="Tabassum Meelad Fest Logo" 
+            onError={(e) => {
+              const target = e.currentTarget;
+              if (target.src.includes('tabassum_logo.jpg')) {
+                target.src = '/tabassum_logo.png';
+              }
+            }}
+            className="object-contain drop-shadow-2xl transition-transform duration-500 group-hover:scale-105" 
+            style={{ width: iconWidth, height: iconHeight, borderRadius: '50%' }} 
+          />
+          {/* Subtle gold ambient glow */}
+          <div className="absolute inset-0 blur-lg rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ backgroundColor: 'var(--color-primary-accent, #C89A4B)', opacity: 0.2 }} />
         </div>
       )}
 
