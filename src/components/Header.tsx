@@ -31,9 +31,6 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, onNavigate, cmsSe
       { id: 'team-points', label: 'Team Points' },
       { id: 'posters', label: 'Posters' },
       { id: 'smile', label: 'Photo Hub' },
-      { id: 'live', label: 'Live Stream', isLive: true },
-      { id: 'gallery', label: 'Gallery' },
-      { id: 'highlights', label: 'Highlights' },
     ];
 
     const blocks = dragBlocks || cmsSettings?.dragBlocks || cmsSettings?.layoutSections;

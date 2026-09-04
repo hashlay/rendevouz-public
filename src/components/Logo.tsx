@@ -23,9 +23,9 @@ export const Logo: React.FC<LogoProps> = ({
   showIcon = true,
   customIconUrl = '',
 }) => {
-  const displayTitle = (title !== undefined && title !== null && title !== '') ? title : 'NOORUL ISLAM';
-  const displaySubtitle = (subtitle !== undefined && subtitle !== null && subtitle !== '') ? subtitle : 'MADRASA JEPPU';
-  const displayBadge = (badge !== undefined && badge !== null && badge !== '') ? badge : 'ESTD';
+  const displayTitle = (title !== undefined && title !== null && title !== '') ? title : 'TABASSUM';
+  const displaySubtitle = (subtitle !== undefined && subtitle !== null && subtitle !== '') ? subtitle : 'MEELAD FEST';
+  const displayBadge = (badge !== undefined && badge !== null && badge !== '') ? badge : 'Noorul Islam Madrasa, Jeppu';
   // Dimension scales
   const scales = {
     sm: { iconWidth: 42, iconHeight: 24, textSize: 'text-sm', subTextSize: 'text-[9px]' },

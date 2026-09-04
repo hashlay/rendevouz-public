@@ -157,7 +157,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
       )}
 
       <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 w-full z-20 text-center">
-        {!cmsSettings?.heroHideLogo && (
+        {cmsSettings?.heroHideLogo === false && (
           <div className="flex justify-center mb-4 sm:mb-6">
             <div className="scale-75 sm:scale-100 flex items-center justify-center p-4">
               <Logo 
@@ -194,9 +194,11 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
             />
           ) : (
             <>
-              <h1 className="text-2xl sm:text-4xl md:text-6xl font-black text-white uppercase tracking-tight max-w-4xl mx-auto leading-tight mb-2 sm:mb-4 drop-shadow-md text-center">
-                REN<span style={{ color: 'var(--color-primary-accent)' }}>DEZVOUS</span>{' '}
-                <span className="font-extrabold block sm:inline" style={{ color: 'var(--color-primary-accent)' }}>SILVER EDITION</span>
+              <h1 className="text-3xl sm:text-5xl md:text-7xl font-black text-white uppercase tracking-tight max-w-4xl mx-auto leading-tight mb-2 sm:mb-4 drop-shadow-md text-center font-display">
+                TABASSUM{' '}
+                <span className="font-extrabold block sm:inline" style={{ color: 'var(--color-primary-accent)' }}>
+                  MEELAD FEST
+                </span>
               </h1>
             </>
           )}

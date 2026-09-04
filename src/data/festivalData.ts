@@ -1,19 +1,19 @@
 import { HouseScore, ResultItem, Stage, GalleryItem, VideoHighlight, SmilePhoto, HeroMedia, ParticipantProfile } from '../types';
 
 export const INSTITUTION = {
-  name: "Kulliyathu Imam Rabbani",
-  tagline: "Off-Campus of Markaz Garden, Poonoor",
-  eventTitle: "Tabassum Meelad Fest 2k26",
-  subTitle: "Imam Rabbani LIFE Festival",
+  name: "Noorul Islam Madrasa",
+  tagline: "Jeppu, Manglore",
+  eventTitle: "Tabassum Meelad Fest 2026",
+  subTitle: "A smile that brings heart together",
   theme: "A smile that brings heart together",
-  dates: "September 05 , 2026",
-  location: "Main Campus Grounds, Poonoor, Kozhikode",
-  email: "contact@imamrabbani.edu.in",
-  phone: "+91 98471 23456",
+  dates: "September 05 2026",
+  location: "MAS Garden,Jeppu",
+  email: "zenith.theorganizen@gmail.com",
+  phone: "+91 74831 38340",
   socials: {
-    instagram: "https://instagram.com/kulliyathu_imam_rabbani",
-    youtube: "https://youtube.com/@imamrabbanifestival",
-    facebook: "https://facebook.com/imamrabbaniofficial"
+    instagram: "https://instagram.com/zeni.th.in",
+    youtube: "https://tabassum.hashlay.in/",
+    facebook: "https://tabassum.hashlay.in/"
   }
 };
 
