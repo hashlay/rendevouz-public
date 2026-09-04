@@ -601,3 +601,94 @@ export const renderPosterToCanvas = async (
     }
   });
 };
+
+/**
+ * Generates the official social media announcement caption for a Result Poster or Certificate.
+ * Follows the exact festival format with rank emojis, team tags, congratulations, and hashtags.
+ */
+export const generatePosterShareCaption = (
+  eventName: string,
+  category: string,
+  compIndex: number,
+  results: any[],
+  eventSettings?: any
+): string => {
+  const festivalTitle = (eventSettings?.festivalName || 'TABASSUM MEELAD FEST 2K26').toUpperCase();
+  const formattedNum = String(compIndex || 1).padStart(2, '0');
+  const slogan = eventSettings?.festivalTagline || eventSettings?.slogan || 'A Smile That Brings Hearts Together...';
+  const campus = eventSettings?.campusName || eventSettings?.sectorName || 'Noorul Islam Madrasa, Jeppu';
+  const hashtags = eventSettings?.shareHashtags || '#Tabassum2K26 #MeeladFest #Results #NoorulIslamMadrasa #Jeppu #Congratulations';
+
+  const rank1List = (results || []).filter((r: any) => r.rank === 1);
+  const rank2List = (results || []).filter((r: any) => r.rank === 2);
+  const rank3List = (results || []).filter((r: any) => r.rank === 3);
+
+  const getWinnerTeam = (res: any) => {
+    const rawUnit = res?.department || res?.unitName || res?.raw?.unitName || '';
+    if (!rawUnit) return '';
+    const displayUnit = getPosterDisplayUnitName(rawUnit, eventSettings?.posterTemplateConfig);
+    return displayUnit ? `Team ${displayUnit}` : '';
+  };
+
+  const formatRankLine = (emoji: string, rankStr: string, list: any[]) => {
+    if (list.length === 0) return '';
+    return list
+      .map((r: any) => {
+        const pName = r.participantName || r.name || 'Participant';
+        const team = getWinnerTeam(r);
+        return `${emoji} ${rankStr} — ${pName}${team ? `    ${team}` : ''}`;
+      })
+      .join('\n');
+  };
+
+  const rankLines = [
+    formatRankLine('🥇', '1st', rank1List),
+    formatRankLine('🥈', '2nd', rank2List),
+    formatRankLine('🥉', '3rd', rank3List)
+  ]
+    .filter(Boolean)
+    .join('\n');
+
+  return `🏆 ${festivalTitle} — RESULT ${formattedNum}
+✨ ${slogan}
+
+${eventName}
+${category}
+
+${rankLines}
+
+🌿 Congratulations to all the winners and participants!
+May your talents continue to shine. ✨
+${campus}
+${hashtags}`;
+};
+
+/**
+ * Offscreen rendering of a full Result Poster directly to a JPEG Blob (0.95 quality).
+ */
+export const renderPosterToBlob = async (
+  results: any[],
+  eventSettings: any,
+  eventName: string,
+  category: string,
+  compIndex: number
+): Promise<{ blob: Blob; fileName: string }> => {
+  const canvas = document.createElement('canvas');
+  await renderPosterToCanvas(canvas, results, eventSettings, eventName, category, compIndex);
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(
+      (blob) => {
+        if (blob) {
+          const cleanCat = category.replace(/[^\w\s-]/gi, '').trim().replace(/\s+/g, '_');
+          const cleanEvent = eventName.replace(/[^\w\s-]/gi, '').trim().replace(/\s+/g, '_');
+          resolve({ blob, fileName: `Result_Poster_${cleanCat}_${cleanEvent}.jpg` });
+        } else {
+          reject(new Error('Failed to create poster blob'));
+        }
+      },
+      'image/jpeg',
+      0.95
+    );
+  });
+};
+

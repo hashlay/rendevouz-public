@@ -4,6 +4,7 @@ import { useFestival } from '../context/FestivalContext';
 import { Category, ResultItem } from '../types';
 import { ZoomIn, ArrowRight, X, ChevronLeft, ChevronRight, Download, Share2, Check, Copy } from 'lucide-react';
 import { PosterImage } from './PosterImage';
+import { generatePosterShareCaption, renderPosterToBlob } from '../utils/posterRenderer';
 
 interface CompetitionPoster {
   id: string;
@@ -18,8 +19,14 @@ interface PostersSectionProps {
   onNavigate?: (sectionId: string) => void;
 }
 
+const dataUrlToJpgFile = async (dataUrl: string, fileName: string): Promise<File> => {
+  const res = await fetch(dataUrl);
+  const blob = await res.blob();
+  return new File([blob], fileName, { type: 'image/jpeg' });
+};
+
 export const PostersSection: React.FC<PostersSectionProps> = ({ onNavigate }) => {
-  const { results = [] } = useFestival();
+  const { results = [], eventSettings } = useFestival();
   const [activePoster, setActivePoster] = useState<CompetitionPoster | null>(null);
   const [copied, setCopied] = useState(false);
   const [showShareMenu, setShowShareMenu] = useState(false);
@@ -106,8 +113,11 @@ export const PostersSection: React.FC<PostersSectionProps> = ({ onNavigate }) =>
 
   const handleDownload = async (poster: CompetitionPoster) => {
     try {
-      const fileName = `Result_Poster_${poster.category}_${poster.eventName.replace(/[^a-zA-Z0-9]/g, '_')}.jpg`;
-      if (poster.imageUrl && poster.imageUrl.startsWith('data:')) {
+      const cleanCat = poster.category.replace(/[^\w\s-]/gi, '').trim().replace(/\s+/g, '_');
+      const cleanEvent = poster.eventName.replace(/[^\w\s-]/gi, '').trim().replace(/\s+/g, '_');
+      const fileName = `Result_Poster_${cleanCat}_${cleanEvent}.jpg`;
+
+      if (poster.imageUrl && poster.imageUrl.startsWith('data:image/')) {
         const a = document.createElement('a');
         a.href = poster.imageUrl;
         a.download = fileName;
@@ -115,16 +125,21 @@ export const PostersSection: React.FC<PostersSectionProps> = ({ onNavigate }) =>
         a.click();
         document.body.removeChild(a);
       } else {
-        const canvas = document.querySelector(`canvas[data-poster-id="${poster.id}"]`) as HTMLCanvasElement;
-        if (canvas) {
-          const url = canvas.toDataURL('image/jpeg', 0.95);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = fileName;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-        }
+        const { blob } = await renderPosterToBlob(
+          poster.results,
+          eventSettings,
+          poster.eventName,
+          poster.category,
+          poster.compIndex
+        );
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
       }
     } catch (err) {
       console.error('Failed to download poster:', err);
@@ -132,25 +147,67 @@ export const PostersSection: React.FC<PostersSectionProps> = ({ onNavigate }) =>
   };
 
   const handleShare = async (poster: CompetitionPoster) => {
-    const shareUrl = `${window.location.origin}/results?category=${encodeURIComponent(poster.category)}&event=${encodeURIComponent(poster.eventName)}`;
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: `🏆 Result Poster: ${poster.eventName} (${poster.category})`,
-          text: `Check out the official result poster for ${poster.eventName} (${poster.category})!`,
-          url: shareUrl
-        });
-      } catch (_) {
-        setShowShareMenu(!showShareMenu);
+    const caption = generatePosterShareCaption(
+      poster.eventName,
+      poster.category,
+      poster.compIndex,
+      poster.results,
+      eventSettings
+    );
+    const cleanCat = poster.category.replace(/[^\w\s-]/gi, '').trim().replace(/\s+/g, '_');
+    const cleanEvent = poster.eventName.replace(/[^\w\s-]/gi, '').trim().replace(/\s+/g, '_');
+    const fileName = `Result_Poster_${cleanCat}_${cleanEvent}.jpg`;
+
+    try {
+      let file: File | null = null;
+      if (poster.imageUrl && poster.imageUrl.startsWith('data:image/')) {
+        file = await dataUrlToJpgFile(poster.imageUrl, fileName);
+      } else {
+        const { blob } = await renderPosterToBlob(
+          poster.results,
+          eventSettings,
+          poster.eventName,
+          poster.category,
+          poster.compIndex
+        );
+        file = new File([blob], fileName, { type: 'image/jpeg' });
       }
-    } else {
-      setShowShareMenu(!showShareMenu);
+
+      if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          title: `🏆 ${poster.eventName} (${poster.category}) Result`,
+          text: caption,
+          files: [file]
+        });
+        return;
+      }
+    } catch (err: any) {
+      if (err.name === 'AbortError') return;
+      console.warn('Native image file share failed, falling back:', err);
     }
+
+    // Fallback for browsers/desktops without native file share:
+    // 1. Download JPEG image immediately
+    handleDownload(poster);
+    // 2. Copy formatted caption to clipboard
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(caption);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    }
+    // 3. Open share menu popup for direct WhatsApp Web share
+    setShowShareMenu(true);
   };
 
   const handleCopyLink = (poster: CompetitionPoster) => {
-    const shareUrl = `${window.location.origin}/results?category=${encodeURIComponent(poster.category)}&event=${encodeURIComponent(poster.eventName)}`;
-    navigator.clipboard.writeText(shareUrl);
+    const caption = generatePosterShareCaption(
+      poster.eventName,
+      poster.category,
+      poster.compIndex,
+      poster.results,
+      eventSettings
+    );
+    navigator.clipboard.writeText(caption);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -355,16 +412,16 @@ export const PostersSection: React.FC<PostersSectionProps> = ({ onNavigate }) =>
 
               {/* Share Menu Popup */}
               {showShareMenu && (
-                <div className="absolute bottom-full right-0 mb-2 w-52 bg-[#1C1C21] border border-[#33333D] rounded-xl p-2 shadow-2xl z-50">
+                <div className="absolute bottom-full right-0 mb-2 w-56 bg-[#1C1C21] border border-[#33333D] rounded-xl p-2 shadow-2xl z-50">
                   <button
                     onClick={() => handleCopyLink(activePoster)}
                     className="w-full text-left px-3 py-2 text-xs font-mono text-zinc-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors flex items-center gap-2 cursor-pointer"
                   >
                     {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
-                    {copied ? 'Link Copied!' : 'Copy Result Link'}
+                    {copied ? 'Caption Copied!' : 'Copy Result Caption'}
                   </button>
                   <a
-                    href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`🏆 Official Result Poster: ${activePoster.eventName} (${activePoster.category}) - ${window.location.origin}/results?category=${encodeURIComponent(activePoster.category)}&event=${encodeURIComponent(activePoster.eventName)}`)}`}
+                    href={`https://api.whatsapp.com/send?text=${encodeURIComponent(generatePosterShareCaption(activePoster.eventName, activePoster.category, activePoster.compIndex, activePoster.results, eventSettings))}`}
                     target="_blank"
                     rel="noreferrer"
                     className="w-full text-left px-3 py-2 text-xs font-mono text-zinc-300 hover:text-white hover:bg-[#25D366]/20 rounded-lg transition-colors flex items-center gap-2 mt-1"

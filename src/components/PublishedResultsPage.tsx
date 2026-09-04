@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useFestival } from '../context/FestivalContext';
 import { Category, ResultItem } from '../types';
 import { Search, ChevronDown, ChevronUp, AlertCircle, ArrowLeft, Trophy, Download, Share2, Copy, Check } from 'lucide-react';
-import { renderPosterToCanvas } from '../utils/posterRenderer';
+import { renderPosterToCanvas, generatePosterShareCaption, renderPosterToBlob } from '../utils/posterRenderer';
 
 interface PublishedResultsPageProps {
   initialCategory?: Category;
@@ -57,28 +57,63 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
     }
   };
 
-  const handleSharePoster = async (group: { eventName: string; category: string; key: string; items: ResultItem[] }) => {
-    const text = `🏆 Official Result: ${group.eventName} (${group.category}) - Festival Results!`;
-    const shareUrl = `${window.location.origin}/results?category=${encodeURIComponent(group.category)}&event=${encodeURIComponent(group.eventName)}`;
+  const handleSharePoster = async (group: { eventName: string; category: string; key: string; items: ResultItem[]; announcementNumber?: number }) => {
+    const compIdx = group.announcementNumber || 1;
+    const caption = generatePosterShareCaption(
+      group.eventName,
+      group.category,
+      compIdx,
+      group.items,
+      eventSettings
+    );
+    const cleanCat = group.category.replace(/[^\w\s-]/gi, '').trim().replace(/\s+/g, '_');
+    const cleanEvent = group.eventName.replace(/[^\w\s-]/gi, '').trim().replace(/\s+/g, '_');
+    const fileName = `Result_Poster_${cleanCat}_${cleanEvent}.jpg`;
 
-    if (navigator.share) {
-      try {
+    try {
+      const { blob } = await renderPosterToBlob(
+        group.items,
+        eventSettings,
+        group.eventName,
+        group.category,
+        compIdx
+      );
+      const file = new File([blob], fileName, { type: 'image/jpeg' });
+
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({
-          title: `${group.eventName} - Official Result`,
-          text: text,
-          url: shareUrl
+          title: `🏆 ${group.eventName} (${group.category}) Result`,
+          text: caption,
+          files: [file]
         });
         return;
-      } catch (_) {}
+      }
+    } catch (err: any) {
+      if (err.name === 'AbortError') return;
+      console.warn('Native image file share failed:', err);
     }
 
+    // Fallback: Download JPG & copy caption & open popup
+    handleDownloadPoster(group);
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(caption);
+      setCopiedKey(group.key);
+      setTimeout(() => setCopiedKey(null), 2500);
+    }
     setActiveShareGroup(activeShareGroup === group.key ? null : group.key);
   };
 
-  const handleCopyLink = (group: { eventName: string; category: string; key: string }) => {
-    const shareUrl = `${window.location.origin}/results?category=${encodeURIComponent(group.category)}&event=${encodeURIComponent(group.eventName)}`;
+  const handleCopyLink = (group: { eventName: string; category: string; key: string; items: ResultItem[]; announcementNumber?: number }) => {
+    const compIdx = group.announcementNumber || 1;
+    const caption = generatePosterShareCaption(
+      group.eventName,
+      group.category,
+      compIdx,
+      group.items,
+      eventSettings
+    );
     if (navigator.clipboard) {
-      navigator.clipboard.writeText(shareUrl);
+      navigator.clipboard.writeText(caption);
       setCopiedKey(group.key);
       setTimeout(() => setCopiedKey(null), 2000);
     }
@@ -372,16 +407,16 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
 
                       {/* Share Menu Popup */}
                       {activeShareGroup === group.key && (
-                        <div className="absolute bottom-full left-32 mb-2 w-52 bg-[#1C1C21] border border-[#33333D] rounded-xl p-2 shadow-2xl z-50">
+                        <div className="absolute bottom-full left-32 mb-2 w-56 bg-[#1C1C21] border border-[#33333D] rounded-xl p-2 shadow-2xl z-50">
                           <button
                             onClick={(e) => { e.stopPropagation(); handleCopyLink(group); }}
-                            className="w-full text-left px-3 py-2 text-xs font-mono text-zinc-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors flex items-center gap-2"
+                            className="w-full text-left px-3 py-2 text-xs font-mono text-zinc-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors flex items-center gap-2 cursor-pointer"
                           >
                             {copiedKey === group.key ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
-                            {copiedKey === group.key ? 'Link Copied!' : 'Copy Result Link'}
+                            {copiedKey === group.key ? 'Caption Copied!' : 'Copy Result Caption'}
                           </button>
                           <a
-                            href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`🏆 Official Result: ${group.eventName} (${group.category}) - ${window.location.origin}/results?category=${encodeURIComponent(group.category)}&event=${encodeURIComponent(group.eventName)}`)}`}
+                            href={`https://api.whatsapp.com/send?text=${encodeURIComponent(generatePosterShareCaption(group.eventName, group.category, group.announcementNumber || 1, group.items, eventSettings))}`}
                             target="_blank"
                             rel="noreferrer"
                             onClick={(e) => e.stopPropagation()}

@@ -39,8 +39,8 @@ export const PosterImage: React.FC<PosterImageProps> = ({
         );
         
         if (!active) return;
-        // High-definition WebP export for crisp on-screen viewing and print quality
-        const url = canvas.toDataURL('image/webp', 0.92) || canvas.toDataURL('image/jpeg', 0.95);
+        // High-definition JPEG export so sharing and downloading always produces true JPG images
+        const url = canvas.toDataURL('image/jpeg', 0.95);
         setDataUrl(url);
         if (onLoadRef.current) onLoadRef.current(url);
       } catch (err) {
