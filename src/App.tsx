@@ -17,6 +17,7 @@ import { FaceScannerModal } from './components/FaceScannerModal';
 import { PublishedResultsPage } from './components/PublishedResultsPage';
 import { TeamPointsPage } from './components/TeamPointsPage';
 import { PublicPostersPage } from './components/PublicPostersPage';
+import { PostersSection } from './components/PostersSection';
 import { PublicGalleryPage } from './components/PublicGalleryPage';
 import { Footer } from './components/Footer';
 
@@ -264,6 +265,8 @@ function PublicWebsiteContent({ onSwitchToApp }: { onSwitchToApp: (mode: 'worksp
                     case 'smile':
                     case 'photohub':
                       return <SmilePhotoPortal key="smile" cmsSettings={cmsData?.cmsSettings} />;
+                    case 'posters':
+                      return <PostersSection key="posters" onNavigate={handleNavigate} />;
                     case 'gallery':
                       return <GallerySection key="gallery" onNavigate={handleNavigate} />;
                     case 'live_stream':
@@ -280,6 +283,8 @@ function PublicWebsiteContent({ onSwitchToApp }: { onSwitchToApp: (mode: 'worksp
                 <HeroSection onNavigate={handleNavigate} cmsSettings={cmsData?.cmsSettings} heroMedia={cmsData?.heroMedia} dragBlocks={cmsData?.dragBlocks} />
                 <AboutSection onOpenConceptModal={() => setIsConceptModalOpen(true)} cmsSettings={cmsData?.cmsSettings} />
                 <ResultsSection onNavigate={handleNavigate} />
+                <PostersSection onNavigate={handleNavigate} />
+                <GallerySection onNavigate={handleNavigate} />
                 <SmilePhotoPortal cmsSettings={cmsData?.cmsSettings} />
               </>
             )}
