@@ -146,15 +146,15 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings, dragBlo
                   <Logo
                     size="lg"
                     variant="full"
-                    title={cmsSettings?.footerLogoTitle || 'At-Tabassum'}
+                    title={cmsSettings?.footerLogoTitle || 'tabassum'}
                     subtitle={cmsSettings?.footerLogoSubtitle || 'Meelad Fest'}
                     badge={cmsSettings?.footerLogoBadge || 'NOORUL ISLAM MADRASA'}
-                    customIconUrl={cmsSettings?.footerLogo || '/At-Tabassum_logo.jpg'}
+                    customIconUrl={cmsSettings?.footerLogo || '/tabassum_logo.jpg'}
                   />
                 </div>
               </div>
               <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed max-w-md pt-2">
-                {cmsSettings?.footerDescription || 'At-Tabassum Meelad Fest 2026 is a vibrant celebration of talent, creativity, knowledge, and togetherness, proudly organized by Noorul Islam Madrasa, Jeppu, Mangalore, bringing students together through meaningful learning, healthy competition, and shared values.'}
+                {cmsSettings?.footerDescription || 'tabassum Meelad Fest 2026 is a vibrant celebration of talent, creativity, knowledge, and togetherness, proudly organized by Noorul Islam Madrasa, Jeppu, Mangalore, bringing students together through meaningful learning, healthy competition, and shared values.'}
               </p>
             </div>
 

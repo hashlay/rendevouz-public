@@ -82,8 +82,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
     if (!formatted.includes('<br') && !formatted.includes('display: block') && !formatted.includes('class="block')) {
       if (formatted.includes('<span')) {
         formatted = formatted.replace('<span', '<br /><span class="block"');
-      } else if (formatted.toUpperCase().includes('At-Tabassum') && formatted.toUpperCase().includes('MEELAD FEST')) {
-        formatted = formatted.replace(/At-Tabassum\s+MEELAD\s+FEST/i, 'At-Tabassum<br /><span class="block" style="color: var(--color-primary-accent)">MEELAD FEST</span>');
+      } else if (formatted.toUpperCase().includes('tabassum') && formatted.toUpperCase().includes('MEELAD FEST')) {
+        formatted = formatted.replace(/tabassum\s+MEELAD\s+FEST/i, 'tabassum<br /><span class="block" style="color: var(--color-primary-accent)">MEELAD FEST</span>');
       }
     }
     return formatted;
@@ -111,7 +111,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
               preload="metadata"
               className="w-full h-full object-cover filter brightness-[0.75] contrast-[1.05]"
             >
-              <source src="/videos/At-Tabassum-hero-mobile.mp4" type="video/mp4" />
+              <source src="/videos/tabassum-hero-mobile.mp4" type="video/mp4" />
             </video>
           )}
         </div>
@@ -134,7 +134,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
               preload="metadata"
               className="w-full h-full object-cover filter brightness-[0.75] contrast-[1.05]"
             >
-              <source src="/videos/At-Tabassum-hero-desktop.mp4" type="video/mp4" />
+              <source src="/videos/tabassum-hero-desktop.mp4" type="video/mp4" />
             </video>
           )}
         </div>
@@ -183,7 +183,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
             />
           ) : (
             <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-white uppercase tracking-tight max-w-4xl mx-auto leading-[0.95] mb-3 sm:mb-5 drop-shadow-md text-center font-display flex flex-col items-center">
-              <span className="block">At-Tabassum</span>
+              <span className="block">tabassum</span>
               <span className="block font-black" style={{ color: 'var(--color-primary-accent)' }}>
                 MEELAD FEST
               </span>
