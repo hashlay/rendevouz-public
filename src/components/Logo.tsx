@@ -28,13 +28,13 @@ export const Logo: React.FC<LogoProps> = ({
   const displayBadge = (badge !== undefined && badge !== null && badge !== '') ? badge : 'NOORUL ISLAM MADRASA';
   // Dimension scales
   const scales = {
-    sm: { iconWidth: 42, iconHeight: 24, textSize: 'text-sm', subTextSize: 'text-[9px]' },
-    md: { iconWidth: 56, iconHeight: 32, textSize: 'text-base', subTextSize: 'text-[10px]' },
-    lg: { iconWidth: 80, iconHeight: 46, textSize: 'text-xl', subTextSize: 'text-xs' },
-    xl: { iconWidth: 120, iconHeight: 68, textSize: 'text-3xl', subTextSize: 'text-sm' },
+    sm: { iconSize: 32, textSize: 'text-sm', subTextSize: 'text-[9px]' },
+    md: { iconSize: 42, textSize: 'text-base', subTextSize: 'text-[10px]' },
+    lg: { iconSize: 52, textSize: 'text-xl', subTextSize: 'text-xs' },
+    xl: { iconSize: 80, textSize: 'text-3xl', subTextSize: 'text-sm' },
   };
 
-  const { iconWidth, iconHeight, textSize, subTextSize } = scales[size];
+  const { iconSize, textSize, subTextSize } = scales[size];
 
   return (
     <div className={`flex items-center gap-3 select-none ${className}`}>
@@ -42,16 +42,16 @@ export const Logo: React.FC<LogoProps> = ({
       {showIcon && (
         <div className="relative group shrink-0 flex items-center justify-center">
           <img
-            src={customIconUrl || '/tabassum_logo.jpg'}
+            src={customIconUrl || '/tabassum_logo.png'}
             alt="At-Tabassum Meelad Fest Logo"
             onError={(e) => {
               const target = e.currentTarget;
-              if (target.src.includes('tabassum_logo.jpg')) {
+              if (!target.src.endsWith('/tabassum_logo.png')) {
                 target.src = '/tabassum_logo.png';
               }
             }}
-            className="object-contain drop-shadow-2xl transition-transform duration-500 group-hover:scale-105"
-            style={{ width: iconWidth, height: iconHeight, borderRadius: '50%' }}
+            className="object-contain rounded-full drop-shadow-2xl transition-transform duration-500 group-hover:scale-105"
+            style={{ width: iconSize, height: iconSize }}
           />
           {/* Subtle gold ambient glow */}
           <div className="absolute inset-0 blur-lg rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ backgroundColor: 'var(--color-primary-accent, #C89A4B)', opacity: 0.2 }} />

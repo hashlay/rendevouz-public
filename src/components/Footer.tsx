@@ -149,7 +149,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings, dragBlo
                     title={cmsSettings?.footerLogoTitle || 'At-Tabassum'}
                     subtitle={cmsSettings?.footerLogoSubtitle || 'Meelad Fest'}
                     badge={cmsSettings?.footerLogoBadge || 'NOORUL ISLAM MADRASA'}
-                    customIconUrl={cmsSettings?.footerLogo || '/tabassum_logo.jpg'}
+                    customIconUrl={cmsSettings?.footerLogo || '/tabassum_logo.png'}
                   />
                 </div>
               </div>
