@@ -50,103 +50,103 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
     return () => clearInterval(interval);
   }, [mobileImages.length, cmsSettings?.heroMobileLoopEnabled, cmsSettings?.heroMobileLoopInterval]);
 
+  const isLiveStreamEnabled = (): boolean => {
+    const blocks = dragBlocks || cmsSettings?.dragBlocks || cmsSettings?.eventSettings?.dragBlocks;
+    if (Array.isArray(blocks) && blocks.length > 0) {
+      const liveBlock = blocks.find((b: any) => b.type === 'live_stages' || b.type === 'live_stream' || b.id === 'live_stages' || b.id === 'live_stream');
+      if (liveBlock !== undefined) {
+        return !!liveBlock.enabled;
+      }
+    }
+    if (cmsSettings?.showLiveStream === true || cmsSettings?.showLive === true) {
+      return true;
+    }
+    return false;
+  };
+
+  const formatHeroTitle = (title: string) => {
+    let formatted = title
+      .replace(/#FF2B2B/gi, 'var(--color-primary-accent)')
+      .replace(/#ff2b2b/gi, 'var(--color-primary-accent)')
+      .replace(/text-\[#FF2B2B\]/gi, '')
+      .replace(/text-[#FF2B2B]/gi, '')
+      .replace(/text-red-\d+/gi, '')
+      .replace(/<span([^>]*)>/gi, (m, p1) => {
+        if (p1.includes('style=')) {
+          return `<span ${p1.replace(/style="([^"]*)"/gi, 'style="$1; color: var(--color-primary-accent)"')}>`;
+        }
+        return `<span ${p1} style="color: var(--color-primary-accent)">`;
+      });
+
+    // Ensure two-line stacked layout like Image 1 and Image 3 if not already broken
+    if (!formatted.includes('<br') && !formatted.includes('display: block') && !formatted.includes('class="block')) {
+      if (formatted.includes('<span')) {
+        formatted = formatted.replace('<span', '<br /><span class="block"');
+      } else if (formatted.toUpperCase().includes('TABASSUM') && formatted.toUpperCase().includes('MEELAD FEST')) {
+        formatted = formatted.replace(/TABASSUM\s+MEELAD\s+FEST/i, 'TABASSUM<br /><span class="block" style="color: var(--color-primary-accent)">MEELAD FEST</span>');
+      }
+    }
+    return formatted;
+  };
+
   return (
-    <section id="hero" className="relative min-h-[85vh] sm:min-h-screen pt-20 sm:pt-28 pb-12 sm:pb-16 flex items-center justify-center overflow-hidden bg-[#0D0D0D]">
-      {/* 
-        Hero Background Layer:
-        - Priority 1: Admin-uploaded hero images / slideshow carousel
-        - Priority 2: Default responsive video background (Mobile <768px vs Desktop >=768px)
-      */}
-      
-      {/* Mobile Background (<768px) */}
-      <div className="block md:hidden absolute inset-0 z-0 overflow-hidden">
-        {hasCustomMobile ? (
-          mobileImages.map((url: string, index: number) => (
-            <div
-              key={url + index}
-              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                index === mobileIndex ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
-              }`}
+    <section id="hero" className="relative min-h-[90vh] sm:min-h-screen flex items-center justify-center overflow-hidden bg-[#0A0A0A] pt-24 pb-16">
+      {/* Background Media */}
+      <div className="absolute inset-0 z-0 overflow-hidden select-none pointer-events-none">
+        {/* Mobile View */}
+        <div className="block sm:hidden w-full h-full">
+          {hasCustomMobile ? (
+            <img 
+              src={mobileImages[mobileIndex]} 
+              alt="Festival Atmosphere"
+              className="w-full h-full object-cover filter brightness-[0.75] contrast-[1.05]"
+            />
+          ) : (
+            <video
+              ref={handleVideoRef}
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload="metadata"
+              className="w-full h-full object-cover filter brightness-[0.75] contrast-[1.05]"
             >
-              <img
-                src={url}
-                alt="Festival Background Mobile"
-                className="w-full h-full object-cover object-center brightness-90 contrast-105"
-              />
-            </div>
-          ))
-        ) : (
-          <video
-            ref={handleVideoRef}
-            autoPlay
-            muted
-            loop
-            playsInline
-            controls={false}
-            preload="metadata"
-            className="w-full h-full object-cover object-center pointer-events-none brightness-90 contrast-105 motion-reduce:hidden"
-            style={{ pointerEvents: 'none' }}
-          >
-            <source src="/videos/tabassum-hero-mobile.mp4" type="video/mp4" />
-          </video>
-        )}
-        <div className="absolute inset-0 z-10 bg-gradient-to-t from-[#0D0D0D] via-[#0D0D0D]/60 to-black/30 pointer-events-none" />
-      </div>
-
-      {/* Desktop Cycling Media Loop (>=768px) */}
-      <div className="hidden md:block absolute inset-0 z-0 overflow-hidden">
-        {hasCustomDesktop ? (
-          desktopImages.map((url: string, index: number) => (
-            <div
-              key={url + index}
-              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                index === desktopIndex ? 'opacity-100 scale-100 z-10' : 'opacity-0 scale-105 z-0 pointer-events-none'
-              }`}
-            >
-              <img
-                src={url}
-                alt="Festival Background Desktop"
-                className="w-full h-full object-cover object-center brightness-100 opacity-100 transform scale-100 transition-transform duration-1000"
-              />
-            </div>
-          ))
-        ) : (
-          <video
-            ref={handleVideoRef}
-            autoPlay
-            muted
-            loop
-            playsInline
-            controls={false}
-            preload="metadata"
-            className="w-full h-full object-cover object-center pointer-events-none brightness-100 opacity-90 motion-reduce:hidden"
-            style={{ pointerEvents: 'none' }}
-          >
-            <source src="/videos/tabassum-hero-desktop.mp4" type="video/mp4" />
-          </video>
-        )}
-
-        {/* Minimal Bottom Vignette to Ensure Readable Text */}
-        <div className="absolute inset-0 z-10 bg-gradient-to-t from-[#0D0D0D] via-[#0D0D0D]/30 to-black/20 pointer-events-none" />
-        <div className="absolute inset-0 z-10 bg-radial-vignette pointer-events-none opacity-40" />
-
-        {/* Background wave grid patterns */}
-        <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden opacity-30">
-          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[450px] bg-gradient-to-tr from-white/10 to-transparent blur-[140px] rounded-full opacity-30" />
-          <svg className="absolute inset-0 w-full h-full opacity-20" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <pattern id="wave-pattern" width="120" height="80" patternUnits="userSpaceOnUse">
-                <path d="M 0 40 C 30 20, 60 60, 90 40 C 105 30, 115 50, 120 40" fill="none" stroke="currentColor" strokeWidth="0.8" className="text-white/15" />
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#wave-pattern)" />
-          </svg>
+              <source src="/videos/tabassum-hero-mobile.mp4" type="video/mp4" />
+            </video>
+          )}
         </div>
+
+        {/* Desktop View */}
+        <div className="hidden sm:block w-full h-full">
+          {hasCustomDesktop ? (
+            <img 
+              src={desktopImages[desktopIndex]} 
+              alt="Festival Atmosphere"
+              className="w-full h-full object-cover filter brightness-[0.75] contrast-[1.05]"
+            />
+          ) : (
+            <video
+              ref={handleVideoRef}
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload="metadata"
+              className="w-full h-full object-cover filter brightness-[0.75] contrast-[1.05]"
+            >
+              <source src="/videos/tabassum-hero-desktop.mp4" type="video/mp4" />
+            </video>
+          )}
+        </div>
+
+        {/* Gradient overlays */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-black/40 to-black/70" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-black/20 to-[#0A0A0A]" />
       </div>
 
-      {/* Background Media Manager Button for Admin */}
-      {(authUser?.role === 'developer' || authUser?.role === 'committee') && (
-        <div className="absolute bottom-4 left-4 z-20 hidden sm:flex items-center bg-black/70 border border-white/10 rounded-full px-3 py-1.5 backdrop-blur-md">
+      {/* Admin Quick Action Button */}
+      {authUser && (authUser.role === 'admin' || authUser.role === 'superadmin') && (
+        <div className="absolute top-24 right-4 sm:right-8 z-30 bg-black/60 border border-white/10 backdrop-blur-md rounded-full px-3 py-1.5 shadow-lg">
           <button
             onClick={() => setActiveModalView('admin-dashboard')}
             className="text-[10px] text-amber-400 font-mono hover:underline flex items-center gap-1.5"
@@ -176,31 +176,18 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
         <div className="flex flex-col items-center">
           {cmsSettings?.heroTitle ? (
             <h1
-              className="text-[32px] xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-white leading-none tracking-tight flex flex-col items-center mb-4 sm:mb-6 uppercase font-display text-center"
+              className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-white leading-[0.95] tracking-tight flex flex-col items-center mb-3 sm:mb-5 uppercase font-display text-center"
               dangerouslySetInnerHTML={{
-                __html: cmsSettings.heroTitle
-                  .replace(/#FF2B2B/gi, 'var(--color-primary-accent)')
-                  .replace(/#ff2b2b/gi, 'var(--color-primary-accent)')
-                  .replace(/text-\[#FF2B2B\]/gi, '')
-                  .replace(/text-[#FF2B2B]/gi, '')
-                  .replace(/text-red-\d+/gi, '')
-                  .replace(/<span([^>]*)>/gi, (m, p1) => {
-                    if (p1.includes('style=')) {
-                      return `<span ${p1.replace(/style="([^"]*)"/gi, 'style="$1; color: var(--color-primary-accent)"')}>`;
-                    }
-                    return `<span ${p1} style="color: var(--color-primary-accent)">`;
-                  })
+                __html: formatHeroTitle(cmsSettings.heroTitle)
               }}
             />
           ) : (
-            <>
-              <h1 className="text-3xl sm:text-5xl md:text-7xl font-black text-white uppercase tracking-tight max-w-4xl mx-auto leading-tight mb-2 sm:mb-4 drop-shadow-md text-center font-display">
-                TABASSUM{' '}
-                <span className="font-extrabold block sm:inline" style={{ color: 'var(--color-primary-accent)' }}>
-                  MEELAD FEST
-                </span>
-              </h1>
-            </>
+            <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-white uppercase tracking-tight max-w-4xl mx-auto leading-[0.95] mb-3 sm:mb-5 drop-shadow-md text-center font-display flex flex-col items-center">
+              <span className="block">TABASSUM</span>
+              <span className="block font-black" style={{ color: 'var(--color-primary-accent)' }}>
+                MEELAD FEST
+              </span>
+            </h1>
           )}
 
           <p className="text-sm sm:text-xl font-light text-zinc-200 tracking-wide mb-2 sm:mb-3 font-sans drop-shadow-sm max-w-2xl mx-auto text-center">
@@ -214,50 +201,50 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
             <span>{cmsSettings?.heroInstitutionRight || INSTITUTION.tagline}</span>
           </p>
           
-        <div className="flex justify-center mb-10 sm:mb-12">
-          <div className="inline-flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 bg-black/60 backdrop-blur-xl border border-white/10 px-6 sm:px-8 py-3 rounded-full shadow-2xl">
-            <div className="flex items-center gap-2 text-zinc-300 font-mono text-[10px] sm:text-xs">
-              <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4" style={{ color: 'var(--color-primary-accent)' }} />
-              <span>{cmsSettings?.heroDate || INSTITUTION.dates}</span>
-            </div>
-            <div className="hidden sm:block w-1.5 h-1.5 rounded-full opacity-40" style={{ backgroundColor: 'var(--color-primary-accent)' }} />
-            <div className="flex items-center gap-2 text-zinc-300 font-mono text-[10px] sm:text-xs">
-              <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4" style={{ color: 'var(--color-primary-accent)' }} />
-              <span>{cmsSettings?.heroLocation || INSTITUTION.location}</span>
+          <div className="flex justify-center mb-8 sm:mb-10">
+            <div className="inline-flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 bg-black/60 backdrop-blur-xl border border-white/10 px-6 sm:px-8 py-3 rounded-full shadow-2xl">
+              <div className="flex items-center gap-2 text-zinc-300 font-mono text-[10px] sm:text-xs">
+                <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4" style={{ color: 'var(--color-primary-accent)' }} />
+                <span>{cmsSettings?.heroDate || INSTITUTION.dates}</span>
+              </div>
+              <div className="hidden sm:block w-1.5 h-1.5 rounded-full opacity-40" style={{ backgroundColor: 'var(--color-primary-accent)' }} />
+              <div className="flex items-center gap-2 text-zinc-300 font-mono text-[10px] sm:text-xs">
+                <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4" style={{ color: 'var(--color-primary-accent)' }} />
+                <span>{cmsSettings?.heroLocation || INSTITUTION.location}</span>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Dual Action Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6 sm:mb-10 max-w-md mx-auto sm:max-w-none">
-          <button
-            onClick={() => onNavigate('results')}
-            style={{ backgroundColor: 'var(--color-primary-accent)' }}
-            className="w-full sm:w-auto px-6 py-3 hover:opacity-90 text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
-          >
-            <Trophy className="w-4 h-4 text-white" />
-            <span>Check Live Results</span>
-            <ChevronRight className="w-3.5 h-3.5" />
-          </button>
+          {/* Dual Action Buttons */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-6 sm:mb-10 max-w-md mx-auto sm:max-w-none">
+            <button
+              onClick={() => onNavigate('results')}
+              style={{ backgroundColor: 'var(--color-primary-accent)' }}
+              className="w-full sm:w-auto px-6 py-3.5 hover:brightness-110 text-white text-xs sm:text-sm font-extrabold uppercase tracking-wider rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+            >
+              <Trophy className="w-4 h-4 text-white" />
+              <span>Check Live Results</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
 
-          {dragBlocks && dragBlocks.find((b: any) => b.type === 'live_stages' || b.type === 'live_stream')?.enabled === false ? (
-            <button
-              onClick={() => onNavigate('standings')}
-              className="w-full sm:w-auto px-6 py-3 bg-black/60 hover:bg-black/80 border border-white/30 hover:border-white/60 text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl backdrop-blur-lg transition-all duration-300 flex items-center justify-center gap-2 transform hover:-translate-y-0.5 cursor-pointer"
-            >
-              <Trophy className="w-4 h-4" style={{ color: 'var(--color-primary-accent)' }} />
-              <span>View Team Standings</span>
-            </button>
-          ) : (
-            <button
-              onClick={() => onNavigate('live')}
-              className="w-full sm:w-auto px-6 py-3 bg-black/60 hover:bg-black/80 border border-white/30 hover:border-white/60 text-white text-xs sm:text-sm font-bold uppercase tracking-wider rounded-xl backdrop-blur-lg transition-all duration-300 flex items-center justify-center gap-2 transform hover:-translate-y-0.5 cursor-pointer"
-            >
-              <Radio className="w-4 h-4 animate-pulse" style={{ color: 'var(--color-primary-accent)' }} />
-              <span>Watch Live Stream</span>
-            </button>
-          )}
-        </div>
+            {isLiveStreamEnabled() ? (
+              <button
+                onClick={() => onNavigate('live')}
+                className="w-full sm:w-auto px-6 py-3.5 bg-black/60 hover:bg-black/80 border border-white/30 hover:border-white/60 text-white text-xs sm:text-sm font-extrabold uppercase tracking-wider rounded-xl backdrop-blur-lg transition-all duration-300 flex items-center justify-center gap-2 transform hover:-translate-y-0.5 cursor-pointer"
+              >
+                <Radio className="w-4 h-4 animate-pulse" style={{ color: 'var(--color-primary-accent)' }} />
+                <span>Watch Live Stream</span>
+              </button>
+            ) : (
+              <button
+                onClick={() => onNavigate('standings')}
+                className="w-full sm:w-auto px-6 py-3.5 bg-black/60 hover:bg-black/80 border border-white/30 hover:border-white/60 text-white text-xs sm:text-sm font-extrabold uppercase tracking-wider rounded-xl backdrop-blur-lg transition-all duration-300 flex items-center justify-center gap-2 transform hover:-translate-y-0.5 cursor-pointer"
+              >
+                <Trophy className="w-4 h-4" style={{ color: 'var(--color-primary-accent)' }} />
+                <span>View Team Standings</span>
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </section>
