@@ -83,31 +83,42 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings, dragBlo
       <div className="bg-[#111111] py-4 sm:py-5 border-t border-b border-white/5 relative z-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-4">
 
-          <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
+          <a 
+            href="https://wa.me/917483138340?text=Hi!%20I%20want%20to%20build%20my%20project"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 group cursor-pointer text-center sm:text-left transition-all hover:opacity-95"
+            title="Chat with Zenith Software on WhatsApp"
+          >
             {/* Zenith Logo */}
-            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-black/40 rounded-xl flex items-center justify-center p-2 border border-white/5 shadow-inner">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-black/40 rounded-xl flex items-center justify-center p-2 border border-white/5 shadow-inner transition-transform group-hover:scale-105 group-hover:border-white/20">
               <img
                 src="/zenith_logo.jpg"
                 alt="Zenith Software"
-                className="w-full h-full object-contain opacity-80"
+                className="w-full h-full object-contain opacity-80 group-hover:opacity-100 transition-opacity"
                 style={{ mixBlendMode: 'screen', filter: 'grayscale(1) invert(1) contrast(2)' }}
               />
             </div>
 
             {/* Zenith Text */}
             <div className="space-y-0.5">
-              <h3 className="text-[11px] sm:text-xs font-bold text-white uppercase tracking-wider flex items-center justify-center sm:justify-start gap-1.5 opacity-90">
+              <h3 className="text-[11px] sm:text-xs font-bold text-white uppercase tracking-wider flex items-center justify-center sm:justify-start gap-1.5 opacity-90 group-hover:text-[var(--color-primary-accent)] transition-colors">
                 Developed by Zenith Software
               </h3>
-              <p className="text-[9px] sm:text-[10px] text-zinc-500 max-w-sm leading-relaxed">
+              <p className="text-[9px] sm:text-[10px] text-zinc-500 max-w-sm leading-relaxed group-hover:text-zinc-300 transition-colors">
                 For complete software solutions, web development, graphic design, and professional video editing, reach out to our expert team.
               </p>
             </div>
-          </div>
+          </a>
 
           {/* Zenith Contact */}
           <div className="flex flex-col sm:items-end gap-1.5 text-[9px] sm:text-[10px] font-mono text-zinc-500">
-            <a href="https://wa.me/917483138340" className="flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer group">
+            <a 
+              href="https://wa.me/917483138340?text=Hi!%20I%20want%20to%20build%20my%20project" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer group"
+            >
               <Phone className="w-3 h-3 transition-transform group-hover:scale-110 opacity-70" style={{ color: 'var(--color-primary-accent)' }} />
               +91 74831 38340
             </a>
