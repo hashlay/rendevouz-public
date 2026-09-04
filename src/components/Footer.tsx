@@ -83,7 +83,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings, dragBlo
       <div className="bg-[#111111] py-4 sm:py-5 border-t border-b border-white/5 relative z-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-4">
 
-          <a 
+          <a
             href="https://wa.me/917483138340?text=Hi!%20I%20want%20to%20build%20my%20project"
             target="_blank"
             rel="noopener noreferrer"
@@ -113,8 +113,8 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings, dragBlo
 
           {/* Zenith Contact */}
           <div className="flex flex-col sm:items-end gap-1.5 text-[9px] sm:text-[10px] font-mono text-zinc-500">
-            <a 
-              href="https://wa.me/917483138340?text=Hi!%20I%20want%20to%20build%20my%20project" 
+            <a
+              href="https://wa.me/917483138340?text=Hi!%20I%20want%20to%20build%20my%20project"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer group"
@@ -146,15 +146,15 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings, dragBlo
                   <Logo
                     size="lg"
                     variant="full"
-                    title={cmsSettings?.footerLogoTitle || 'TABASSUM'}
+                    title={cmsSettings?.footerLogoTitle || 'At-Tabassum'}
                     subtitle={cmsSettings?.footerLogoSubtitle || 'Meelad Fest'}
                     badge={cmsSettings?.footerLogoBadge || 'NOORUL ISLAM MADRASA'}
-                    customIconUrl={cmsSettings?.footerLogo || '/tabassum_logo.jpg'}
+                    customIconUrl={cmsSettings?.footerLogo || '/At-Tabassum_logo.jpg'}
                   />
                 </div>
               </div>
               <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed max-w-md pt-2">
-                {cmsSettings?.footerDescription || 'Tabassum Meelad Fest 2026 is a vibrant celebration of talent, creativity, knowledge, and togetherness, proudly organized by Noorul Islam Madrasa, Jeppu, Mangalore, bringing students together through meaningful learning, healthy competition, and shared values.'}
+                {cmsSettings?.footerDescription || 'At-Tabassum Meelad Fest 2026 is a vibrant celebration of talent, creativity, knowledge, and togetherness, proudly organized by Noorul Islam Madrasa, Jeppu, Mangalore, bringing students together through meaningful learning, healthy competition, and shared values.'}
               </p>
             </div>
 

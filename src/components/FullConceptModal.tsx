@@ -51,7 +51,7 @@ export const FullConceptModal: React.FC<FullConceptModalProps> = ({ isOpen, onCl
         <div className="mt-8 pt-6 border-t border-white/10 flex flex-wrap items-center justify-between gap-4 text-xs font-mono text-zinc-400">
           <div className="flex items-center gap-2">
             <ShieldCheck className="w-4 h-4" style={{ color: primaryColor }} />
-            <span>{cmsSettings?.conceptModalFooter || (FULL_CONCEPT_TEXT as any).footer || 'Tabassum Meelad Fest'}</span>
+            <span>{cmsSettings?.conceptModalFooter || (FULL_CONCEPT_TEXT as any).footer || 'At-Tabassum Meelad Fest'}</span>
           </div>
           <button
             onClick={onClose}

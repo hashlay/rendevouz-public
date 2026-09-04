@@ -467,6 +467,7 @@ export interface ParticipantProfile {
   department: string;
   category: string;
   dob?: string;
+  candidateClass?: string;
   avatarUrl: string;
   qrCodeData: string;
   phone?: string;

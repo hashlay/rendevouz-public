@@ -23,7 +23,7 @@ export const Logo: React.FC<LogoProps> = ({
   showIcon = true,
   customIconUrl = '',
 }) => {
-  const displayTitle = (title !== undefined && title !== null && title !== '') ? title : 'TABASSUM';
+  const displayTitle = (title !== undefined && title !== null && title !== '') ? title : 'At-Tabassum';
   const displaySubtitle = (subtitle !== undefined && subtitle !== null && subtitle !== '') ? subtitle : 'MEELAD FEST';
   const displayBadge = (badge !== undefined && badge !== null && badge !== '') ? badge : 'NOORUL ISLAM MADRASA';
   // Dimension scales
@@ -41,17 +41,17 @@ export const Logo: React.FC<LogoProps> = ({
       {/* Brand Icon */}
       {showIcon && (
         <div className="relative group shrink-0 flex items-center justify-center">
-          <img 
-            src={customIconUrl || '/tabassum_logo.jpg'} 
-            alt="Tabassum Meelad Fest Logo" 
+          <img
+            src={customIconUrl || '/At-Tabassum_logo.jpg'}
+            alt="At-Tabassum Meelad Fest Logo"
             onError={(e) => {
               const target = e.currentTarget;
-              if (target.src.includes('tabassum_logo.jpg')) {
-                target.src = '/tabassum_logo.png';
+              if (target.src.includes('At-Tabassum_logo.jpg')) {
+                target.src = '/At-Tabassum_logo.png';
               }
             }}
-            className="object-contain drop-shadow-2xl transition-transform duration-500 group-hover:scale-105" 
-            style={{ width: iconWidth, height: iconHeight, borderRadius: '50%' }} 
+            className="object-contain drop-shadow-2xl transition-transform duration-500 group-hover:scale-105"
+            style={{ width: iconWidth, height: iconHeight, borderRadius: '50%' }}
           />
           {/* Subtle gold ambient glow */}
           <div className="absolute inset-0 blur-lg rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ backgroundColor: 'var(--color-primary-accent, #C89A4B)', opacity: 0.2 }} />

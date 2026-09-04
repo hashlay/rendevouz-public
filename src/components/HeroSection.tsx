@@ -15,10 +15,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
   const { authUser, setActiveModalView } = useFestival();
   const [desktopIndex, setDesktopIndex] = React.useState(0);
   const [mobileIndex, setMobileIndex] = React.useState(0);
-  
-  const customDesktop = propHeroMedia?.filter(m => m.device !== 'mobile').sort((a,b) => (a.order || 0) - (b.order || 0)).map(m => m.url).filter((url): url is string => Boolean(url && typeof url === 'string' && url.trim().length > 0)) || [];
-  const customMobile = propHeroMedia?.filter(m => m.device !== 'desktop').sort((a,b) => (a.order || 0) - (b.order || 0)).map(m => m.url).filter((url): url is string => Boolean(url && typeof url === 'string' && url.trim().length > 0)) || [];
-  
+
+  const customDesktop = propHeroMedia?.filter(m => m.device !== 'mobile').sort((a, b) => (a.order || 0) - (b.order || 0)).map(m => m.url).filter((url): url is string => Boolean(url && typeof url === 'string' && url.trim().length > 0)) || [];
+  const customMobile = propHeroMedia?.filter(m => m.device !== 'desktop').sort((a, b) => (a.order || 0) - (b.order || 0)).map(m => m.url).filter((url): url is string => Boolean(url && typeof url === 'string' && url.trim().length > 0)) || [];
+
   // Directly use uploaded media. Fallback to default responsive video if zero custom images.
   const desktopImages = customDesktop;
   const mobileImages = customMobile;
@@ -33,7 +33,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
       });
     }
   };
-  
+
   React.useEffect(() => {
     if (desktopImages.length <= 1 || cmsSettings?.heroDesktopLoopEnabled === false) return;
     const interval = setInterval(() => {
@@ -82,8 +82,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
     if (!formatted.includes('<br') && !formatted.includes('display: block') && !formatted.includes('class="block')) {
       if (formatted.includes('<span')) {
         formatted = formatted.replace('<span', '<br /><span class="block"');
-      } else if (formatted.toUpperCase().includes('TABASSUM') && formatted.toUpperCase().includes('MEELAD FEST')) {
-        formatted = formatted.replace(/TABASSUM\s+MEELAD\s+FEST/i, 'TABASSUM<br /><span class="block" style="color: var(--color-primary-accent)">MEELAD FEST</span>');
+      } else if (formatted.toUpperCase().includes('At-Tabassum') && formatted.toUpperCase().includes('MEELAD FEST')) {
+        formatted = formatted.replace(/At-Tabassum\s+MEELAD\s+FEST/i, 'At-Tabassum<br /><span class="block" style="color: var(--color-primary-accent)">MEELAD FEST</span>');
       }
     }
     return formatted;
@@ -96,8 +96,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
         {/* Mobile View */}
         <div className="block sm:hidden w-full h-full">
           {hasCustomMobile ? (
-            <img 
-              src={mobileImages[mobileIndex]} 
+            <img
+              src={mobileImages[mobileIndex]}
               alt="Festival Atmosphere"
               className="w-full h-full object-cover filter brightness-[0.75] contrast-[1.05]"
             />
@@ -111,7 +111,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
               preload="metadata"
               className="w-full h-full object-cover filter brightness-[0.75] contrast-[1.05]"
             >
-              <source src="/videos/tabassum-hero-mobile.mp4" type="video/mp4" />
+              <source src="/videos/At-Tabassum-hero-mobile.mp4" type="video/mp4" />
             </video>
           )}
         </div>
@@ -119,8 +119,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
         {/* Desktop View */}
         <div className="hidden sm:block w-full h-full">
           {hasCustomDesktop ? (
-            <img 
-              src={desktopImages[desktopIndex]} 
+            <img
+              src={desktopImages[desktopIndex]}
               alt="Festival Atmosphere"
               className="w-full h-full object-cover filter brightness-[0.75] contrast-[1.05]"
             />
@@ -134,7 +134,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
               preload="metadata"
               className="w-full h-full object-cover filter brightness-[0.75] contrast-[1.05]"
             >
-              <source src="/videos/tabassum-hero-desktop.mp4" type="video/mp4" />
+              <source src="/videos/At-Tabassum-hero-desktop.mp4" type="video/mp4" />
             </video>
           )}
         </div>
@@ -160,12 +160,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
         {cmsSettings?.heroHideLogo === false && (
           <div className="flex justify-center mb-4 sm:mb-6">
             <div className="scale-75 sm:scale-100 flex items-center justify-center p-4">
-              <Logo 
-                size="xl" 
-                variant="full" 
-                title={cmsSettings?.heroLogoTitle} 
-                subtitle={cmsSettings?.heroLogoSubtitle} 
-                badge={cmsSettings?.heroLogoBadge} 
+              <Logo
+                size="xl"
+                variant="full"
+                title={cmsSettings?.heroLogoTitle}
+                subtitle={cmsSettings?.heroLogoSubtitle}
+                badge={cmsSettings?.heroLogoBadge}
                 customIconUrl={cmsSettings?.heroLogo}
               />
             </div>
@@ -183,7 +183,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
             />
           ) : (
             <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-white uppercase tracking-tight max-w-4xl mx-auto leading-[0.95] mb-3 sm:mb-5 drop-shadow-md text-center font-display flex flex-col items-center">
-              <span className="block">TABASSUM</span>
+              <span className="block">At-Tabassum</span>
               <span className="block font-black" style={{ color: 'var(--color-primary-accent)' }}>
                 MEELAD FEST
               </span>
@@ -200,7 +200,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
             <span className="text-zinc-500">•</span>
             <span>{cmsSettings?.heroInstitutionRight || INSTITUTION.tagline}</span>
           </p>
-          
+
           <div className="flex justify-center mb-8 sm:mb-10">
             <div className="inline-flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 bg-black/60 backdrop-blur-xl border border-white/10 px-6 sm:px-8 py-3 rounded-full shadow-2xl">
               <div className="flex items-center gap-2 text-zinc-300 font-mono text-[10px] sm:text-xs">

@@ -1,6 +1,6 @@
 {
-  "name": "Tabassum Meelad Fest 2k26",
-  "description": "Official festival portal for Tabassum Meelad Fest 2k26",
+  "name": "At-Tabassum Meelad Fest 2k26",
+  "description": "Official festival portal for At-Tabassum Meelad Fest 2k26",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

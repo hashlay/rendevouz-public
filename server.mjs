@@ -397,9 +397,9 @@ app.get('/api/public/cms', async (req, res) => {
 
 // Participant Auth Routes
 app.post('/api/public/auth/participant-login', async (req, res) => {
-  const { chestNumber, dob } = req.body;
+  const { chestNumber, dob, candidateClass, classVal } = req.body;
   const dbState = await getDbState();
-  const { chestNumbers = [], participants = [] } = dbState;
+  const { chestNumbers = [], participants = [], eventSettings = {} } = dbState;
   const cleanChest = (chestNumber || '').toString().trim();
 
   const cNum = chestNumbers.find(c => c.chestNumber?.toString() === cleanChest || c.codeNumber === cleanChest);
@@ -407,7 +407,17 @@ app.post('/api/public/auth/participant-login', async (req, res) => {
   if (participant && participant.deletedAt) participant = null;
 
   if (!participant) return res.status(401).json({ error: 'Invalid Chest Number' });
-  if (dob && participant.dob && participant.dob !== dob) return res.status(401).json({ error: 'Incorrect Date of Birth' });
+
+  const criteriaMode = eventSettings?.participantLoginCriteria || 'class';
+  if (criteriaMode === 'class') {
+    const val = (candidateClass || classVal || dob || '').toString().trim().toLowerCase().replace(/^class\s*/i, '');
+    const pClass = (participant.candidateClass || '').toString().trim().toLowerCase().replace(/^class\s*/i, '');
+    if (val && pClass && val !== pClass) {
+      return res.status(401).json({ error: 'Incorrect Class / Grade' });
+    }
+  } else {
+    if (dob && participant.dob && participant.dob !== dob) return res.status(401).json({ error: 'Incorrect Date of Birth' });
+  }
 
   res.json({ token: `token_${participant.id}_${Date.now()}`, participant });
 });

@@ -310,7 +310,7 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       const res = await fetch('/api/public/auth/participant-login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chestNumber: username.trim(), dob: password })
+        body: JSON.stringify({ chestNumber: username.trim(), dob: password, candidateClass: password, classVal: password })
       });
       const data = await res.json();
       
@@ -333,6 +333,7 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         department: found.unitName || 'Main Team',
         category: found.categoryName || 'General',
         dob: found.dob || password || '',
+        candidateClass: found.candidateClass || found.class || '',
         avatarUrl: found.avatarUrl || NO_DP_AVATAR,
         qrCodeData: found.chestNumber?.toString() || username.trim(),
         schedule: (found.registeredPrograms || []).map((prog: any, idx: number) => ({
@@ -554,6 +555,7 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         department: found.unitName || found.department || found.institution || 'Main Team',
         category: found.categoryName || found.category || 'General',
         dob: found.dob || found.dateOfBirth || '',
+        candidateClass: found.candidateClass || found.class || '',
         avatarUrl: found.avatarUrl || found.profilePhotoUrl || NO_DP_AVATAR,
         qrCodeData: (found.chestNumber || found.codeNumber || cleanChest).toString(),
         schedule: mappedSchedule,

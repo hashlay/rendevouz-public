@@ -34,7 +34,7 @@ function formatDobDisplay(dob?: string): string {
 }
 
 export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = ({ isOpen, onClose }) => {
-  const { authUser, logout, updateParticipant, results: allResults = [] } = useFestival();
+  const { authUser, logout, updateParticipant, results: allResults = [], eventSettings } = useFestival();
 
   if (!isOpen || !authUser || authUser.role !== 'participant' || !authUser.participant) {
     return null;
@@ -88,6 +88,8 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
   const deptName = p.department || 'Ninthikal Team';
   const catName = p.category || 'General';
   const dobFormatted = formatDobDisplay(p.dob);
+  const criteriaMode = eventSettings?.participantLoginCriteria || (p.candidateClass ? 'class' : 'dob');
+  const classDisplay = p.candidateClass ? p.candidateClass.replace(/^class\s*[:\-]?\s*/i, '').trim() : '';
 
   // Build exact competition posters list as in PublicPostersPage.tsx
   const competitionPosters = useMemo(() => {
@@ -394,9 +396,15 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
               <p>
                 Chest Number: <strong className="text-white font-mono">{p.codeNumber}</strong>
               </p>
-              <p>
-                Date of Birth: <strong className="text-white font-mono">{dobFormatted}</strong>
-              </p>
+              {criteriaMode === 'class' ? (
+                <p>
+                  Class : <strong className="text-white font-mono">{classDisplay ? classDisplay : 'N/A'}</strong>
+                </p>
+              ) : (
+                <p>
+                  Date of Birth: <strong className="text-white font-mono">{dobFormatted}</strong>
+                </p>
+              )}
             </div>
           </div>
         </div>
