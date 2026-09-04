@@ -23,7 +23,7 @@ export const Logo: React.FC<LogoProps> = ({
   showIcon = true,
   customIconUrl = '',
 }) => {
-  const displayTitle = (title !== undefined && title !== null && title !== '') ? title : 'tabassum';
+  const displayTitle = (title !== undefined && title !== null && title !== '') ? title : 'At-Tabassum';
   const displaySubtitle = (subtitle !== undefined && subtitle !== null && subtitle !== '') ? subtitle : 'MEELAD FEST';
   const displayBadge = (badge !== undefined && badge !== null && badge !== '') ? badge : 'NOORUL ISLAM MADRASA';
   // Dimension scales
@@ -43,7 +43,7 @@ export const Logo: React.FC<LogoProps> = ({
         <div className="relative group shrink-0 flex items-center justify-center">
           <img
             src={customIconUrl || '/tabassum_logo.jpg'}
-            alt="tabassum Meelad Fest Logo"
+            alt="At-Tabassum Meelad Fest Logo"
             onError={(e) => {
               const target = e.currentTarget;
               if (target.src.includes('tabassum_logo.jpg')) {
