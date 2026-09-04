@@ -1,3 +1,4 @@
+import { parseFontForCanvas } from './fontHelper';
 
 function getBgHash(url: string): string {
   if (!url) return '';
@@ -342,7 +343,7 @@ export const renderPosterToCanvas = async (
     // Campus Name
     if (c.showCampusName !== false) {
       ctx.textAlign = 'left';
-      ctx.font = `900 ${c.campusNameSize ?? 28}px ${c.campusNameFont || c.fontFamily || 'sans-serif'}`;
+      ctx.font = parseFontForCanvas(c.campusNameFont || c.fontFamily, c.campusNameSize ?? 28, '900');
       ctx.fillStyle = c.campusNameColor || c.titleColor || '#ffffff';
       const campusText = c.campusNameUppercase !== false ? campusName.toUpperCase() : campusName;
       const campusMetrics = ctx.measureText(campusText);
@@ -355,7 +356,7 @@ export const renderPosterToCanvas = async (
     // Fest Name
     if (c.showFestName !== false) {
       ctx.textAlign = 'left';
-      ctx.font = `900 ${c.festNameSize ?? 36}px ${c.festNameFont || c.fontFamily || 'sans-serif'}`;
+      ctx.font = parseFontForCanvas(c.festNameFont || c.fontFamily, c.festNameSize ?? 36, '900');
       ctx.fillStyle = c.festNameColor || c.titleColor || '#fbbf24';
       const festText = c.festNameUppercase !== false ? festivalName.toUpperCase() : festivalName;
       const festMetrics = ctx.measureText(festText);
@@ -370,7 +371,7 @@ export const renderPosterToCanvas = async (
 
     // Result Label Word (e.g. "RESULT")
     ctx.textAlign = 'left';
-    ctx.font = `800 ${c.resultLabelSize || 28}px ${c.resultLabelFont || c.fontFamily || 'sans-serif'}`;
+    ctx.font = parseFontForCanvas(c.resultLabelFont || c.fontFamily, c.resultLabelSize || 28, '800');
     ctx.fillStyle = c.resultLabelColor || '#ffffff';
     const rawLbl = c.resultLabelText || 'RESULT';
     const rLblText = c.resultLabelUppercase !== false ? rawLbl.toUpperCase() : rawLbl;
@@ -382,7 +383,7 @@ export const renderPosterToCanvas = async (
 
     // Result Number (e.g. "01", "10", "105")
     ctx.textAlign = 'left';
-    ctx.font = `800 ${c.resultNumSize || 28}px ${c.resultNumFont || c.fontFamily || 'sans-serif'}`;
+    ctx.font = parseFontForCanvas(c.resultNumFont || c.fontFamily, c.resultNumSize || 28, '800');
     ctx.fillStyle = c.resultNumColor || '#ffffff';
     const rNumX = c.resultNumX ?? 600;
     const rNumY = c.resultNumY ?? 180;
@@ -392,7 +393,7 @@ export const renderPosterToCanvas = async (
 
     // Category
     ctx.textAlign = 'left';
-    ctx.font = `800 ${c.categorySize ?? 32}px ${c.categoryFont || c.fontFamily || 'sans-serif'}`;
+    ctx.font = parseFontForCanvas(c.categoryFont || c.fontFamily, c.categorySize ?? 32, '800');
     ctx.fillStyle = c.categoryColor || 'rgba(255, 255, 255, 0.7)';
     const rawCat = activeCategory?.name || 'GENERAL';
     const catText = c.categoryUppercase !== false ? rawCat.toUpperCase() : rawCat;
@@ -404,7 +405,7 @@ export const renderPosterToCanvas = async (
 
     // Competition Name
     ctx.textAlign = 'left';
-    ctx.font = `900 ${c.compNameSize ?? 52}px ${c.compNameFont || c.fontFamily || 'sans-serif'}`;
+    ctx.font = parseFontForCanvas(c.compNameFont || c.fontFamily, c.compNameSize ?? 52, '900');
     ctx.fillStyle = c.compNameColor || '#ffffff';
     const rawComp = c.compNameOverride !== undefined && c.compNameOverride !== '' ? c.compNameOverride : activeComp.name;
     const compText = c.compNameUppercase ? rawComp.toUpperCase() : rawComp;
@@ -471,7 +472,7 @@ export const renderPosterToCanvas = async (
 
         // Rank badge (drawn twice if tied, exactly like reference)
         const rankFontSize = c.rankSize || 38;
-        ctx.font = `900 ${rankFontSize}px ${c.rankFont || c.fontFamily || 'sans-serif'}`;
+        ctx.font = parseFontForCanvas(c.rankFont || c.fontFamily, rankFontSize, '900');
         const textWidth = ctx.measureText(rankText).width;
         const badgeShapeSize = c.rankBadgeShapeSize ?? 40;
         const badgeCenterY = by - (rankFontSize * 0.32);
@@ -508,7 +509,7 @@ export const renderPosterToCanvas = async (
 
         // Winner name (supports multi-line \n)
         ctx.textAlign = 'left';
-        ctx.font = `800 ${c.winnerSize}px ${c.winnerFont || c.fontFamily || 'sans-serif'}`;
+        ctx.font = parseFontForCanvas(c.winnerFont || c.fontFamily, c.winnerSize, '800');
         ctx.fillStyle = c.winnerColor;
         const nameLines = winnerName.split('\n').filter(Boolean);
         const nameGap = (c.winnerSize ?? 44) * 1.15;
@@ -523,7 +524,7 @@ export const renderPosterToCanvas = async (
         // Unit name (supports multi-line \n)
         const isArabic = c.unitLanguage === 'ar';
         const arabicFont = (c.unitFont && c.unitFont !== 'monospace') ? c.unitFont : "'Cairo', 'Amiri', sans-serif";
-        ctx.font = `700 ${c.unitSize}px ${isArabic ? arabicFont : (c.unitFont || 'monospace')}`;
+        ctx.font = parseFontForCanvas(isArabic ? arabicFont : (c.unitFont || 'monospace'), c.unitSize, '700');
         ctx.fillStyle = getPosterTeamColor(rawWinnerUnit || winnerUnit, c.unitColor);
         const displayUnitName = getPosterDisplayUnitName(rawWinnerUnit || winnerUnit, c);
         const unitText = isArabic ? displayUnitName : (c.unitUppercase !== false ? displayUnitName.toUpperCase() : displayUnitName);
@@ -551,7 +552,7 @@ export const renderPosterToCanvas = async (
       const line2 = c.footerLine2 || `Generated live by ${campusName} ${festivalName} Management Portal`;
 
       ctx.textAlign = 'center';
-      ctx.font = `800 28px ${c.fontFamily || 'sans-serif'}`;
+      ctx.font = parseFontForCanvas(c.fontFamily, 28, '800');
       ctx.fillStyle = c.titleColor || '#fbbf24';
       ctx.fillText(line1, W / 2, H - 100);
 
