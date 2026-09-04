@@ -182,13 +182,13 @@ export const PostersSection: React.FC<PostersSectionProps> = ({ onNavigate }) =>
           </button>
         </div>
 
-        {/* Posters Grid */}
+        {/* Posters Grid - Exactly matching PublicPostersPage card display */}
         {displayPosters.length === 0 ? (
           <div className="text-center py-16 bg-[#161619]/50 rounded-2xl border border-white/5">
             <p className="text-zinc-400 font-medium">No result posters announced yet.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-8">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
             {displayPosters.map((poster) => (
               <div
                 key={poster.id}
@@ -197,50 +197,44 @@ export const PostersSection: React.FC<PostersSectionProps> = ({ onNavigate }) =>
                   setCopied(false);
                   setShowShareMenu(false);
                 }}
-                className="group relative bg-[#161619] border border-[#2A2A32] rounded-xl overflow-hidden cursor-pointer shadow-md sm:hover:border-white/40 transition-colors duration-300 flex flex-col"
+                className="group cursor-pointer flex flex-col"
               >
-                {/* Poster Frame */}
-                <div className="relative aspect-[3/4] overflow-hidden bg-black flex items-center justify-center">
+                {/* Poster Canvas Card Container - Exact match with PublicPostersPage */}
+                <div className="relative aspect-[4/5] bg-[#121215] border border-[#232328] rounded-2xl overflow-hidden shadow-lg group-hover:border-zinc-500 transition-all duration-300 flex items-center justify-center">
                   <PosterImage
                     competitionId={poster.id}
                     eventName={poster.eventName}
                     category={poster.category}
                     compIndex={poster.compIndex}
                     results={poster.results}
-                    className="w-full h-full object-cover will-change-transform sm:group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-102"
                     onLoadUrl={(url) => { poster.imageUrl = url; }}
                   />
 
-                  {/* Gradient Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 sm:group-hover:opacity-90 transition-opacity pointer-events-none" />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
 
                   {/* Announcement Number Badge */}
-                  <div className="absolute top-2 left-2 bg-black/75 px-2 py-0.5 rounded text-[9px] font-mono font-bold text-amber-400 uppercase border border-amber-500/30">
+                  <div className="absolute top-2.5 left-2.5 bg-black/80 px-2.5 py-0.5 rounded-md text-[10px] font-mono font-bold text-amber-400 uppercase border border-amber-500/30 shadow-md">
                     #{poster.compIndex}
-                  </div>
-
-                  {/* Category Badge */}
-                  <div className="absolute bottom-2 left-2 bg-black/80 px-2 py-0.5 rounded text-[9px] font-mono font-bold text-zinc-300 uppercase border border-white/10">
-                    {poster.category}
                   </div>
 
                   {/* Zoom Action on Hover */}
                   <div
-                    className="absolute top-2 right-2 p-1.5 rounded-full text-white opacity-0 sm:group-hover:opacity-100 transition-opacity shadow-md"
+                    className="absolute top-2.5 right-2.5 p-1.5 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
                     style={{ backgroundColor: 'var(--color-primary-accent)' }}
                   >
                     <ZoomIn className="w-3.5 h-3.5 text-white" />
                   </div>
                 </div>
 
-                {/* Title and Info */}
-                <div className="p-2.5 bg-[#141417] border-t border-[#25252D] flex flex-col justify-between flex-1">
-                  <h3 className="text-xs font-bold text-white line-clamp-1 group-hover:text-amber-400 transition-colors">
+                {/* Event Name & Category below card */}
+                <div className="mt-3 text-center">
+                  <h3 className="text-sm font-bold text-white tracking-tight line-clamp-1 group-hover:text-red-400 transition-colors">
                     {poster.eventName}
                   </h3>
-                  <span className="text-[10px] font-mono text-zinc-400 mt-0.5 block">
-                    {poster.category} Category
-                  </span>
+                  <p className="text-[11px] text-zinc-400 font-mono mt-0.5 uppercase tracking-wider">
+                    {poster.category}
+                  </p>
                 </div>
               </div>
             ))}
