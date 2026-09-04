@@ -626,8 +626,10 @@ export const generatePosterShareCaption = (
   const getWinnerTeam = (res: any) => {
     const rawUnit = res?.department || res?.unitName || res?.raw?.unitName || '';
     if (!rawUnit) return '';
-    const displayUnit = getPosterDisplayUnitName(rawUnit, eventSettings?.posterTemplateConfig);
-    return displayUnit ? `Team ${displayUnit}` : '';
+    const cleanUnit = rawUnit.replace(/^team\s*[:\-]?\s*/i, '').trim();
+    const displayUnit = getPosterDisplayUnitName(cleanUnit, eventSettings?.posterTemplateConfig) || cleanUnit;
+    const finalUnit = displayUnit.replace(/^team\s*[:\-]?\s*/i, '').trim();
+    return finalUnit ? `Team ${finalUnit}` : '';
   };
 
   const formatRankLine = (emoji: string, rankStr: string, list: any[]) => {
