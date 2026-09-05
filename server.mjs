@@ -197,7 +197,8 @@ async function getDbState(force = false) {
       // Fetch only core operational collections in parallel
       const [
         settingsDocs, unitsDocs, categoriesDocs, competitionsDocs,
-        participantsDocs, teamsDocs, resultsDocs, chestDocs
+        participantsDocs, teamsDocs, resultsDocs, chestDocs,
+        galleryDocs, videoDocs, dragBlocksDocs, heroMediaDocs
       ] = await Promise.all([
         db.collection('settings').find({}).toArray().catch(() => []),
         db.collection('units').find({}).toArray().catch(() => []),
@@ -206,7 +207,11 @@ async function getDbState(force = false) {
         db.collection('participants').find({}).toArray().catch(() => []),
         db.collection('teams').find({}).toArray().catch(() => []),
         db.collection('results').find({}).toArray().catch(() => []),
-        db.collection('chestNumbers').find({}).toArray().catch(() => [])
+        db.collection('chestNumbers').find({}).toArray().catch(() => []),
+        db.collection('gallery').find({}).toArray().catch(() => []),
+        db.collection('videoHighlights').find({}).toArray().catch(() => []),
+        db.collection('dragBlocks').find({}).toArray().catch(() => []),
+        db.collection('heroMedia').find({}).toArray().catch(() => [])
       ]);
 
       settingsDocs.forEach(s => {
@@ -223,6 +228,22 @@ async function getDbState(force = false) {
         }
       });
 
+      // Ensure Theme 4 exists in posterTemplateConfig
+      const ptc = state.posterTemplateConfig || state.eventSettings?.posterTemplateConfig;
+      if (ptc && Array.isArray(ptc.customThemes)) {
+        if (ptc.customThemes.length === 3) {
+          ptc.customThemes.push('/themes/theme_purple.jpg');
+        } else if (ptc.customThemes.length >= 4 && (!ptc.customThemes[3] || ptc.customThemes[3].startsWith('data:image/svg'))) {
+          ptc.customThemes[3] = '/themes/theme_purple.jpg';
+        }
+        if (ptc.themeConfigs) {
+          const ref = ptc.themeConfigs[0] || ptc.themeConfigs[1] || ptc.themeConfigs[2] || {};
+          if (!ptc.themeConfigs[3]) {
+            ptc.themeConfigs[3] = { ...ref };
+          }
+        }
+      }
+
       const dedupeDocs = (docs) => {
         const map = new Map();
         docs.forEach(d => {
@@ -232,17 +253,17 @@ async function getDbState(force = false) {
         return Array.from(map.values());
       };
 
-      if (unitsDocs.length > 0) state.units = dedupeDocs(unitsDocs);
-      if (categoriesDocs.length > 0) state.categories = dedupeDocs(categoriesDocs);
-      if (competitionsDocs.length > 0) state.competitions = dedupeDocs(competitionsDocs);
-      if (participantsDocs.length > 0) state.participants = dedupeDocs(participantsDocs);
-      if (teamsDocs.length > 0) state.teams = dedupeDocs(teamsDocs);
-      if (resultsDocs.length > 0) state.results = dedupeDocs(resultsDocs);
-      if (chestDocs.length > 0) state.chestNumbers = dedupeDocs(chestDocs);
-      if (galleryDocs.length > 0) state.gallery = dedupeDocs(galleryDocs);
-      if (videoDocs.length > 0) state.videoHighlights = dedupeDocs(videoDocs);
-      if (dragBlocksDocs.length > 0) state.dragBlocks = dedupeDocs(dragBlocksDocs);
-      if (heroMediaDocs.length > 0) state.heroMedia = dedupeDocs(heroMediaDocs);
+      if (unitsDocs && unitsDocs.length > 0) state.units = dedupeDocs(unitsDocs);
+      if (categoriesDocs && categoriesDocs.length > 0) state.categories = dedupeDocs(categoriesDocs);
+      if (competitionsDocs && competitionsDocs.length > 0) state.competitions = dedupeDocs(competitionsDocs);
+      if (participantsDocs && participantsDocs.length > 0) state.participants = dedupeDocs(participantsDocs);
+      if (teamsDocs && teamsDocs.length > 0) state.teams = dedupeDocs(teamsDocs);
+      if (resultsDocs && resultsDocs.length > 0) state.results = dedupeDocs(resultsDocs);
+      if (chestDocs && chestDocs.length > 0) state.chestNumbers = dedupeDocs(chestDocs);
+      if (galleryDocs && galleryDocs.length > 0) state.gallery = dedupeDocs(galleryDocs);
+      if (videoDocs && videoDocs.length > 0) state.videoHighlights = dedupeDocs(videoDocs);
+      if (dragBlocksDocs && dragBlocksDocs.length > 0) state.dragBlocks = dedupeDocs(dragBlocksDocs);
+      if (heroMediaDocs && heroMediaDocs.length > 0) state.heroMedia = dedupeDocs(heroMediaDocs);
 
       cachedDbState = state;
       lastDbStateTime = Date.now();
