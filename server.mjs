@@ -277,11 +277,12 @@ app.get('/api/public/cms', async (req, res) => {
   });
 });
 
-// Public Event Settings
+// Public Event Settings (ultra-lightweight < 2KB payload for instant page loads)
 app.get('/api/public/settings', async (req, res) => {
   const dbState = await getDbState();
-  const settings = dbState.eventSettings || dbState.settings || {};
-  res.json(settings);
+  const raw = dbState.eventSettings || dbState.settings || {};
+  const { posterTemplateConfig, certificateTemplateConfig, ...cleanSettings } = raw;
+  res.json(cleanSettings);
 });
 
 // Public Units
