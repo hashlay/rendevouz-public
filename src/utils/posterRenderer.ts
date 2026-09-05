@@ -7,7 +7,7 @@ function getBgHash(url: string): string {
 
 /**
  * Fixed team font colors for Posters Section:
- * - As-Shukr: Dark Blue (#2b2bc3)
+ * - Ash-shukr: Dark Blue (#2b2bc3)
  * - As-sabr: Dark Green (#1b5e20)
  * Applies across all themes by default.
  */
@@ -18,7 +18,7 @@ export const getPosterTeamColor = (unitOrTeamName?: string, defaultColor: string
   const cleanStr = str.replace(/[\u064B-\u065F\u0670\u0671]/g, '').replace(/ٱ/g, 'ا');
   const normalized = cleanStr.replace(/[\s\-_]/g, '');
 
-  // As-Shukr: Dark Blue #2b2bc3
+  // Ash-shukr: Dark Blue #2b2bc3
   if (
     normalized.includes('shukr') ||
     normalized.includes('shukur') ||
@@ -75,7 +75,7 @@ export const getPosterDisplayUnitName = (unitOrTeamName?: string, config?: any):
     normalized.includes('شكر') ||
     normalized === 'shk'
   ) {
-    return customNames['As-Shukr'] || customNames['Ash-Shukr'] || 'ٱلشُّكْر';
+    return customNames['Ash-Shukr'] || 'ٱلشُّكْر';
   }
 
   // Sabr matching
@@ -168,7 +168,6 @@ export function getDefaultThemeConfig(): any {
     // Language / Arabic options for Units/Teams
     unitLanguage: 'en', // 'en' | 'ar'
     unitArabicNames: {
-      'As-Shukr': 'ٱلشُّكْر',
       'Ash-Shukr': 'ٱلشُّكْر',
       'As-Sabr': 'ٱلصَّبْر',
     },
