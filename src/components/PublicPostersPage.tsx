@@ -266,7 +266,7 @@ export const PublicPostersPage: React.FC = () => {
         </div>
 
         {/* Posters Grid - Matching screenshot 1 & 3 older version */}
-        {loading ? (
+        {(loading || results.length === 0) ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[1, 2, 3, 4].map((i) => (
               <div key={i} className="flex flex-col">

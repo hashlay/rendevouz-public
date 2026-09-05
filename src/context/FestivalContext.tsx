@@ -211,7 +211,7 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           fetch(`/api/public/categories?t=${Date.now()}`).then(r => r.ok ? r.json() : []).catch(() => [])
         ]);
         
-        if (Array.isArray(resResults)) {
+        if (Array.isArray(resResults) && resResults.length > 0) {
           setResults(prev => {
             if (prev.length === resResults.length && JSON.stringify(prev) === JSON.stringify(resResults)) {
               return prev;
@@ -219,8 +219,29 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             return resResults;
           });
         }
-        if (resSettings) setEventSettings(resSettings);
-        if (Array.isArray(resCategories)) setCategories(resCategories);
+        if (resSettings && typeof resSettings === 'object' && Object.keys(resSettings).length > 0) {
+          setEventSettings((prev: any) => {
+            const merged = { ...prev, ...resSettings };
+            if (!resSettings.posterTemplateConfig && prev?.posterTemplateConfig) {
+              merged.posterTemplateConfig = prev.posterTemplateConfig;
+            }
+            return merged;
+          });
+
+          // Preload theme images in background for instantaneous poster rendering
+          const themes = resSettings.posterTemplateConfig?.customThemes;
+          if (Array.isArray(themes)) {
+            themes.forEach((url: string) => {
+              if (url && typeof url === 'string') {
+                const img = new Image();
+                img.src = url;
+              }
+            });
+          }
+        }
+        if (Array.isArray(resCategories) && resCategories.length > 0) {
+          setCategories(resCategories);
+        }
       } catch (err) {
         console.error("Failed to fetch public data:", err);
       }
@@ -241,8 +262,8 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           fetch(`/api/public/units?t=${ts}`).then(r => r.ok ? r.json() : []).catch(() => [])
         ]);
 
-        const units = Array.isArray(resUnits) ? resUnits : [];
-        const standings = Array.isArray(resStandings) ? resStandings : [];
+        const units = Array.isArray(resUnits) && resUnits.length > 0 ? resUnits : [];
+        const standings = Array.isArray(resStandings) && resStandings.length > 0 ? resStandings : [];
 
         const colors = ['#FF2B2B', '#E5E7EB', '#38BDF8', '#F59E0B', '#10B981', '#8B5CF6'];
         const accents = [
