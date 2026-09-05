@@ -5,6 +5,8 @@ function getBgHash(url: string): string {
   return `hash_${url.length}_${url.slice(-30)}`;
 }
 
+const posterImageCache = new Map<string, HTMLImageElement>();
+
 /**
  * Fixed team font colors for Posters Section:
  * - Ash-shukr: Dark Blue (#2b2bc3)
@@ -589,11 +591,20 @@ export const renderPosterToCanvas = async (
     };
 
     if (backgroundSource) {
+      const cached = posterImageCache.get(backgroundSource);
+      if (cached && cached.complete && cached.naturalWidth > 0) {
+        drawBackgroundAndOverlay(cached);
+        return;
+      }
+
       const img = new Image();
       if (backgroundSource.startsWith('http://') || backgroundSource.startsWith('https://')) {
         img.crossOrigin = 'anonymous';
       }
-      img.onload = () => drawBackgroundAndOverlay(img);
+      img.onload = () => {
+        posterImageCache.set(backgroundSource, img);
+        drawBackgroundAndOverlay(img);
+      };
       img.onerror = () => drawBackgroundAndOverlay();
       img.src = backgroundSource;
     } else {

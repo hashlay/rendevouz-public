@@ -10,6 +10,8 @@ interface CertificateImageProps {
   onLoadUrl?: (url: string) => void;
 }
 
+const publicCertImageCache = new Map<string, HTMLImageElement>();
+
 export const CertificateImage: React.FC<CertificateImageProps> = ({ 
   participantName, competitionName, competitionId, rank, className = '', onLoadUrl 
 }) => {
@@ -125,10 +127,26 @@ export const CertificateImage: React.FC<CertificateImageProps> = ({
       const fallbackUrl = rank === 1 ? '/certificate_1.jpg' : '/certificate_2.jpg';
       const targetUrl = customUrl || fallbackUrl;
       
+      const cached = publicCertImageCache.get(targetUrl);
+      if (cached && cached.complete && cached.naturalWidth > 0) {
+        tryRenderImage(cached);
+        return;
+      }
+
       const img = new Image();
       if (targetUrl.startsWith('http://') || targetUrl.startsWith('https://')) {
         img.crossOrigin = 'anonymous';
       }
+      img.onload = () => {
+        publicCertImageCache.set(targetUrl, img);
+        if (!active) return;
+        tryRenderImage(img);
+      };
+      img.onerror = () => {
+        if (!active) return;
+        drawFallbackCertificate(canvas, ctx);
+      };
+      img.src = targetUrl;
       
       const tryRenderImage = (imageElement: HTMLImageElement) => {
         try {

@@ -210,8 +210,14 @@ async function getDbState(force = false) {
       const { _id, ...rest } = s;
       if (_id === 'eventSettings') state.eventSettings = { ...state.eventSettings, ...rest };
       if (_id === 'cmsSettings') state.cmsSettings = { ...rest };
-      if (_id === 'posterTemplateConfig') state.posterTemplateConfig = { ...rest };
-      if (_id === 'certificateTemplateConfig') state.certificateTemplateConfig = { ...rest };
+      if (_id === 'posterTemplateConfig') {
+        state.posterTemplateConfig = { ...rest };
+        state.eventSettings.posterTemplateConfig = { ...rest };
+      }
+      if (_id === 'certificateTemplateConfig') {
+        state.certificateTemplateConfig = { ...rest };
+        state.eventSettings.certificateTemplateConfig = { ...rest };
+      }
     });
 
     const dedupeDocs = (docs) => {
@@ -277,12 +283,17 @@ app.get('/api/public/cms', async (req, res) => {
   });
 });
 
-// Public Event Settings (ultra-lightweight < 2KB payload for instant page loads)
+// Public Event Settings
 app.get('/api/public/settings', async (req, res) => {
   const dbState = await getDbState();
   const raw = dbState.eventSettings || dbState.settings || {};
-  const { posterTemplateConfig, certificateTemplateConfig, ...cleanSettings } = raw;
-  res.json(cleanSettings);
+  const settings = {
+    ...raw,
+    posterTemplateConfig: dbState.posterTemplateConfig || raw.posterTemplateConfig,
+    certificateTemplateConfig: dbState.certificateTemplateConfig || raw.certificateTemplateConfig,
+    posterOverrides: raw.posterOverrides || dbState.posterOverrides || {}
+  };
+  res.json(settings);
 });
 
 // Public Units
