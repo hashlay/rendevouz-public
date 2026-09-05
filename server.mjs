@@ -63,6 +63,11 @@ app.use((req, res, next) => {
 // 🔄 DYNAMIC PROXY MIDDLEWARE FOR ADMIN VERCEL URL
 // =========================================================================
 app.use('/api', async (req, res, next) => {
+  // Never proxy public endpoints - serve them directly from local MongoDB & instant cache!
+  if (req.url.startsWith('/public') || req.url.startsWith('/v1/public')) {
+    return next();
+  }
+
   const adminUrl = process.env.ADMIN_API_URL || process.env.VITE_API_BASE_URL;
   if (!adminUrl || adminUrl.trim() === '') {
     return next(); // Proceed to local MongoDB/handler logic below
@@ -260,6 +265,16 @@ app.use('/api/public', (req, res, next) => {
   res.setHeader('Pragma', 'no-cache');
   res.setHeader('Expires', '0');
   next();
+});
+
+// Public CMS Layout & Settings Endpoint
+app.get('/api/public/cms', async (req, res) => {
+  const dbState = await getDbState();
+  res.json({
+    dragBlocks: dbState.dragBlocks && dbState.dragBlocks.length > 0 ? dbState.dragBlocks : DEFAULT_DRAG_BLOCKS,
+    cmsSettings: dbState.cmsSettings || {},
+    heroMedia: dbState.heroMedia || []
+  });
 });
 
 // Public Event Settings
