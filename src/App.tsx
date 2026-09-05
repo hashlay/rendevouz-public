@@ -132,7 +132,7 @@ function PublicWebsiteContent({ onSwitchToApp }: { onSwitchToApp: (mode: 'worksp
     };
 
     fetchCMSData();
-    const interval = setInterval(fetchCMSData, 2500);
+    const interval = setInterval(fetchCMSData, 10000);
     return () => clearInterval(interval);
   }, []);
 

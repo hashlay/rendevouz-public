@@ -136,8 +136,30 @@ async function getMongoDb() {
   }
 }
 
-// Helper to fetch full database state from MongoDB
-async function getDbState() {
+// In-memory cache for high performance & instant responses (4-second TTL, invalidated on write)
+let cachedDbState = null;
+let lastDbStateTime = 0;
+const DB_STATE_CACHE_TTL = 4000;
+
+export function invalidateDbCache() {
+  lastDbStateTime = 0;
+}
+
+// Invalidate cache immediately on any write/mutation request so data is never stale
+app.use((req, res, next) => {
+  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
+    lastDbStateTime = 0;
+  }
+  next();
+});
+
+// Helper to fetch full database state from MongoDB with in-memory caching
+async function getDbState(force = false) {
+  const now = Date.now();
+  if (!force && cachedDbState && (now - lastDbStateTime < DB_STATE_CACHE_TTL)) {
+    return cachedDbState;
+  }
+
   const db = await getMongoDb();
   let state = {
     settings: {},
@@ -156,7 +178,7 @@ async function getDbState() {
     cmsSettings: {}
   };
 
-  if (!db) return state;
+  if (!db) return cachedDbState || state;
 
   try {
     // Overlay dedicated collections for 100% real-time accuracy
@@ -208,11 +230,13 @@ async function getDbState() {
     if (dragBlocksDocs.length > 0) state.dragBlocks = dedupeDocs(dragBlocksDocs);
     if (heroMediaDocs.length > 0) state.heroMedia = dedupeDocs(heroMediaDocs);
 
+    cachedDbState = state;
+    lastDbStateTime = Date.now();
   } catch (err) {
     console.error('Error assembling DB state from MongoDB:', err.message);
   }
 
-  return state;
+  return cachedDbState || state;
 }
 
 const DEFAULT_DRAG_BLOCKS = [

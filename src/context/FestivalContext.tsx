@@ -211,7 +211,14 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           fetch(`/api/public/categories?t=${Date.now()}`).then(r => r.ok ? r.json() : []).catch(() => [])
         ]);
         
-        if (Array.isArray(resResults)) setResults(resResults);
+        if (Array.isArray(resResults)) {
+          setResults(prev => {
+            if (prev.length === resResults.length && JSON.stringify(prev) === JSON.stringify(resResults)) {
+              return prev;
+            }
+            return resResults;
+          });
+        }
         if (resSettings) setEventSettings(resSettings);
         if (Array.isArray(resCategories)) setCategories(resCategories);
       } catch (err) {
@@ -219,7 +226,7 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       }
     };
     fetchPublicData();
-    const interval = setInterval(fetchPublicData, 5000);
+    const interval = setInterval(fetchPublicData, 12000);
     return () => clearInterval(interval);
   }, []);
 
