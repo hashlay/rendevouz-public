@@ -141,10 +141,10 @@ async function getMongoDb() {
   }
 }
 
-// In-memory cache for high performance & instant responses (4-second TTL, invalidated on write)
+// In-memory cache for high performance & instant responses (15-second TTL, invalidated immediately on write)
 let cachedDbState = null;
 let lastDbStateTime = 0;
-const DB_STATE_CACHE_TTL = 4000;
+const DB_STATE_CACHE_TTL = 15000;
 
 export function invalidateDbCache() {
   lastDbStateTime = 0;
