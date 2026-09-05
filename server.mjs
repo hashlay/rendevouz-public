@@ -439,27 +439,46 @@ app.get('/api/public/standings', async (req, res) => {
   };
 
   const standings = activeUnits.map(unit => {
-    const unitParticipants = participants.filter(p => p.unitId === unit.id && !p.deletedAt);
+    const isUnitMatch = (uId, uName) => {
+      if (!uId && !uName) return false;
+      const normTarget = unit.id.toLowerCase().replace(/[-_]/g, '');
+      const normId = uId ? String(uId).toLowerCase().replace(/[-_]/g, '') : '';
+      const normName = uName ? String(uName).toLowerCase().replace(/[-_]/g, '') : '';
+      if (normId === normTarget || normName === normTarget) return true;
+      if (normTarget.includes('shukr') && (normId.includes('shukr') || normName.includes('shukr'))) return true;
+      if (normTarget.includes('sabr') && (normId.includes('sabr') || normName.includes('sabr'))) return true;
+      return false;
+    };
+
+    const unitParticipants = participants.filter(p => (isUnitMatch(p.unitId) || p.unitId === unit.id) && !p.deletedAt);
     const participantIds = unitParticipants.map(p => p.id);
 
-    const individualResults = results.filter(r =>
-      r.participantId &&
-      participantIds.includes(r.participantId) &&
-      (r.status === 'participated' || !r.status) &&
-      r.publishedStatus &&
-      !r.deletedAt
-    );
+    const individualResults = results.filter(r => {
+      if (r.deletedAt) return false;
+      const isPub = r.publishedStatus || r.isPublished || (r.rank !== undefined && r.rank > 0);
+      if (!isPub) return false;
+      const statusOk = !r.status || r.status === 'participated' || String(r.status).toLowerCase() === 'participated';
+      if (!statusOk) return false;
 
-    const unitTeams = teams.filter(t => t.unitId === unit.id && !t.deletedAt);
+      if (r.participantId && participantIds.includes(r.participantId)) return true;
+      if (!r.teamId && isUnitMatch(r.unitId, r.unitName || r.department)) return true;
+      return false;
+    });
+
+    const unitTeams = teams.filter(t => (isUnitMatch(t.unitId) || t.unitId === unit.id) && !t.deletedAt);
     const teamIds = unitTeams.map(t => t.id);
 
-    const groupResults = results.filter(r =>
-      r.teamId &&
-      teamIds.includes(r.teamId) &&
-      (r.status === 'participated' || !r.status) &&
-      r.publishedStatus &&
-      !r.deletedAt
-    );
+    const groupResults = results.filter(r => {
+      if (r.deletedAt) return false;
+      const isPub = r.publishedStatus || r.isPublished || (r.rank !== undefined && r.rank > 0);
+      if (!isPub) return false;
+      const statusOk = !r.status || r.status === 'participated' || String(r.status).toLowerCase() === 'participated';
+      if (!statusOk) return false;
+
+      if (r.teamId && teamIds.includes(r.teamId)) return true;
+      if (r.teamId && isUnitMatch(r.unitId, r.unitName || r.department)) return true;
+      return false;
+    });
 
     const allUnitResults = [...individualResults, ...groupResults];
 
