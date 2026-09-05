@@ -158,6 +158,8 @@ app.use((req, res, next) => {
   next();
 });
 
+let _dbStatePromise = null;
+
 // Helper to fetch full database state from MongoDB with in-memory caching
 async function getDbState(force = false) {
   const now = Date.now();
@@ -165,89 +167,97 @@ async function getDbState(force = false) {
     return cachedDbState;
   }
 
-  const db = await getMongoDb();
-  let state = {
-    settings: {},
-    eventSettings: {},
-    units: [],
-    categories: [],
-    competitions: [],
-    participants: [],
-    teams: [],
-    results: [],
-    chestNumbers: [],
-    gallery: [],
-    videoHighlights: [],
-    dragBlocks: [],
-    heroMedia: [],
-    cmsSettings: {}
-  };
+  if (_dbStatePromise) return _dbStatePromise;
 
-  if (!db) return cachedDbState || state;
-
-  try {
-    // Overlay dedicated collections for 100% real-time accuracy
-    const [
-      settingsDocs, unitsDocs, categoriesDocs, competitionsDocs,
-      participantsDocs, teamsDocs, resultsDocs, chestDocs,
-      galleryDocs, videoDocs, dragBlocksDocs, heroMediaDocs
-    ] = await Promise.all([
-      db.collection('settings').find({}).toArray().catch(() => []),
-      db.collection('units').find({}).toArray().catch(() => []),
-      db.collection('categories').find({}).toArray().catch(() => []),
-      db.collection('competitions').find({}).toArray().catch(() => []),
-      db.collection('participants').find({}).toArray().catch(() => []),
-      db.collection('teams').find({}).toArray().catch(() => []),
-      db.collection('results').find({}).toArray().catch(() => []),
-      db.collection('chestNumbers').find({}).toArray().catch(() => []),
-      db.collection('gallery').find({}).toArray().catch(() => []),
-      db.collection('videoHighlights').find({}).toArray().catch(() => []),
-      db.collection('dragBlocks').find({}).toArray().catch(() => []),
-      db.collection('heroMedia').find({}).toArray().catch(() => [])
-    ]);
-
-    settingsDocs.forEach(s => {
-      const { _id, ...rest } = s;
-      if (_id === 'eventSettings') state.eventSettings = { ...state.eventSettings, ...rest };
-      if (_id === 'cmsSettings') state.cmsSettings = { ...rest };
-      if (_id === 'posterTemplateConfig') {
-        state.posterTemplateConfig = { ...rest };
-        state.eventSettings.posterTemplateConfig = { ...rest };
-      }
-      if (_id === 'certificateTemplateConfig') {
-        state.certificateTemplateConfig = { ...rest };
-        state.eventSettings.certificateTemplateConfig = { ...rest };
-      }
-    });
-
-    const dedupeDocs = (docs) => {
-      const map = new Map();
-      docs.forEach(d => {
-        const docId = d.id || d._id;
-        if (docId) map.set(docId.toString(), { id: docId, ...d });
-      });
-      return Array.from(map.values());
+  _dbStatePromise = (async () => {
+    const db = await getMongoDb();
+    let state = {
+      settings: {},
+      eventSettings: {},
+      units: [],
+      categories: [],
+      competitions: [],
+      participants: [],
+      teams: [],
+      results: [],
+      chestNumbers: [],
+      gallery: [],
+      videoHighlights: [],
+      dragBlocks: [],
+      heroMedia: [],
+      cmsSettings: {}
     };
 
-    if (unitsDocs.length > 0) state.units = dedupeDocs(unitsDocs);
-    if (categoriesDocs.length > 0) state.categories = dedupeDocs(categoriesDocs);
-    if (competitionsDocs.length > 0) state.competitions = dedupeDocs(competitionsDocs);
-    if (participantsDocs.length > 0) state.participants = dedupeDocs(participantsDocs);
-    if (teamsDocs.length > 0) state.teams = dedupeDocs(teamsDocs);
-    if (resultsDocs.length > 0) state.results = dedupeDocs(resultsDocs);
-    if (chestDocs.length > 0) state.chestNumbers = dedupeDocs(chestDocs);
-    if (galleryDocs.length > 0) state.gallery = dedupeDocs(galleryDocs);
-    if (videoDocs.length > 0) state.videoHighlights = dedupeDocs(videoDocs);
-    if (dragBlocksDocs.length > 0) state.dragBlocks = dedupeDocs(dragBlocksDocs);
-    if (heroMediaDocs.length > 0) state.heroMedia = dedupeDocs(heroMediaDocs);
+    if (!db) return cachedDbState || state;
 
-    cachedDbState = state;
-    lastDbStateTime = Date.now();
-  } catch (err) {
-    console.error('Error assembling DB state from MongoDB:', err.message);
-  }
+    try {
+      // Overlay dedicated collections for 100% real-time accuracy
+      const [
+        settingsDocs, unitsDocs, categoriesDocs, competitionsDocs,
+        participantsDocs, teamsDocs, resultsDocs, chestDocs,
+        galleryDocs, videoDocs, dragBlocksDocs, heroMediaDocs
+      ] = await Promise.all([
+        db.collection('settings').find({}).toArray().catch(() => []),
+        db.collection('units').find({}).toArray().catch(() => []),
+        db.collection('categories').find({}).toArray().catch(() => []),
+        db.collection('competitions').find({}).toArray().catch(() => []),
+        db.collection('participants').find({}).toArray().catch(() => []),
+        db.collection('teams').find({}).toArray().catch(() => []),
+        db.collection('results').find({}).toArray().catch(() => []),
+        db.collection('chestNumbers').find({}).toArray().catch(() => []),
+        db.collection('gallery').find({}).toArray().catch(() => []),
+        db.collection('videoHighlights').find({}).toArray().catch(() => []),
+        db.collection('dragBlocks').find({}).toArray().catch(() => []),
+        db.collection('heroMedia').find({}).toArray().catch(() => [])
+      ]);
 
-  return cachedDbState || state;
+      settingsDocs.forEach(s => {
+        const { _id, ...rest } = s;
+        if (_id === 'eventSettings') state.eventSettings = { ...state.eventSettings, ...rest };
+        if (_id === 'cmsSettings') state.cmsSettings = { ...rest };
+        if (_id === 'posterTemplateConfig') {
+          state.posterTemplateConfig = { ...rest };
+          state.eventSettings.posterTemplateConfig = { ...rest };
+        }
+        if (_id === 'certificateTemplateConfig') {
+          state.certificateTemplateConfig = { ...rest };
+          state.eventSettings.certificateTemplateConfig = { ...rest };
+        }
+      });
+
+      const dedupeDocs = (docs) => {
+        const map = new Map();
+        docs.forEach(d => {
+          const docId = d.id || d._id;
+          if (docId) map.set(docId.toString(), { id: docId, ...d });
+        });
+        return Array.from(map.values());
+      };
+
+      if (unitsDocs.length > 0) state.units = dedupeDocs(unitsDocs);
+      if (categoriesDocs.length > 0) state.categories = dedupeDocs(categoriesDocs);
+      if (competitionsDocs.length > 0) state.competitions = dedupeDocs(competitionsDocs);
+      if (participantsDocs.length > 0) state.participants = dedupeDocs(participantsDocs);
+      if (teamsDocs.length > 0) state.teams = dedupeDocs(teamsDocs);
+      if (resultsDocs.length > 0) state.results = dedupeDocs(resultsDocs);
+      if (chestDocs.length > 0) state.chestNumbers = dedupeDocs(chestDocs);
+      if (galleryDocs.length > 0) state.gallery = dedupeDocs(galleryDocs);
+      if (videoDocs.length > 0) state.videoHighlights = dedupeDocs(videoDocs);
+      if (dragBlocksDocs.length > 0) state.dragBlocks = dedupeDocs(dragBlocksDocs);
+      if (heroMediaDocs.length > 0) state.heroMedia = dedupeDocs(heroMediaDocs);
+
+      cachedDbState = state;
+      lastDbStateTime = Date.now();
+    } catch (err) {
+      console.error('Error assembling DB state from MongoDB:', err.message);
+    }
+
+    return cachedDbState || state;
+  })().finally(() => {
+    _dbStatePromise = null;
+  });
+
+  return _dbStatePromise;
 }
 
 const DEFAULT_DRAG_BLOCKS = [
@@ -379,46 +389,109 @@ app.get('/api/public/results', async (req, res) => {
   res.json(enrichedResults);
 });
 
-// Public Standings / House Scores
+// Public Standings / House Scores (Exact match to official CalculationService: Rank 1 = 20, Rank 2 = 14, Rank 3 = 7)
 app.get('/api/public/standings', async (req, res) => {
   const dbState = await getDbState();
-  const { units = [], results = [], participants = [], teams = [] } = dbState;
+  const { units = [], results = [], participants = [], teams = [], categories = [], eventSettings = {} } = dbState;
   const activeUnits = units.filter(u => u.active !== false);
 
-  const standings = activeUnits.map(u => {
-    let overallPoints = 0;
+  const getRankPoints = (r) => {
+    if (!r.rank || r.rank > 10) return 0;
+    const cat = categories.find(c => c.id === r.categoryId);
+    if (cat) {
+      const key = `pointsRank${r.rank}`;
+      if (cat[key] !== undefined && cat[key] !== null) {
+        const val = Number(cat[key]);
+        if (!isNaN(val)) return val;
+      }
+    }
+    const settingsKey = `globalPointsRank${r.rank}`;
+    const settingsVal = eventSettings[settingsKey];
+    if (settingsVal !== undefined && settingsVal !== null) {
+      const val = Number(settingsVal);
+      if (!isNaN(val)) return val;
+    }
+    const defaultMap = { 1: 20, 2: 14, 3: 7 };
+    return defaultMap[r.rank] || 0;
+  };
+
+  const getNormalizedMark = (r) => {
+    return Number(r.averageMark ?? r.totalMark ?? r.marks ?? 0) || 0;
+  };
+
+  const standings = activeUnits.map(unit => {
+    const unitParticipants = participants.filter(p => p.unitId === unit.id && !p.deletedAt);
+    const participantIds = unitParticipants.map(p => p.id);
+
+    const individualResults = results.filter(r =>
+      r.participantId &&
+      participantIds.includes(r.participantId) &&
+      (r.status === 'participated' || !r.status) &&
+      r.publishedStatus &&
+      !r.deletedAt
+    );
+
+    const unitTeams = teams.filter(t => t.unitId === unit.id && !t.deletedAt);
+    const teamIds = unitTeams.map(t => t.id);
+
+    const groupResults = results.filter(r =>
+      r.teamId &&
+      teamIds.includes(r.teamId) &&
+      (r.status === 'participated' || !r.status) &&
+      r.publishedStatus &&
+      !r.deletedAt
+    );
+
+    const allUnitResults = [...individualResults, ...groupResults];
+
     let firstPlaceCount = 0;
     let secondPlaceCount = 0;
     let thirdPlaceCount = 0;
+    let fourthToSeventhPlaceCount = 0;
 
-    results.forEach(r => {
-      if (!r.deletedAt && (r.publishedStatus || (r.rank !== undefined && r.rank > 0))) {
-        const p = participants.find(p => p.id === r.participantId);
-        const t = teams.find(t => t.id === r.teamId);
-        const unitId = p ? p.unitId : (t ? t.unitId : null);
-
-        if (unitId === u.id || r.department === u.name) {
-          const pts = r.points || (r.rank === 1 ? 20 : r.rank === 2 ? 15 : r.rank === 3 ? 10 : 0);
-          overallPoints += pts;
-          if (r.rank === 1) firstPlaceCount++;
-          if (r.rank === 2) secondPlaceCount++;
-          if (r.rank === 3) thirdPlaceCount++;
-        }
-      }
+    allUnitResults.forEach(r => {
+      if (r.rank === 1) firstPlaceCount++;
+      else if (r.rank === 2) secondPlaceCount++;
+      else if (r.rank === 3) thirdPlaceCount++;
+      else if (r.rank >= 4 && r.rank <= 7) fourthToSeventhPlaceCount++;
     });
 
+    const overallPoints = allUnitResults.reduce((sum, r) => sum + getRankPoints(r), 0);
+    const overallMarks = Math.round(allUnitResults.reduce((sum, r) => sum + getNormalizedMark(r), 0) * 100) / 100;
+
     return {
-      unitId: u.id,
-      unitName: u.name,
-      unitCode: u.code,
+      unitId: unit.id,
+      unitName: unit.name,
+      unitCode: unit.code || unit.name.substring(0, 3).toUpperCase(),
+      totalParticipants: unitParticipants.length,
+      completedResultsCount: allUnitResults.length,
+      overallMarks,
       overallPoints,
       firstPlaceCount,
       secondPlaceCount,
-      thirdPlaceCount
+      thirdPlaceCount,
+      fourthToSeventhPlaceCount
     };
-  }).sort((a, b) => b.overallPoints - a.overallPoints);
+  });
 
-  res.json(standings);
+  standings.sort((a, b) => {
+    if (b.overallPoints !== a.overallPoints) return b.overallPoints - a.overallPoints;
+    return b.overallMarks - a.overallMarks;
+  });
+
+  let currentRank = 1;
+  const finalStandings = standings.map((standing, index) => {
+    const prev = standings[index - 1];
+    if (index > 0 && (standing.overallPoints < prev.overallPoints || (standing.overallPoints === prev.overallPoints && standing.overallMarks < prev.overallMarks))) {
+      currentRank++;
+    }
+    return {
+      ...standing,
+      rank: currentRank
+    };
+  });
+
+  res.json(finalStandings);
 });
 
 // Public Gallery

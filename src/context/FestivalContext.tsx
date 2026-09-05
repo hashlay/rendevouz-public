@@ -271,32 +271,36 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         }
 
         // Fallback: Calculate from results if standings endpoint is empty
-        const scoreMap: Record<string, HouseScore> = {};
-        units.forEach((u: any, i: number) => {
-          scoreMap[u.name] = { 
-            id: u.id, 
-            name: u.name, 
-            code: u.code, 
-            color: colors[i % colors.length], 
-            accentColor: accents[i % accents.length], 
-            totalPoints: 0, 
-            goldCount: 0, 
-            silverCount: 0, 
-            bronzeCount: 0 
-          };
-        });
+        if (units.length > 0) {
+          const scoreMap: Record<string, HouseScore> = {};
+          units.forEach((u: any, i: number) => {
+            scoreMap[u.name] = { 
+              id: u.id, 
+              name: u.name, 
+              code: u.code || u.name.substring(0, 3).toUpperCase(), 
+              color: colors[i % colors.length], 
+              accentColor: accents[i % accents.length], 
+              totalPoints: 0, 
+              goldCount: 0, 
+              silverCount: 0, 
+              bronzeCount: 0 
+            };
+          });
 
-        (results || []).forEach(r => {
-          const h = scoreMap[r.department];
-          if (h) {
-            h.totalPoints += r.points || 0;
-            if (r.rank === 1) h.goldCount++;
-            if (r.rank === 2) h.silverCount++;
-            if (r.rank === 3) h.bronzeCount++;
-          }
-        });
+          (results || []).forEach(r => {
+            if (r.deletedAt || !r.publishedStatus) return;
+            const h = scoreMap[r.department];
+            if (h) {
+              const rankPts = r.rank === 1 ? 20 : r.rank === 2 ? 14 : r.rank === 3 ? 7 : 0;
+              h.totalPoints += rankPts;
+              if (r.rank === 1) h.goldCount++;
+              if (r.rank === 2) h.silverCount++;
+              if (r.rank === 3) h.bronzeCount++;
+            }
+          });
 
-        setHouseScores(Object.values(scoreMap).sort((a, b) => b.totalPoints - a.totalPoints));
+          setHouseScores(Object.values(scoreMap).sort((a, b) => b.totalPoints - a.totalPoints));
+        }
       } catch (e) {
         console.error("Failed to fetch unit standings", e);
       }
