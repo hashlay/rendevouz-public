@@ -247,7 +247,7 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       }
     };
     fetchPublicData();
-    const interval = setInterval(fetchPublicData, 12000);
+    const interval = setInterval(fetchPublicData, 4000);
     return () => clearInterval(interval);
   }, []);
 

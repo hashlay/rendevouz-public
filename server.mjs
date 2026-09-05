@@ -144,23 +144,26 @@ async function getMongoDb() {
 // In-memory cache for high performance & instant responses (15-second TTL, invalidated immediately on write)
 let cachedDbState = null;
 let lastDbStateTime = 0;
-const DB_STATE_CACHE_TTL = 15000;
+const DB_STATE_CACHE_TTL = 4000; // 4-second TTL for instantaneous real-time sync
 
 export function invalidateDbCache() {
   lastDbStateTime = 0;
+  cachedDbState = null;
 }
 
 // Invalidate cache immediately on any write/mutation request so data is never stale
 app.use((req, res, next) => {
-  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
-    lastDbStateTime = 0;
+  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method) || req.query.t) {
+    if (Date.now() - lastDbStateTime > 2000) {
+      lastDbStateTime = 0;
+    }
   }
   next();
 });
 
 let _dbStatePromise = null;
 
-// Helper to fetch full database state from MongoDB with in-memory caching
+// Helper to fetch core database state from MongoDB with in-memory caching
 async function getDbState(force = false) {
   const now = Date.now();
   if (!force && cachedDbState && (now - lastDbStateTime < DB_STATE_CACHE_TTL)) {
@@ -191,11 +194,10 @@ async function getDbState(force = false) {
     if (!db) return cachedDbState || state;
 
     try {
-      // Overlay dedicated collections for 100% real-time accuracy
+      // Fetch only core operational collections in parallel
       const [
         settingsDocs, unitsDocs, categoriesDocs, competitionsDocs,
-        participantsDocs, teamsDocs, resultsDocs, chestDocs,
-        galleryDocs, videoDocs, dragBlocksDocs, heroMediaDocs
+        participantsDocs, teamsDocs, resultsDocs, chestDocs
       ] = await Promise.all([
         db.collection('settings').find({}).toArray().catch(() => []),
         db.collection('units').find({}).toArray().catch(() => []),
@@ -204,11 +206,7 @@ async function getDbState(force = false) {
         db.collection('participants').find({}).toArray().catch(() => []),
         db.collection('teams').find({}).toArray().catch(() => []),
         db.collection('results').find({}).toArray().catch(() => []),
-        db.collection('chestNumbers').find({}).toArray().catch(() => []),
-        db.collection('gallery').find({}).toArray().catch(() => []),
-        db.collection('videoHighlights').find({}).toArray().catch(() => []),
-        db.collection('dragBlocks').find({}).toArray().catch(() => []),
-        db.collection('heroMedia').find({}).toArray().catch(() => [])
+        db.collection('chestNumbers').find({}).toArray().catch(() => [])
       ]);
 
       settingsDocs.forEach(s => {
