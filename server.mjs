@@ -294,11 +294,9 @@ const DEFAULT_DRAG_BLOCKS = [
 // 🌐 PUBLIC WEBSITE API ENDPOINTS
 // =========================================================================
 
-// Prevent browser/proxy HTTP caching on public endpoints so fresh data always serves
+// Smart Edge caching for public endpoints: serves instantly from Edge CDN for 3s while keeping data live
 app.use('/api/public', (req, res, next) => {
-  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
-  res.setHeader('Pragma', 'no-cache');
-  res.setHeader('Expires', '0');
+  res.setHeader('Cache-Control', 'public, max-age=1, s-maxage=3, stale-while-revalidate=10');
   next();
 });
 

@@ -228,11 +228,13 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             return merged;
           });
 
-          // Preload theme images in background for instantaneous poster rendering
+          // Preload theme images once in background for instantaneous poster rendering
           const themes = resSettings.posterTemplateConfig?.customThemes;
           if (Array.isArray(themes)) {
             themes.forEach((url: string) => {
-              if (url && typeof url === 'string') {
+              if (url && typeof url === 'string' && !(window as any).__preloadedThemes?.has(url)) {
+                if (!(window as any).__preloadedThemes) (window as any).__preloadedThemes = new Set();
+                (window as any).__preloadedThemes.add(url);
                 const img = new Image();
                 img.src = url;
               }
@@ -247,7 +249,11 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       }
     };
     fetchPublicData();
-    const interval = setInterval(fetchPublicData, 4000);
+    // Poll every 15s to keep live data fresh without blowing Vercel bandwidth limits
+    const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return; // Skip if tab is inactive
+      fetchPublicData();
+    }, 15000);
     return () => clearInterval(interval);
   }, []);
 

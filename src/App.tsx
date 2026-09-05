@@ -125,14 +125,17 @@ function PublicWebsiteContent({ onSwitchToApp }: { onSwitchToApp: (mode: 'worksp
     };
 
     const fetchCMSData = () => {
-      fetch(`/api/public/cms?t=${Date.now()}`)
+      fetch('/api/public/cms')
         .then(res => res.ok ? res.json() : Promise.reject(res))
         .then(applyCMSData)
         .catch(err => console.error('Failed to load CMS data:', err));
     };
 
     fetchCMSData();
-    const interval = setInterval(fetchCMSData, 10000);
+    const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return;
+      fetchCMSData();
+    }, 30000);
     return () => clearInterval(interval);
   }, []);
 
