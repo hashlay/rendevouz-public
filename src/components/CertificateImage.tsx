@@ -104,17 +104,19 @@ export const CertificateImage: React.FC<CertificateImageProps> = ({
       const compSpecificConfig = eventSettings?.certificateTemplateConfig?.[compKey];
       const globalRankConfig = eventSettings?.certificateTemplateConfig?.[rank] || {};
       const templateConfig = compSpecificConfig || globalRankConfig;
-      const nameX = templateConfig.nameX ?? (rank === 1 ? -151 : -125);
-      const nameY = templateConfig.nameY ?? 461;
-      const compX = templateConfig.compX ?? (rank === 1 ? -37 : -30);
-      const compY = templateConfig.compY ?? 553;
-      const nameSize = templateConfig.nameSize ?? 33;
-      const compSize = templateConfig.compSize ?? 25;
-      const defaultColor = rank === 1 ? '#cc0000' : '#000000';
+      const nameX = templateConfig.nameX ?? -410;
+      const nameY = templateConfig.nameY ?? 671;
+      const compX = templateConfig.compX ?? -414;
+      const compY = templateConfig.compY ?? 913;
+      const nameSize = templateConfig.nameSize ?? 68;
+      const compSize = templateConfig.compSize ?? 68;
+      const defaultColor = '#000000';
       const nameColor = templateConfig.nameColor ?? defaultColor;
       const compColor = templateConfig.compColor ?? defaultColor;
       const nameFont = templateConfig.nameFont || '"Montserrat", "Inter", sans-serif';
       const compFont = templateConfig.compFont || '"Montserrat", "Inter", sans-serif';
+      const nameAlign = templateConfig.nameAlign || 'left';
+      const compAlign = templateConfig.compAlign || 'left';
 
       const displayName = eventSettings?.certificateOverrides?.[`${compKey}_${participantName}`] || eventSettings?.certificateOverrides?.[participantName] || participantName;
       const displayComp = eventSettings?.certificateOverrides?.[`comp_${competitionId || competitionName}`] || eventSettings?.certificateOverrides?.[`comp_${competitionName}`] || competitionName;
@@ -124,7 +126,7 @@ export const CertificateImage: React.FC<CertificateImageProps> = ({
         : rank === 2 
           ? eventSettings?.certTheme2Url 
           : eventSettings?.certTheme3Url;
-      const fallbackUrl = rank === 1 ? '/certificate_1.jpg' : '/certificate_2.jpg';
+      const fallbackUrl = rank === 1 ? '/certificate_1.jpg' : (rank === 2 ? '/certificate_2.jpg' : '/certificate_3.jpg');
       const targetUrl = customUrl || fallbackUrl;
       
       const cached = publicCertImageCache.get(targetUrl);
@@ -190,7 +192,7 @@ export const CertificateImage: React.FC<CertificateImageProps> = ({
             nameSize,
             `bold ${nameSize}px ${nameFont}`,
             nameColor,
-            'center'
+            nameAlign
           );
 
           fillMultiLinePublicText(
@@ -200,7 +202,7 @@ export const CertificateImage: React.FC<CertificateImageProps> = ({
             compSize,
             `bold ${compSize}px ${compFont}`,
             compColor,
-            'left'
+            compAlign
           );
 
           const url = canvas.toDataURL('image/webp', 0.92) || canvas.toDataURL('image/jpeg', 0.95);
