@@ -303,20 +303,9 @@ export const renderPosterToCanvas = async (
   const compOverride = (eventSettings?.posterOverrides && compName && eventSettings.posterOverrides[compName]) ||
                        (eventSettings?.posterOverrides && compId && eventSettings.posterOverrides[compId]);
   
-  const isOverrideValid = compOverride && 
-                          compOverride._savedThemeIndex === themeIdx && 
-                          compOverride._savedBgImageUrl === getBgHash(backgroundSource);
+  const isOverrideValid = !!compOverride;
+  const c = isOverrideValid ? { ...baseConf, ...compOverride } : baseConf;
 
-  const c = isOverrideValid ? { ...baseConf, ...compOverride } : {
-    ...baseConf,
-    compNameOverride: compOverride?.compNameOverride,
-    rank1NameOverride: compOverride?.rank1NameOverride,
-    rank1UnitOverride: compOverride?.rank1UnitOverride,
-    rank2NameOverride: compOverride?.rank2NameOverride,
-    rank2UnitOverride: compOverride?.rank2UnitOverride,
-    rank3NameOverride: compOverride?.rank3NameOverride,
-    rank3UnitOverride: compOverride?.rank3UnitOverride
-  };
 
   
   const festivalName = eventSettings?.festivalName || 'Sahityotsav';
