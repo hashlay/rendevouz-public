@@ -206,9 +206,9 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const fetchPublicData = async () => {
       try {
         const [resResults, resSettings, resCategories] = await Promise.all([
-          fetch(`/api/public/results?t=${Date.now()}`).then(r => r.ok ? r.json() : []).catch(() => []),
-          fetch(`/api/public/settings?t=${Date.now()}`).then(r => r.ok ? r.json() : null).catch(() => null),
-          fetch(`/api/public/categories?t=${Date.now()}`).then(r => r.ok ? r.json() : []).catch(() => [])
+          fetch('/api/public/results').then(r => r.ok ? r.json() : []).catch(() => []),
+          fetch('/api/public/settings').then(r => r.ok ? r.json() : null).catch(() => null),
+          fetch('/api/public/categories').then(r => r.ok ? r.json() : []).catch(() => [])
         ]);
         
         if (Array.isArray(resResults) && resResults.length > 0) {
@@ -249,12 +249,6 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       }
     };
     fetchPublicData();
-    // Poll every 15s to keep live data fresh without blowing Vercel bandwidth limits
-    const interval = setInterval(() => {
-      if (typeof document !== 'undefined' && document.hidden) return; // Skip if tab is inactive
-      fetchPublicData();
-    }, 15000);
-    return () => clearInterval(interval);
   }, []);
 
   // Derived State: House Scores (Standings) fetched directly from backend calculation engine
@@ -262,10 +256,9 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   useEffect(() => {
     const computeHouseScores = async () => {
       try {
-        const ts = Date.now();
         const [resStandings, resUnits] = await Promise.all([
-          fetch(`/api/public/standings?t=${ts}`).then(r => r.ok ? r.json() : []).catch(() => []),
-          fetch(`/api/public/units?t=${ts}`).then(r => r.ok ? r.json() : []).catch(() => [])
+          fetch('/api/public/standings').then(r => r.ok ? r.json() : []).catch(() => []),
+          fetch('/api/public/units').then(r => r.ok ? r.json() : []).catch(() => [])
         ]);
 
         const units = Array.isArray(resUnits) && resUnits.length > 0 ? resUnits : [];

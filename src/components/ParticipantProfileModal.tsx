@@ -2,6 +2,9 @@ import React, { useState, useMemo } from 'react';
 import { X, User, QrCode, Calendar, Award, Sparkles, Download, ScanFace, CheckCircle, ExternalLink, ShieldCheck, MapPin, Printer } from 'lucide-react';
 import { useFestival } from '../context/FestivalContext';
 import { CertificateImage } from './CertificateImage';
+
+// Toggle to false in future to re-enable certificates in participant modal
+const CERTIFICATES_DISABLED = true;
 import { PosterImage } from './PosterImage';
 
 interface ParticipantProfileModalProps {
@@ -563,86 +566,88 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
           )}
         </div>
 
-        {/* Section C: Official Certificates */}
-        <div className="space-y-4">
-          <h4 className="text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
-            <Award className="w-5 h-5 text-emerald-400" />
-            <span>Official Certificates</span>
-          </h4>
+        {/* Section C: Official Certificates - completely invisible when disabled */}
+        {!CERTIFICATES_DISABLED && (
+          <div className="space-y-4">
+            <h4 className="text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
+              <Award className="w-5 h-5 text-emerald-400" />
+              <span>Official Certificates</span>
+            </h4>
 
-          {participantCertificates.length === 0 ? (
-            <div className="bg-black/30 border border-white/10 rounded-3xl p-8 text-center text-sm text-zinc-400 font-mono">
-              No certificates available yet. (Certificates are awarded for Rank 1, 2, and 3 after admin verification).
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {participantCertificates.map((res) => {
-                return (
-                  <div key={`cert-${res.id}`} className="bg-black/50 border border-white/10 hover:border-emerald-500/50 rounded-3xl p-6 flex flex-col justify-between gap-4 transition-all">
-                    <div>
-                      <h5 className="text-base font-bold text-white">{res.eventName}</h5>
-                      <p className="text-xs text-emerald-400 font-mono uppercase mt-1 font-bold">Rank #{res.rank} Official Certificate</p>
-                    </div>
-                    
-                    <div className="flex-1 min-h-[150px] relative rounded-xl overflow-hidden border border-white/5 bg-black/50">
-                      <CertificateImage 
-                        participantName={cleanName}
-                        competitionName={res.eventName}
-                        competitionId={res.competitionId}
-                        rank={res.rank || 1}
-                        className="w-full h-full object-contain"
-                        onLoadUrl={(url) => {
-                          const imgEl = document.getElementById(`cert-img-data-${res.id}`) as HTMLImageElement;
-                          if (imgEl) imgEl.src = url;
-                        }}
-                      />
-                      <img id={`cert-img-data-${res.id}`} style={{ display: 'none' }} alt="data-url" />
-                    </div>
+            {participantCertificates.length === 0 ? (
+              <div className="bg-black/30 border border-white/10 rounded-3xl p-8 text-center text-sm text-zinc-400 font-mono">
+                No certificates available yet. (Certificates are awarded for Rank 1, 2, and 3 after admin verification).
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {participantCertificates.map((res) => {
+                  return (
+                    <div key={`cert-${res.id}`} className="bg-black/50 border border-white/10 hover:border-emerald-500/50 rounded-3xl p-6 flex flex-col justify-between gap-4 transition-all">
+                      <div>
+                        <h5 className="text-base font-bold text-white">{res.eventName}</h5>
+                        <p className="text-xs text-emerald-400 font-mono uppercase mt-1 font-bold">Rank #{res.rank} Official Certificate</p>
+                      </div>
+                      
+                      <div className="flex-1 min-h-[150px] relative rounded-xl overflow-hidden border border-white/5 bg-black/50">
+                        <CertificateImage 
+                          participantName={cleanName}
+                          competitionName={res.eventName}
+                          competitionId={res.competitionId}
+                          rank={res.rank || 1}
+                          className="w-full h-full object-contain"
+                          onLoadUrl={(url) => {
+                            const imgEl = document.getElementById(`cert-img-data-${res.id}`) as HTMLImageElement;
+                            if (imgEl) imgEl.src = url;
+                          }}
+                        />
+                        <img id={`cert-img-data-${res.id}`} style={{ display: 'none' }} alt="data-url" />
+                      </div>
 
-                    <div className="flex items-center gap-2 mt-2">
-                      <button
-                        onClick={() => {
-                          const imgEl = document.getElementById(`cert-img-data-${res.id}`) as HTMLImageElement;
-                          if (imgEl && imgEl.src) {
-                            const a = document.createElement('a');
-                            a.href = imgEl.src;
-                            a.download = `Certificate_${res.eventName.replace(/\s+/g, '_')}_${cleanName.replace(/\s+/g, '_')}.jpg`;
-                            a.click();
-                          } else {
-                            alert("Please wait for certificate to load");
-                          }
-                        }}
-                        className="flex-1 px-3 py-2.5 bg-white/10 hover:bg-emerald-500 hover:text-black text-white text-xs font-mono font-bold rounded-xl border border-white/15 transition-all flex items-center justify-center gap-2 shadow-sm"
-                      >
-                        <Download className="w-4 h-4" /> Download
-                      </button>
-                      <button
-                        onClick={() => {
-                          const imgEl = document.getElementById(`cert-img-data-${res.id}`) as HTMLImageElement;
-                          if (imgEl && imgEl.src) {
-                            handleShare('Official Certificate', `Rank ${res.rank} Certificate for ${res.eventName}`, imgEl.src);
-                          }
-                        }}
-                        className="flex-1 px-3 py-2.5 bg-white/10 hover:bg-emerald-500 hover:text-black text-white text-xs font-mono font-bold rounded-xl border border-white/15 transition-all flex items-center justify-center gap-2 shadow-sm"
-                      >
-                        <ExternalLink className="w-4 h-4" /> Share
-                      </button>
-                      <button
-                        onClick={() => {
-                          const imgEl = document.getElementById(`cert-img-data-${res.id}`) as HTMLImageElement;
-                          if (imgEl && imgEl.src) handlePrint(imgEl.src);
-                        }}
-                        className="flex-1 px-3 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-mono font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm shadow-emerald-900/40"
-                      >
-                        <Printer className="w-4 h-4" /> Print
-                      </button>
+                      <div className="flex items-center gap-2 mt-2">
+                        <button
+                          onClick={() => {
+                            const imgEl = document.getElementById(`cert-img-data-${res.id}`) as HTMLImageElement;
+                            if (imgEl && imgEl.src) {
+                              const a = document.createElement('a');
+                              a.href = imgEl.src;
+                              a.download = `Certificate_${res.eventName.replace(/\s+/g, '_')}_${cleanName.replace(/\s+/g, '_')}.jpg`;
+                              a.click();
+                            } else {
+                              alert("Please wait for certificate to load");
+                            }
+                          }}
+                          className="flex-1 px-3 py-2.5 bg-white/10 hover:bg-emerald-500 hover:text-black text-white text-xs font-mono font-bold rounded-xl border border-white/15 transition-all flex items-center justify-center gap-2 shadow-sm"
+                        >
+                          <Download className="w-4 h-4" /> Download
+                        </button>
+                        <button
+                          onClick={() => {
+                            const imgEl = document.getElementById(`cert-img-data-${res.id}`) as HTMLImageElement;
+                            if (imgEl && imgEl.src) {
+                              handleShare('Official Certificate', `Rank ${res.rank} Certificate for ${res.eventName}`, imgEl.src);
+                            }
+                          }}
+                          className="flex-1 px-3 py-2.5 bg-white/10 hover:bg-emerald-500 hover:text-black text-white text-xs font-mono font-bold rounded-xl border border-white/15 transition-all flex items-center justify-center gap-2 shadow-sm"
+                        >
+                          <ExternalLink className="w-4 h-4" /> Share
+                        </button>
+                        <button
+                          onClick={() => {
+                            const imgEl = document.getElementById(`cert-img-data-${res.id}`) as HTMLImageElement;
+                            if (imgEl && imgEl.src) handlePrint(imgEl.src);
+                          }}
+                          className="flex-1 px-3 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-mono font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm shadow-emerald-900/40"
+                        >
+                          <Printer className="w-4 h-4" /> Print
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Section D: Official Winner Posters */}
         <div className="space-y-4">

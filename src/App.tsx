@@ -132,11 +132,6 @@ function PublicWebsiteContent({ onSwitchToApp }: { onSwitchToApp: (mode: 'worksp
     };
 
     fetchCMSData();
-    const interval = setInterval(() => {
-      if (typeof document !== 'undefined' && document.hidden) return;
-      fetchCMSData();
-    }, 30000);
-    return () => clearInterval(interval);
   }, []);
 
   // Push history state whenever a modal opens so back gestures close the modal & return home
@@ -241,9 +236,7 @@ function PublicWebsiteContent({ onSwitchToApp }: { onSwitchToApp: (mode: 'worksp
       <main>
         {pageView === 'gallery' ? (
           <PublicGalleryPage />
-        ) : pageView === 'posters' ? (
-          <PublicPostersPage />
-        ) : pageView === 'results' ? (
+        ) : pageView === 'posters' || pageView === 'results' ? (
           <PublishedResultsPage
             initialCategory={resultsFilter.category}
             initialEvent={resultsFilter.eventName}
@@ -255,7 +248,7 @@ function PublicWebsiteContent({ onSwitchToApp }: { onSwitchToApp: (mode: 'worksp
           <>
             {cmsData?.dragBlocks && cmsData.dragBlocks.length > 0 ? (
               cmsData.dragBlocks
-                .filter((b: any) => b.enabled)
+                .filter((b: any) => b.enabled && b.type !== 'posters')
                 .sort((a: any, b: any) => a.order - b.order)
                 .map((block: any) => {
                   switch (block.type) {
@@ -268,8 +261,6 @@ function PublicWebsiteContent({ onSwitchToApp }: { onSwitchToApp: (mode: 'worksp
                     case 'smile':
                     case 'photohub':
                       return <SmilePhotoPortal key="smile" cmsSettings={cmsData?.cmsSettings} />;
-                    case 'posters':
-                      return <PostersSection key="posters" onNavigate={handleNavigate} />;
                     case 'gallery':
                       return <GallerySection key="gallery" onNavigate={handleNavigate} />;
                     case 'live_stream':
@@ -286,7 +277,6 @@ function PublicWebsiteContent({ onSwitchToApp }: { onSwitchToApp: (mode: 'worksp
                 <HeroSection onNavigate={handleNavigate} cmsSettings={cmsData?.cmsSettings} heroMedia={cmsData?.heroMedia} dragBlocks={cmsData?.dragBlocks} />
                 <AboutSection onOpenConceptModal={() => setIsConceptModalOpen(true)} cmsSettings={cmsData?.cmsSettings} />
                 <ResultsSection onNavigate={handleNavigate} />
-                <PostersSection onNavigate={handleNavigate} />
                 <GallerySection onNavigate={handleNavigate} />
                 <SmilePhotoPortal cmsSettings={cmsData?.cmsSettings} />
               </>
