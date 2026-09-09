@@ -129,27 +129,6 @@ export const CertificateImage: React.FC<CertificateImageProps> = ({
       const fallbackUrl = rank === 1 ? '/certificate_1.jpg' : (rank === 2 ? '/certificate_2.jpg' : '/certificate_3.jpg');
       const targetUrl = customUrl || fallbackUrl;
       
-      const cached = publicCertImageCache.get(targetUrl);
-      if (cached && cached.complete && cached.naturalWidth > 0) {
-        tryRenderImage(cached);
-        return;
-      }
-
-      const img = new Image();
-      if (targetUrl.startsWith('http://') || targetUrl.startsWith('https://')) {
-        img.crossOrigin = 'anonymous';
-      }
-      img.onload = () => {
-        publicCertImageCache.set(targetUrl, img);
-        if (!active) return;
-        tryRenderImage(img);
-      };
-      img.onerror = () => {
-        if (!active) return;
-        drawFallbackCertificate(canvas, ctx);
-      };
-      img.src = targetUrl;
-      
       const tryRenderImage = (imageElement: HTMLImageElement) => {
         try {
           ctx.canvas.width = imageElement.width || 1200;
@@ -216,11 +195,21 @@ export const CertificateImage: React.FC<CertificateImageProps> = ({
         }
       };
 
+      const cached = publicCertImageCache.get(targetUrl);
+      if (cached && cached.complete && cached.naturalWidth > 0) {
+        tryRenderImage(cached);
+        return;
+      }
+
+      const img = new Image();
+      if (targetUrl.startsWith('http://') || targetUrl.startsWith('https://')) {
+        img.crossOrigin = 'anonymous';
+      }
       img.onload = () => {
+        publicCertImageCache.set(targetUrl, img);
         if (!active) return;
         tryRenderImage(img);
       };
-
       img.onerror = () => {
         if (!active) return;
         if (customUrl && !img.src.endsWith(fallbackUrl)) {
@@ -239,7 +228,6 @@ export const CertificateImage: React.FC<CertificateImageProps> = ({
           drawFallbackCertificate(canvas, ctx);
         }
       };
-
       img.src = targetUrl;
     };
     

@@ -16,8 +16,6 @@ import { ParticipantProfileModal } from './components/ParticipantProfileModal';
 import { FaceScannerModal } from './components/FaceScannerModal';
 import { PublishedResultsPage } from './components/PublishedResultsPage';
 import { TeamPointsPage } from './components/TeamPointsPage';
-import { PublicPostersPage } from './components/PublicPostersPage';
-import { PostersSection } from './components/PostersSection';
 import { PublicGalleryPage } from './components/PublicGalleryPage';
 import { Footer } from './components/Footer';
 
@@ -87,12 +85,11 @@ function PublicWebsiteContent({ onSwitchToApp }: { onSwitchToApp: (mode: 'worksp
     eventName: 'All'
   });
 
-  const [pageView, setPageView] = useState<'home' | 'results' | 'team-points' | 'posters' | 'gallery'>(() => {
+  const [pageView, setPageView] = useState<'home' | 'results' | 'team-points' | 'gallery'>(() => {
     const path = window.location.pathname.toLowerCase();
     if (path.includes('gallery')) return 'gallery';
-    if (path.includes('posters')) return 'posters';
     if (path.includes('team-points') || path.includes('standings')) return 'team-points';
-    if (path.includes('results')) return 'results';
+    if (path.includes('results') || path.includes('posters')) return 'results';
     return 'home';
   });
 
@@ -157,11 +154,9 @@ function PublicWebsiteContent({ onSwitchToApp }: { onSwitchToApp: (mode: 'worksp
       const path = window.location.pathname.toLowerCase();
       if (path.includes('gallery')) {
         setPageView('gallery');
-      } else if (path.includes('posters')) {
-        setPageView('posters');
       } else if (path.includes('team-points') || path.includes('standings')) {
         setPageView('team-points');
-      } else if (path.includes('results')) {
+      } else if (path.includes('results') || path.includes('posters')) {
         setPageView('results');
       } else {
         setPageView('home');
@@ -189,15 +184,7 @@ function PublicWebsiteContent({ onSwitchToApp }: { onSwitchToApp: (mode: 'worksp
       }
       return;
     }
-    if (sectionId === 'posters') {
-      setPageView('posters');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      if (window.location.pathname !== '/posters') {
-        window.history.pushState({}, '', '/posters');
-      }
-      return;
-    }
-    if (sectionId === 'results') {
+    if (sectionId === 'posters' || sectionId === 'results') {
       setPageView('results');
       window.scrollTo({ top: 0, behavior: 'smooth' });
       if (window.location.pathname !== '/results') {
@@ -236,7 +223,7 @@ function PublicWebsiteContent({ onSwitchToApp }: { onSwitchToApp: (mode: 'worksp
       <main>
         {pageView === 'gallery' ? (
           <PublicGalleryPage />
-        ) : pageView === 'posters' || pageView === 'results' ? (
+        ) : pageView === 'results' ? (
           <PublishedResultsPage
             initialCategory={resultsFilter.category}
             initialEvent={resultsFilter.eventName}

@@ -151,6 +151,18 @@ export function invalidateDbCache() {
   cachedDbState = null;
 }
 
+// Internal webhook for real-time cache busting from Admin Server
+app.post('/api/internal/cache-bust', (req, res) => {
+  const secret = req.headers['x-internal-secret'] || req.query.secret || req.body?.secret;
+  const expectedSecret = process.env.INTERNAL_CACHE_BUST_SECRET || 'rendezvous_secret_cache_bust_2026';
+  if (secret !== expectedSecret) {
+    return res.status(401).json({ error: 'Unauthorized cache bust' });
+  }
+  invalidateDbCache();
+  console.log('⚡ [Real-Time Sync] Public cache invalidated via internal webhook.');
+  return res.json({ success: true, timestamp: Date.now() });
+});
+
 // Invalidate cache immediately on any write/mutation request so data is never stale
 app.use((req, res, next) => {
   if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method) || req.query.t) {
@@ -359,6 +371,7 @@ app.get('/api/public/results', async (req, res) => {
       let codeNumber = r.codeNumber || r.chestNumber || '';
       let department = r.department || r.unitName || '';
       let participationType = comp?.participationType === 'group' ? 'Group' : 'Individual';
+      let teamMemberIds = [];
 
       if (r.participantId && !participantName) {
         const p = participants.find(p => p.id === r.participantId);
@@ -369,13 +382,16 @@ app.get('/api/public/results', async (req, res) => {
           const unit = units.find(u => u.id === p.unitId);
           department = unit ? unit.name : '';
         }
-      } else if (r.teamId && !participantName) {
+      } else if (r.teamId) {
         const t = teams.find(t => t.id === r.teamId);
         if (t) {
-          participantName = t.teamName || t.teamNumber;
-          codeNumber = t.teamNumber;
-          const unit = units.find(u => u.id === t.unitId);
-          department = unit ? unit.name : '';
+          teamMemberIds = Array.isArray(t.memberIds) ? t.memberIds : [];
+          if (!participantName) {
+            participantName = t.teamName || t.teamNumber;
+            codeNumber = t.teamNumber;
+            const unit = units.find(u => u.id === t.unitId);
+            department = unit ? unit.name : '';
+          }
         }
       }
 
@@ -396,10 +412,16 @@ app.get('/api/public/results', async (req, res) => {
         participantName,
         codeNumber,
         department,
+        teamId: r.teamId,
+        participantId: r.participantId,
+        teamMemberIds,
         rank: r.rank || 0,
         grade,
         points,
-        raw: r
+        raw: {
+          ...r,
+          teamMemberIds
+        }
       };
     });
 
@@ -555,6 +577,102 @@ app.get('/api/public/cms', async (req, res) => {
   });
 });
 
+// Helper: Build 100% genuine participant portal data with real programs, teams, and results
+function buildParticipantPortalData(participant, cNum, cleanChest, dbState) {
+  const { competitions = [], results = [], registrations = [], teams = [], units = [], categories = [] } = dbState;
+
+  // 1. Pre-registered competitions (individual & group)
+  const regRecord = registrations.find(r => r.participantId === participant.id && !r.deletedAt);
+  const indCompIds = regRecord?.selectedIndividualCompetitionIds || participant.registeredEvents || [];
+  const groupCompIds = regRecord?.selectedGroupTeamIds ? [...regRecord.selectedGroupTeamIds] : [];
+
+  // 2. Teams where participant is a member
+  const candidateTeams = teams.filter(t => Array.isArray(t.memberIds) && t.memberIds.includes(participant.id) && !t.deletedAt);
+  candidateTeams.forEach(t => {
+    if (t.competitionId && !groupCompIds.includes(t.competitionId)) {
+      groupCompIds.push(t.competitionId);
+    }
+  });
+
+  const candidateTeamIds = candidateTeams.map(t => t.id);
+
+  // 3. Direct result entry competitions (even if pre-registration was skipped!)
+  const directResultCompIds = results
+    .filter(r => !r.deletedAt && (r.participantId === participant.id || (r.teamId && candidateTeamIds.includes(r.teamId))))
+    .map(r => r.competitionId)
+    .filter(Boolean);
+
+  const allCompIds = Array.from(new Set([...indCompIds, ...groupCompIds, ...directResultCompIds]));
+
+  const registeredComps = competitions
+    .filter(c => allCompIds.includes(c.id))
+    .map(c => {
+      const cat = categories.find(cat => cat.id === c.categoryId);
+      return {
+        id: c.id,
+        competitionId: c.id,
+        program: c.name,
+        name: c.name,
+        eventName: c.name,
+        category: cat ? cat.name : (c.category || 'General'),
+        stage: c.stageType === 'on_stage' ? 'On Stage' : (c.stageType === 'off_stage' ? 'Off Stage' : (c.stage || 'Main Stage')),
+        stageType: c.stageType,
+        time: c.startTime || '09:00 AM',
+        status: 'upcoming',
+        participationType: c.participationType === 'group' ? 'group' : 'individual'
+      };
+    });
+
+  const unit = units.find(u => u.id === participant.unitId);
+  const category = categories.find(c => c.id === participant.selectedCategoryId);
+
+  // 4. Candidate's results (both individual & group/team results)
+  const participantResults = results
+    .filter(r => !r.deletedAt && (r.participantId === participant.id || (r.teamId && candidateTeamIds.includes(r.teamId))))
+    .map(r => {
+      const comp = competitions.find(c => c.id === r.competitionId);
+      const cat = categories.find(c => c.id === r.categoryId);
+      const isGroup = comp?.participationType === 'group' || !!r.teamId;
+      return {
+        id: r.id,
+        competitionId: r.competitionId,
+        eventName: comp ? comp.name : (r.eventName || r.program || 'Competition'),
+        program: comp ? comp.name : (r.eventName || r.program || 'Competition'),
+        category: cat ? cat.name : (r.category || 'General'),
+        rank: r.rank,
+        grade: r.grade || 'A',
+        totalMarks: r.averageMark ?? r.totalMark ?? r.marks ?? 0,
+        points: r.points || (r.rank === 1 ? 20 : r.rank === 2 ? 14 : r.rank === 3 ? 7 : 0),
+        publishedStatus: r.publishedStatus ?? true,
+        participantName: participant.fullName,
+        codeNumber: cNum ? (cNum.chestNumber || cNum.codeNumber) : (participant.profilePhoto || cleanChest),
+        department: unit ? unit.name : (participant.unitName || 'Main Unit'),
+        teamName: unit ? unit.name : (participant.unitName || 'Main Unit'),
+        participationType: isGroup ? 'group' : 'individual',
+        raw: {
+          ...r,
+          teamMemberIds: isGroup ? [participant.id] : []
+        }
+      };
+    });
+
+  const enrichedParticipant = {
+    ...participant,
+    chestNumber: cNum ? (cNum.chestNumber || cNum.codeNumber) : (participant.profilePhoto || cleanChest),
+    unitName: unit ? unit.name : participant.unitName || 'Main Unit',
+    department: unit ? unit.name : participant.unitName || 'Main Unit',
+    categoryName: category ? category.name : participant.categoryName || 'General',
+    category: category ? category.name : participant.categoryName || 'General',
+    candidateTeams,
+    registeredPrograms: registeredComps,
+    registeredComps,
+    schedule: registeredComps,
+    results: participantResults
+  };
+
+  return { participant: enrichedParticipant, registeredComps, participantResults };
+}
+
 // Participant Auth Routes
 app.post('/api/public/auth/participant-login', async (req, res) => {
   const { chestNumber, dob, candidateClass, classVal } = req.body;
@@ -579,14 +697,20 @@ app.post('/api/public/auth/participant-login', async (req, res) => {
     if (dob && participant.dob && participant.dob !== dob) return res.status(401).json({ error: 'Incorrect Date of Birth' });
   }
 
-  res.json({ token: `token_${participant.id}_${Date.now()}`, participant });
+  const portalData = buildParticipantPortalData(participant, cNum, cleanChest, dbState);
+  res.json({
+    token: `token_${participant.id}_${Date.now()}`,
+    participant: portalData.participant,
+    registeredComps: portalData.registeredComps,
+    participantResults: portalData.participantResults
+  });
 });
 
 app.get('/api/public/participant/by-chest/:chestNo', async (req, res) => {
   const { chestNo } = req.params;
   const cleanChest = (chestNo || '').toString().trim();
   const dbState = await getDbState();
-  const { chestNumbers = [], participants = [], competitions = [], results = [], registrations = [], teams = [], units = [], categories = [] } = dbState;
+  const { chestNumbers = [], participants = [] } = dbState;
 
   const cNum = chestNumbers.find(c => c.chestNumber?.toString() === cleanChest || c.codeNumber === cleanChest);
   let participant = participants.find(p => (cNum && (p.id === cNum.participantId || p.id === cNum.entityId)) || p.profilePhoto === cleanChest || p.id === cleanChest);
@@ -595,40 +719,12 @@ app.get('/api/public/participant/by-chest/:chestNo', async (req, res) => {
     return res.status(404).json({ error: 'Participant not found for this chest number' });
   }
 
-  // Find registered competitions from registrations list or registeredEvents property
-  const regRecord = registrations.find(r => r.participantId === participant.id && !r.deletedAt);
-  const indCompIds = regRecord?.selectedIndividualCompetitionIds || participant.registeredEvents || [];
-  const groupCompIds = regRecord?.selectedGroupTeamIds || [];
-
-  // Also include competitions from teams where candidate is a member
-  const candidateTeams = teams.filter(t => Array.isArray(t.memberIds) && t.memberIds.includes(participant.id) && !t.deletedAt);
-  candidateTeams.forEach(t => {
-    if (t.competitionId && !groupCompIds.includes(t.competitionId)) {
-      groupCompIds.push(t.competitionId);
-    }
+  const portalData = buildParticipantPortalData(participant, cNum, cleanChest, dbState);
+  res.json({
+    participant: portalData.participant,
+    registeredComps: portalData.registeredComps,
+    participantResults: portalData.participantResults
   });
-
-  const allCompIds = Array.from(new Set([...indCompIds, ...groupCompIds]));
-  const registeredComps = competitions.filter(c => allCompIds.includes(c.id));
-
-  // Results for candidate (both individual and team results)
-  const candidateTeamIds = candidateTeams.map(t => t.id);
-  const participantResults = results.filter(r => 
-    !r.deletedAt && (r.participantId === participant.id || candidateTeamIds.includes(r.teamId))
-  );
-
-  const unit = units.find(u => u.id === participant.unitId);
-  const category = categories.find(c => c.id === participant.selectedCategoryId);
-
-  const enrichedParticipant = {
-    ...participant,
-    chestNumber: cNum ? (cNum.chestNumber || cNum.codeNumber) : (participant.profilePhoto || cleanChest),
-    unitName: unit ? unit.name : participant.unitName || 'Main Unit',
-    categoryName: category ? category.name : participant.categoryName || 'General',
-    candidateTeams
-  };
-
-  res.json({ participant: enrichedParticipant, registeredComps, participantResults });
 });
 
 // CLOUDINARY MEDIA UPLOAD ENDPOINTS

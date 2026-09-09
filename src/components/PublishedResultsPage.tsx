@@ -22,6 +22,7 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
   const [expandedEvent, setExpandedEvent] = useState<string | null>(initialEvent !== 'All' ? initialEvent : null);
   const [activeShareGroup, setActiveShareGroup] = useState<string | null>(null);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const [generatingKey, setGeneratingKey] = useState<string | null>(null);
 
   useEffect(() => {
     setSelectedCategory(initialCategory);
@@ -33,6 +34,7 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
 
   const handleDownloadPoster = async (group: { eventName: string; category: string; key: string; items: ResultItem[]; announcementNumber?: number }) => {
     try {
+      setGeneratingKey(group.key);
       const canvas = document.createElement('canvas');
       const compIdx = group.announcementNumber || 1;
       await renderPosterToCanvas(
@@ -54,6 +56,8 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
       document.body.removeChild(a);
     } catch (err) {
       console.error("Failed to download HD poster", err);
+    } finally {
+      setGeneratingKey(null);
     }
   };
 
@@ -390,16 +394,18 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
 
                     <div className="px-4 pb-2 pt-4 bg-[#111114] flex items-center gap-3 border-t border-[#202028] mt-2 relative">
                       <button 
+                        disabled={generatingKey === group.key}
                         onClick={(e) => { e.stopPropagation(); handleDownloadPoster(group); }}
                         style={{ color: 'var(--color-primary-accent)', borderColor: 'var(--color-primary-accent)' }}
-                        className="flex items-center gap-1.5 px-3.5 py-1.5 bg-white/5 hover:bg-white/10 border rounded-md text-xs font-bold font-mono uppercase transition-colors cursor-pointer shadow-sm"
+                        className="flex items-center gap-1.5 px-3.5 py-1.5 bg-white/5 hover:bg-white/10 border rounded-md text-xs font-bold font-mono uppercase transition-colors cursor-pointer shadow-sm disabled:opacity-50"
                       >
-                        <Download className="w-3.5 h-3.5" />
-                        <span>Download HD Poster</span>
+                        <Download className={`w-3.5 h-3.5 ${generatingKey === group.key ? 'animate-bounce' : ''}`} />
+                        <span>{generatingKey === group.key ? 'Rendering HD...' : 'Download HD Poster'}</span>
                       </button>
                       <button 
+                        disabled={generatingKey === group.key}
                         onClick={(e) => { e.stopPropagation(); handleSharePoster(group); }}
-                        className="flex items-center gap-1.5 px-3.5 py-1.5 bg-white/5 hover:bg-white/10 text-zinc-300 border border-white/10 rounded-md text-xs font-bold font-mono uppercase transition-colors cursor-pointer shadow-sm"
+                        className="flex items-center gap-1.5 px-3.5 py-1.5 bg-white/5 hover:bg-white/10 text-zinc-300 border border-white/10 rounded-md text-xs font-bold font-mono uppercase transition-colors cursor-pointer shadow-sm disabled:opacity-50"
                       >
                         <Share2 className="w-3.5 h-3.5" />
                         <span>Share</span>

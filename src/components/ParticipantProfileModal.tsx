@@ -88,8 +88,8 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
   };
 
   const cleanName = p.name ? p.name.replace(/\s*\(\d+\)$/, '') : 'Participant';
-  const deptName = p.department || 'Ninthikal Team';
-  const catName = p.category || 'General';
+  const deptName = p.department || p.unitName || '';
+  const catName = p.category || p.categoryName || '';
   const dobFormatted = formatDobDisplay(p.dob);
   const criteriaMode = eventSettings?.participantLoginCriteria || (p.candidateClass ? 'class' : 'dob');
   const classDisplay = p.candidateClass ? p.candidateClass.replace(/^class\s*[:\-]?\s*/i, '').trim() : '';
@@ -145,6 +145,9 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
     const registeredTeamIds = new Set<string>();
 
     if (p.teamId) registeredTeamIds.add(p.teamId);
+    if (Array.isArray((p as any).candidateTeams)) {
+      (p as any).candidateTeams.forEach((t: any) => { if (t?.id) registeredTeamIds.add(t.id); });
+    }
 
     const checkAndAddProgram = (prog: any) => {
       if (!prog) return;
@@ -162,6 +165,7 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
 
     if (Array.isArray(p.schedule)) p.schedule.forEach(checkAndAddProgram);
     if (Array.isArray(p.registeredPrograms)) p.registeredPrograms.forEach(checkAndAddProgram);
+    if (Array.isArray(p.results)) p.results.forEach(checkAndAddProgram);
 
     // Prioritize allResults (real API data) before local p.results (fallback mock data)
     const candidateSourceResults = [

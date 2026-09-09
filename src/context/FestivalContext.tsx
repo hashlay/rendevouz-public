@@ -17,7 +17,6 @@ import {
 } from '../types';
 import {
   DEFAULT_HERO_MEDIA,
-  DEMO_PARTICIPANTS,
   RESULTS_DATA,
   GALLERY_DATA,
   SMILE_PHOTOS,
@@ -158,7 +157,19 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   // Purge legacy demo mock data from localStorage once on boot
   useEffect(() => {
     try {
-      if (!localStorage.getItem('rendezvous_data_cleaned_v6')) {
+      const storedAuth = localStorage.getItem('rendezvous_auth_user');
+      if (storedAuth && (
+        storedAuth.includes('Festival Competition') ||
+        storedAuth.includes('3012') ||
+        storedAuth.includes('3016') ||
+        storedAuth.includes('Ajmal') ||
+        storedAuth.includes('Tashmeer') ||
+        storedAuth.includes('Main Team')
+      )) {
+        localStorage.removeItem('rendezvous_auth_user');
+        setAuthUser(null);
+      }
+      if (!localStorage.getItem('rendezvous_data_cleaned_v7')) {
         localStorage.removeItem('rendezvous_results_v2');
         localStorage.removeItem('rendezvous_gallery_v2');
         localStorage.removeItem('rendezvous_smile_photos_v2');
@@ -169,7 +180,6 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         localStorage.removeItem('rendezvous_judges_v2');
         localStorage.removeItem('rendezvous_marks_v2');
         
-        // Also clear the React state so it doesn't get immediately re-written
         setResults([]);
         setGallery([]);
         setSmilePhotos([]);
@@ -180,7 +190,7 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         setJudges([]);
         setMarks([]);
         
-        localStorage.setItem('rendezvous_data_cleaned_v6', 'true');
+        localStorage.setItem('rendezvous_data_cleaned_v7', 'true');
       }
     } catch (_) {}
   }, []);
@@ -194,6 +204,7 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [eventSettings, setEventSettings] = useState<any>({});
   const [categories, setCategories] = useState<any[]>([]);
   const [isFaceScanning, setIsFaceScanning] = useState(false);
+  const [houseScores, setHouseScores] = useState<HouseScore[]>([]);
 
   // CMS States
   const [participants, setParticipants] = useState<any[]>([]);
@@ -201,24 +212,21 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [judges, setJudges] = useState<any[]>([]);
   const [marks, setMarks] = useState<any[]>([]);
 
-  // Fetch initial data & periodic sync from Backend API
+  // Unified Initial Data Fetch (Eliminating Waterfall: All 5 endpoints fetched in parallel)
   useEffect(() => {
-    const fetchPublicData = async () => {
+    const fetchAllPublicData = async () => {
       try {
-        const [resResults, resSettings, resCategories] = await Promise.all([
+        const [resResults, resSettings, resCategories, resStandings, resUnits] = await Promise.all([
           fetch('/api/public/results').then(r => r.ok ? r.json() : []).catch(() => []),
           fetch('/api/public/settings').then(r => r.ok ? r.json() : null).catch(() => null),
-          fetch('/api/public/categories').then(r => r.ok ? r.json() : []).catch(() => [])
+          fetch('/api/public/categories').then(r => r.ok ? r.json() : []).catch(() => []),
+          fetch('/api/public/standings').then(r => r.ok ? r.json() : []).catch(() => []),
+          fetch('/api/public/units').then(r => r.ok ? r.json() : []).catch(() => [])
         ]);
-        
-        if (Array.isArray(resResults) && resResults.length > 0) {
-          setResults(prev => {
-            if (prev.length === resResults.length && JSON.stringify(prev) === JSON.stringify(resResults)) {
-              return prev;
-            }
-            return resResults;
-          });
-        }
+
+        const rawResults = Array.isArray(resResults) ? resResults : [];
+        setResults(rawResults);
+
         if (resSettings && typeof resSettings === 'object' && Object.keys(resSettings).length > 0) {
           setEventSettings((prev: any) => {
             const merged = { ...prev, ...resSettings };
@@ -227,43 +235,15 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             }
             return merged;
           });
-
-          // Preload theme images once in background for instantaneous poster rendering
-          const themes = resSettings.posterTemplateConfig?.customThemes;
-          if (Array.isArray(themes)) {
-            themes.forEach((url: string) => {
-              if (url && typeof url === 'string' && !(window as any).__preloadedThemes?.has(url)) {
-                if (!(window as any).__preloadedThemes) (window as any).__preloadedThemes = new Set();
-                (window as any).__preloadedThemes.add(url);
-                const img = new Image();
-                img.src = url;
-              }
-            });
-          }
         }
+
         if (Array.isArray(resCategories) && resCategories.length > 0) {
           setCategories(resCategories);
         }
-      } catch (err) {
-        console.error("Failed to fetch public data:", err);
-      }
-    };
-    fetchPublicData();
-  }, []);
 
-  // Derived State: House Scores (Standings) fetched directly from backend calculation engine
-  const [houseScores, setHouseScores] = useState<HouseScore[]>([]);
-  useEffect(() => {
-    const computeHouseScores = async () => {
-      try {
-        const [resStandings, resUnits] = await Promise.all([
-          fetch('/api/public/standings').then(r => r.ok ? r.json() : []).catch(() => []),
-          fetch('/api/public/units').then(r => r.ok ? r.json() : []).catch(() => [])
-        ]);
-
+        // Immediately compute House Scores (Standings) without waiting for another render or network call
         const units = Array.isArray(resUnits) && resUnits.length > 0 ? resUnits : [];
         const standings = Array.isArray(resStandings) && resStandings.length > 0 ? resStandings : [];
-
         const colors = ['#FF2B2B', '#E5E7EB', '#38BDF8', '#F59E0B', '#10B981', '#8B5CF6'];
         const accents = [
           'from-[#FF2B2B] to-[#990000]', 
@@ -287,11 +267,7 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             bronzeCount: s.thirdPlaceCount || 0
           }));
           setHouseScores(scores);
-          return;
-        }
-
-        // Fallback: Calculate from results if standings endpoint is empty
-        if (units.length > 0) {
+        } else if (units.length > 0) {
           const scoreMap: Record<string, HouseScore> = {};
           units.forEach((u: any, i: number) => {
             scoreMap[u.name] = { 
@@ -307,7 +283,7 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             };
           });
 
-          (results || []).forEach(r => {
+          rawResults.forEach(r => {
             if (r.deletedAt || !r.publishedStatus) return;
             const h = scoreMap[r.department];
             if (h) {
@@ -321,13 +297,22 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
           setHouseScores(Object.values(scoreMap).sort((a, b) => b.totalPoints - a.totalPoints));
         }
-      } catch (e) {
-        console.error("Failed to fetch unit standings", e);
+
+        // Revalidate stored participant on mount to ensure fresh live data
+        const currentSavedAuth = safeStorageGet<AuthUser | null>('rendezvous_auth_user', null);
+        if (currentSavedAuth && currentSavedAuth.role === 'participant' && currentSavedAuth.participant) {
+          const cNo = currentSavedAuth.participant.codeNumber || currentSavedAuth.username;
+          if (cNo) {
+            loginUnifiedByChestNo(cNo.toString());
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch public data:", err);
       }
     };
-    
-    computeHouseScores();
-  }, [results]);
+
+    fetchAllPublicData();
+  }, []);
 
   // Auth Handlers
   const openLoginModal = (tab: 'participant' | 'committee' | 'developer' = 'participant') => {
@@ -335,6 +320,48 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setIsLoginModalOpen(true);
     setActiveModalView('login');
   };
+
+  // Reactively recompute participant results whenever public results arrive or change
+  useEffect(() => {
+    if (!authUser || authUser.role !== 'participant' || !authUser.participant) return;
+    const p = authUser.participant;
+    const cleanChest = (p.codeNumber || authUser.username || '').toString().trim().toLowerCase();
+    const candidateTeamIds = ((p as any).candidateTeams || []).map((t: any) => t.id);
+
+    const freshParticipantResults = (results || []).filter(r => {
+      const rPartId = r.participantId || (r.raw && r.raw.participantId);
+      const rCode = (r.codeNumber || r.chestNumber || (r.raw && r.raw.codeNumber) || (r.raw && r.raw.chestNumber) || '').toString().trim().toLowerCase();
+      const rName = (r.participantName || (r.raw && r.raw.participantName) || '').toString().trim().toLowerCase();
+      
+      const isIdMatch = Boolean(rPartId && p.id && rPartId === p.id);
+      const isCodeMatch = Boolean(rCode && cleanChest && rCode === cleanChest);
+      const isNameMatch = Boolean(!rCode && !rPartId && rName && p.name && rName === p.name.trim().toLowerCase());
+      const isTeamMatch = Boolean(
+        (r.teamId && candidateTeamIds.includes(r.teamId)) ||
+        (r.raw && r.raw.teamMemberIds && Array.isArray(r.raw.teamMemberIds) && (r.raw.teamMemberIds.includes(p.id) || r.raw.teamMemberIds.includes(cleanChest))) ||
+        (r.teamMemberIds && Array.isArray(r.teamMemberIds) && (r.teamMemberIds.includes(p.id) || r.teamMemberIds.includes(cleanChest)))
+      );
+
+      return isIdMatch || isCodeMatch || isNameMatch || isTeamMatch;
+    });
+
+    setAuthUser(prev => {
+      if (!prev || !prev.participant) return prev;
+      const currentRes = prev.participant.results || [];
+      const currentIds = currentRes.map(x => x.id || `${x.competitionId}_${x.rank}`).join(',');
+      const freshIds = freshParticipantResults.map(x => x.id || `${x.competitionId}_${x.rank}`).join(',');
+      if (currentIds === freshIds && currentRes.length === freshParticipantResults.length) {
+        return prev;
+      }
+      return {
+        ...prev,
+        participant: {
+          ...prev.participant,
+          results: freshParticipantResults
+        }
+      };
+    });
+  }, [results]);
 
   const loginUnified = async (username: string, password?: string) => {
     try {
@@ -350,40 +377,71 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       }
       
       const found = data.participant;
-      
-      // Get all results for this participant (both individual & group results)
-      const participantResults = results.filter(r => 
-        (r.participantId === found.id || (r.raw && r.raw.participantId === found.id)) ||
-        (r.raw && r.raw.teamMemberIds && Array.isArray(r.raw.teamMemberIds) && r.raw.teamMemberIds.includes(found.id))
-      );
+      const cleanChest = (found.chestNumber || username).toString().trim();
+      const candidateTeams = found.candidateTeams || [];
+      const candidateTeamIds = candidateTeams.map((t: any) => t.id);
+
+      // Raw schedule from real registered comps
+      const rawComps = data.registeredComps || data.registeredPrograms || found.registeredPrograms || found.schedule || found.registeredComps || [];
+      const mappedSchedule = rawComps.map((prog: any, idx: number) => ({
+        id: prog.id || prog.competitionId || `prog_${idx}`,
+        program: prog.program || prog.name || prog.eventName || prog.title || 'Registered Program',
+        category: prog.category || found.categoryName || found.category || 'General',
+        stage: prog.stage || (prog.stageType === 'on_stage' ? 'On Stage' : prog.stageType === 'off_stage' ? 'Off Stage' : 'Main Stage'),
+        time: prog.time || prog.startTime || '09:00 AM',
+        status: prog.status || 'upcoming',
+        participationType: prog.participationType || 'individual'
+      }));
+
+      // Merge API results and context results without duplicating
+      const apiResults = data.participantResults || found.results || [];
+      const contextResults = (results || []).filter(r => {
+        const rPartId = r.participantId || (r.raw && r.raw.participantId);
+        const rCode = (r.codeNumber || r.chestNumber || (r.raw && r.raw.codeNumber) || (r.raw && r.raw.chestNumber) || '').toString().trim().toLowerCase();
+        const rName = (r.participantName || (r.raw && r.raw.participantName) || '').toString().trim().toLowerCase();
+        
+        const isIdMatch = Boolean(rPartId && found.id && rPartId === found.id);
+        const isCodeMatch = Boolean(rCode && cleanChest && rCode === cleanChest.toLowerCase());
+        const isNameMatch = Boolean(!rCode && !rPartId && rName && found.name && rName === found.name.trim().toLowerCase());
+        const isTeamMatch = Boolean(
+          (r.teamId && candidateTeamIds.includes(r.teamId)) ||
+          (r.raw && r.raw.teamMemberIds && Array.isArray(r.raw.teamMemberIds) && (r.raw.teamMemberIds.includes(found.id) || r.raw.teamMemberIds.includes(cleanChest))) ||
+          (r.teamMemberIds && Array.isArray(r.teamMemberIds) && (r.teamMemberIds.includes(found.id) || r.teamMemberIds.includes(cleanChest)))
+        );
+
+        return isIdMatch || isCodeMatch || isNameMatch || isTeamMatch;
+      });
+
+      const resultMap = new Map();
+      [...apiResults, ...contextResults].forEach(r => {
+        const rId = r.id || `${r.competitionId}_${r.rank}`;
+        if (!resultMap.has(rId)) {
+          resultMap.set(rId, r);
+        }
+      });
+      const participantResults = Array.from(resultMap.values());
       
       const updatedParticipant: ParticipantProfile = {
-        codeNumber: found.chestNumber?.toString() || username.trim(),
+        id: found.id || `part_${cleanChest}`,
+        codeNumber: (found.chestNumber || found.codeNumber || cleanChest).toString(),
         password: '',
-        name: found.fullName || found.name || username.trim(),
-        department: found.unitName || 'Main Team',
-        category: found.categoryName || 'General',
-        dob: found.dob || password || '',
+        name: found.fullName || found.name || cleanChest,
+        department: found.unitName || found.department || '',
+        category: found.categoryName || found.category || '',
+        dob: found.dob || found.dateOfBirth || password || '',
         candidateClass: found.candidateClass || found.class || '',
-        avatarUrl: found.avatarUrl || NO_DP_AVATAR,
-        qrCodeData: found.chestNumber?.toString() || username.trim(),
-        schedule: (found.registeredPrograms || []).map((prog: any, idx: number) => ({
-          id: prog.id || `prog_${idx}`,
-          program: prog.program || prog.name || 'Registered Program',
-          category: prog.category || found.categoryName || 'General',
-          stage: 'Main Stage',
-          time: '09:00 AM',
-          status: prog.status || 'upcoming'
-        })),
+        avatarUrl: found.avatarUrl || found.profilePhotoUrl || NO_DP_AVATAR,
+        qrCodeData: (found.chestNumber || found.codeNumber || cleanChest).toString(),
+        schedule: mappedSchedule,
         results: participantResults,
         matchedPhotos: []
       };
 
       const user: AuthUser = {
         role: 'participant',
-        username: username.trim(),
-        name: found.fullName || found.name || username.trim(),
-        avatarUrl: found.avatarUrl || NO_DP_AVATAR,
+        username: cleanChest,
+        name: updatedParticipant.name,
+        avatarUrl: updatedParticipant.avatarUrl,
         participant: updatedParticipant
       };
 
@@ -391,7 +449,6 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setIsLoginModalOpen(false);
       setActiveModalView('participant-profile');
       
-      // Update the URL to explicitly show the chest number link
       if (typeof window !== 'undefined') {
         const newUrl = new URL(window.location.href);
         newUrl.searchParams.set('chestNo', updatedParticipant.codeNumber);
@@ -410,11 +467,16 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       if (!cleanChest) return { success: false, error: 'Chest number empty' };
 
       let found: any = null;
+      let apiRegisteredComps: any[] = [];
+      let apiParticipantResults: any[] = [];
+
       try {
         const res = await fetch(`/api/public/participant/by-chest/${encodeURIComponent(cleanChest)}?t=${Date.now()}`);
         if (res.ok) {
           const data = await res.json();
           found = data.participant || data;
+          apiRegisteredComps = data.registeredComps || found.registeredPrograms || found.schedule || [];
+          apiParticipantResults = data.participantResults || found.results || [];
         }
       } catch (e) {
         console.warn("API fetch error in loginUnifiedByChestNo, falling back", e);
@@ -427,110 +489,37 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           (p.chestNumber && p.chestNumber.toString().trim().toLowerCase() === cleanChest.toLowerCase()) ||
           (p.id && p.id.toString().trim().toLowerCase() === cleanChest.toLowerCase())
         );
-        if (localPart) found = localPart;
-      }
-
-      // Fallback data for chest number 3012 (Muhammad Ajmal) or when participant record has missing programs
-      if (!found || (cleanChest === '3012' && (!found.registeredPrograms || found.registeredPrograms.length === 0) && (!found.schedule || found.schedule.length === 0))) {
-        if (cleanChest === '3012') {
-          found = {
-            id: 'part_3012',
-            codeNumber: '3012',
-            chestNumber: '3012',
-            fullName: 'Muhammad Ajmal',
-            name: 'Muhammad Ajmal',
-            unitName: 'Muchila',
-            department: 'Muchila',
-            categoryName: 'Senior',
-            category: 'Senior',
-            dob: '2026-08-28',
-            avatarUrl: NO_DP_AVATAR,
-            registeredPrograms: [
-              { id: 'prog_3012_1', program: 'Manqabat (urdu)', category: 'Senior', stage: 'Main Stage', time: '09:00 AM', status: 'completed' },
-              { id: 'prog_3012_2', program: 'Quiz', category: 'Senior', stage: 'Stage 2', time: '11:00 AM', status: 'completed' }
-            ]
-          };
-        } else if (!found) {
-          const demo = DEMO_PARTICIPANTS.find(p => p.codeNumber.toLowerCase() === cleanChest.toLowerCase());
-          if (demo) {
-            found = demo;
-          } else {
-            found = {
-              id: `not_found_${cleanChest}`,
-              codeNumber: cleanChest,
-              chestNumber: cleanChest,
-              isNotFound: true,
-              fullName: '',
-              name: '',
-              unitName: '',
-              department: '',
-              categoryName: '',
-              category: '',
-              dob: '',
-              avatarUrl: NO_DP_AVATAR,
-              registeredPrograms: [],
-              schedule: [],
-              results: []
-            };
-          }
+        if (localPart) {
+          found = localPart;
+          apiRegisteredComps = localPart.registeredPrograms || localPart.schedule || [];
+          apiParticipantResults = localPart.results || [];
         }
       }
 
-      const validProgramsFilter = (pList: any[]) => (pList || []).filter((prog: any) => 
-        prog && prog.program && 
-        prog.program !== 'Competition' && 
-        prog.program !== 'Individual Program' && 
-        prog.program !== 'Group Program'
-      );
-
-      let rawScheduleList = validProgramsFilter(found.registeredPrograms || found.schedule || []);
-
-      if (cleanChest === '3012' || cleanChest === '3016' || rawScheduleList.length === 0) {
-        if (cleanChest === '3012') {
-          if (!found.name && !found.fullName) {
-            found.name = 'Muhammad Ajmal';
-            found.fullName = 'Muhammad Ajmal';
-          }
-          found.department = found.unitName || found.department || 'Muchila';
-          found.category = found.categoryName || found.category || 'Senior';
-          if (rawScheduleList.length < 5) {
-            rawScheduleList = [
-              { id: 'prog_3012_1', program: 'Manqabat (urdu)', category: 'Senior', stage: 'Main Stage', time: '09:00 AM', status: 'completed', type: 'individual' },
-              { id: 'prog_3012_2', program: 'Quiz', category: 'Senior', stage: 'Stage 2', time: '11:00 AM', status: 'completed', type: 'individual' },
-              { id: 'prog_3012_3', program: 'Translation (arabic To Kannada)', category: 'Senior', stage: 'Off Stage', time: '01:30 PM', status: 'completed', type: 'individual' },
-              { id: 'prog_3012_4', program: 'Nasheeda (arabic)', category: 'Senior', stage: 'Main Stage', time: '03:00 PM', status: 'completed', type: 'group' },
-              { id: 'prog_3012_5', program: 'Burda Sharif', category: 'Senior', stage: 'Main Stage', time: '05:00 PM', status: 'completed', type: 'group' }
-            ];
-          }
-        } else if (cleanChest === '3016') {
-          if (!found.name && !found.fullName) {
-            found.name = 'Muhammad Tashmeer';
-            found.fullName = 'Muhammad Tashmeer';
-          }
-          found.department = found.unitName || found.department || 'Muchila';
-          found.category = found.categoryName || found.category || 'Senior';
-          if (rawScheduleList.length < 5) {
-            rawScheduleList = [
-              { id: 'prog_3016_1', program: 'Poetry Recitation (english)', category: 'Senior', stage: 'Main Stage', time: '09:00 AM', status: 'completed', type: 'individual' },
-              { id: 'prog_3016_2', program: 'Essay Writing (english)', category: 'Senior', stage: 'Off Stage', time: '10:30 AM', status: 'absent', isAbsent: true, type: 'individual' },
-              { id: 'prog_3016_3', program: 'Story Writing (kannada)', category: 'Senior', stage: 'Off Stage', time: '01:30 PM', status: 'completed', type: 'individual' },
-              { id: 'prog_3016_4', program: 'Nasheeda (arabic)', category: 'Senior', stage: 'Main Stage', time: '03:00 PM', status: 'completed', type: 'group' },
-              { id: 'prog_3016_5', program: 'Burda Sharif', category: 'Senior', stage: 'Main Stage', time: '05:00 PM', status: 'completed', type: 'group' }
-            ];
-          }
-        } else if (rawScheduleList.length === 0) {
-          const demo = DEMO_PARTICIPANTS.find(p => p.codeNumber.toLowerCase() === cleanChest.toLowerCase());
-          if (demo && demo.schedule && demo.schedule.length > 0) {
-            rawScheduleList = demo.schedule;
-          } else {
-            rawScheduleList = [
-              { id: `prog_${cleanChest}_1`, program: 'Festival Competition', category: found.categoryName || found.category || 'Senior', stage: 'Main Stage', time: '09:00 AM', status: 'completed' }
-            ];
-          }
-        }
+      if (!found || found.isNotFound) {
+        return { success: false, error: 'Participant not found for this chest number' };
       }
 
-      const participantResults = (results || []).filter(r => {
+      const candidateTeams = found.candidateTeams || [];
+      const candidateTeamIds = candidateTeams.map((t: any) => t.id);
+
+      // Raw schedule strictly from real registered comps
+      const rawScheduleList = apiRegisteredComps.length > 0
+        ? apiRegisteredComps
+        : (found.registeredPrograms || found.schedule || found.registeredComps || []);
+
+      const mappedSchedule = rawScheduleList.map((prog: any, idx: number) => ({
+        id: prog.id || prog.competitionId || `prog_${idx}`,
+        program: prog.program || prog.name || prog.eventName || prog.title || prog.competitionName || 'Registered Program',
+        category: prog.category || found.categoryName || found.category || 'General',
+        stage: prog.stage || (prog.stageType === 'on_stage' ? 'On Stage' : prog.stageType === 'off_stage' ? 'Off Stage' : 'Main Stage'),
+        time: prog.time || prog.startTime || '09:00 AM',
+        status: prog.status || 'upcoming',
+        participationType: prog.participationType || 'individual'
+      }));
+
+      // Filter context results matching this participant
+      const contextResults = (results || []).filter(r => {
         const rPartId = r.participantId || (r.raw && r.raw.participantId);
         const rCode = (r.codeNumber || r.chestNumber || (r.raw && r.raw.codeNumber) || (r.raw && r.raw.chestNumber) || '').toString().trim().toLowerCase();
         const rName = (r.participantName || (r.raw && r.raw.participantName) || '').toString().trim().toLowerCase();
@@ -538,53 +527,32 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         const isIdMatch = Boolean(rPartId && found.id && rPartId === found.id);
         const isCodeMatch = Boolean(rCode && cleanChest && rCode === cleanChest.toLowerCase());
         const isNameMatchFallback = Boolean(!rCode && !rPartId && rName && found.name && rName === found.name.trim().toLowerCase());
-        const isTeamMatch = Boolean(r.raw && r.raw.teamMemberIds && Array.isArray(r.raw.teamMemberIds) && (r.raw.teamMemberIds.includes(found.id) || r.raw.teamMemberIds.includes(cleanChest)));
+        const isTeamMatch = Boolean(
+          (r.teamId && candidateTeamIds.includes(r.teamId)) ||
+          (r.raw && r.raw.teamMemberIds && Array.isArray(r.raw.teamMemberIds) && (r.raw.teamMemberIds.includes(found.id) || r.raw.teamMemberIds.includes(cleanChest))) ||
+          (r.teamMemberIds && Array.isArray(r.teamMemberIds) && (r.teamMemberIds.includes(found.id) || r.teamMemberIds.includes(cleanChest)))
+        );
 
         return isIdMatch || isCodeMatch || isNameMatchFallback || isTeamMatch;
       });
 
-      if (cleanChest === '3012' && participantResults.length < 5) {
-        const ajmalResults = [
-          { id: 'res_3012_1', competitionId: 'comp_manqabat', program: 'Manqabat (urdu)', eventName: 'Manqabat (urdu)', category: 'Senior', rank: 1, grade: 'A', totalMarks: 60, points: 20, publishedStatus: true, codeNumber: '3012', participantName: found.fullName || found.name || 'Muhammad Ajmal', teamName: 'Muchila' },
-          { id: 'res_3012_2', competitionId: 'comp_quiz', program: 'Quiz', eventName: 'Quiz', category: 'Senior', rank: 1, grade: 'A', totalMarks: 40, points: 20, publishedStatus: true, codeNumber: '3012', participantName: found.fullName || found.name || 'Muhammad Ajmal', teamName: 'Muchila' },
-          { id: 'res_3012_3', competitionId: 'comp_translation', program: 'Translation (arabic To Kannada)', eventName: 'Translation (arabic To Kannada)', category: 'Senior', rank: 1, grade: 'A', totalMarks: 90, points: 20, publishedStatus: true, codeNumber: '3012', participantName: found.fullName || found.name || 'Muhammad Ajmal', teamName: 'Muchila' },
-          { id: 'res_3012_4', competitionId: 'comp_nasheeda', program: 'Nasheeda (arabic)', eventName: 'Nasheeda (arabic)', category: 'Senior', rank: 1, grade: 'A', totalMarks: 70, points: 20, publishedStatus: true, codeNumber: '3012', participantName: found.fullName || found.name || 'Muhammad Ajmal', teamName: 'Muchila', participationType: 'group' },
-          { id: 'res_3012_5', competitionId: 'comp_burda', program: 'Burda Sharif', eventName: 'Burda Sharif', category: 'Senior', rank: 1, grade: 'A', totalMarks: 62.5, points: 20, publishedStatus: true, codeNumber: '3012', participantName: found.fullName || found.name || 'Muhammad Ajmal', teamName: 'Muchila', participationType: 'group' }
-        ];
-
-        ajmalResults.forEach(r => {
-          if (!participantResults.some(existing => (existing.eventName || existing.program) === r.program)) {
-            participantResults.push(r);
-          }
-        });
-      } else if (cleanChest === '3016') {
-        const tashmirResults = [
-          { id: 'res_3016_essay', competitionId: 'comp_essay', program: 'Essay Writing (english)', eventName: 'Essay Writing (english)', category: 'Senior', rank: undefined, isAbsent: true, status: 'absent', grade: 'N/A', totalMarks: 0, points: 0, publishedStatus: true, codeNumber: '3016', participantName: found.fullName || found.name || 'Muhammad Tashmeer', teamName: 'Muchila' }
-        ];
-
-        tashmirResults.forEach(r => {
-          if (!participantResults.some(existing => (existing.eventName || existing.program) === r.program)) {
-            participantResults.push(r);
-          }
-        });
-      }
-
-      const mappedSchedule = rawScheduleList.map((prog: any, idx: number) => ({
-        id: prog.id || prog.competitionId || `prog_${idx}`,
-        program: prog.program || prog.name || prog.eventName || prog.title || prog.competitionName || 'Registered Program',
-        category: prog.category || found.categoryName || found.category || 'General',
-        stage: prog.stage || prog.stageType || 'Main Stage',
-        time: prog.time || prog.startTime || '09:00 AM',
-        status: prog.status || 'upcoming'
-      }));
+      // Merge API results and context results
+      const resultMap = new Map();
+      [...apiParticipantResults, ...contextResults].forEach(r => {
+        const rId = r.id || `${r.competitionId}_${r.rank}`;
+        if (!resultMap.has(rId)) {
+          resultMap.set(rId, r);
+        }
+      });
+      const participantResults = Array.from(resultMap.values());
 
       const updatedParticipant: ParticipantProfile = {
         id: found.id || `part_${cleanChest}`,
         codeNumber: (found.chestNumber || found.codeNumber || cleanChest).toString(),
         password: '',
         name: found.fullName || found.name || cleanChest,
-        department: found.unitName || found.department || found.institution || 'Main Team',
-        category: found.categoryName || found.category || 'General',
+        department: found.unitName || found.department || found.institution || '',
+        category: found.categoryName || found.category || '',
         dob: found.dob || found.dateOfBirth || '',
         candidateClass: found.candidateClass || found.class || '',
         avatarUrl: found.avatarUrl || found.profilePhotoUrl || NO_DP_AVATAR,
@@ -606,19 +574,12 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setIsLoginModalOpen(false);
       setActiveModalView('participant-profile');
 
-      // Preserve ?chestNo=... in browser URL bar and manage browser history stack
+      // Preserve ?chestNo=... in browser URL bar smoothly
       if (typeof window !== 'undefined') {
-        const newUrl = new URL(window.location.href);
-        newUrl.searchParams.set('chestNo', cleanChest);
-
-        const currentState = window.history.state;
-        if (!currentState || currentState.page !== 'participant' || currentState.chestNo !== cleanChest) {
-          if (!currentState || currentState.page !== 'home') {
-            window.history.replaceState({ page: 'home' }, '', '/');
-          }
-          window.history.pushState({ page: 'participant', chestNo: cleanChest }, '', newUrl.toString());
-        } else {
-          window.history.replaceState({ page: 'participant', chestNo: cleanChest }, '', newUrl.toString());
+        const currentUrl = new URL(window.location.href);
+        if (currentUrl.searchParams.get('chestNo') !== cleanChest) {
+          currentUrl.searchParams.set('chestNo', cleanChest);
+          window.history.pushState({ page: 'participant', chestNo: cleanChest }, '', currentUrl.toString());
         }
       }
       return { success: true };

@@ -29,7 +29,6 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, onNavigate, cmsSe
       { id: 'about', label: 'About' },
       { id: 'results', label: 'Results' },
       { id: 'team-points', label: 'Team Points' },
-      { id: 'posters', label: 'Posters' },
       { id: 'smile', label: 'Photo Hub' },
     ];
 
@@ -61,10 +60,6 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, onNavigate, cmsSe
         links.push({ id: 'highlights', label: 'Highlights' });
       }
     });
-
-    if (!links.some(l => l.id === 'posters')) {
-      links.splice(Math.min(4, links.length), 0, { id: 'posters', label: 'Posters' });
-    }
 
     return links;
   };

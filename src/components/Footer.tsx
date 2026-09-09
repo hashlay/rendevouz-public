@@ -65,7 +65,6 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings, dragBlo
   const showAbout = isTypeEnabled(['about']) && cmsSettings?.showAbout !== false;
   const showResults = isTypeEnabled(['announcements']) && cmsSettings?.showResults !== false;
   const showTeamPoints = isTypeEnabled(['results']) && cmsSettings?.showTeamPoints !== false;
-  const showPosters = isTypeEnabled(['posters']) && cmsSettings?.showPosters !== false;
   const showPhotoHub = isTypeEnabled(['smile', 'photohub']) && cmsSettings?.showPhotoHub !== false && cmsSettings?.showSmile !== false;
   const showLiveStream = isTypeEnabled(['live_stages', 'live_stream']) && cmsSettings?.showLiveStream !== false && cmsSettings?.showLive !== false;
   const showGallery = isTypeEnabled(['gallery']) && cmsSettings?.showGallery !== false;
@@ -168,7 +167,6 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings, dragBlo
                 {showAbout && <QuickLink id="about" label="About & Concept" onNavigate={onNavigate} />}
                 {showResults && <QuickLink id="results" label="Results Standings" onNavigate={onNavigate} />}
                 {showTeamPoints && <QuickLink id="team-points" label="Team Points" onNavigate={onNavigate} />}
-                {showPosters && <QuickLink id="posters" label="Winner Posters" onNavigate={onNavigate} />}
                 {showPhotoHub && <QuickLink id="smile" label="SMILE Photo Hub" onNavigate={onNavigate} />}
                 {showLiveStream && <QuickLink id="live" label="Live Stream" onNavigate={onNavigate} />}
                 {showGallery && <QuickLink id="gallery" label="Festival Gallery" onNavigate={onNavigate} />}
