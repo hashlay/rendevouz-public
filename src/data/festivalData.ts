@@ -1,19 +1,19 @@
 import { HouseScore, ResultItem, Stage, GalleryItem, VideoHighlight, SmilePhoto, HeroMedia, ParticipantProfile } from '../types';
 
 export const INSTITUTION = {
-  name: "Noorul Islam Madrasa",
-  tagline: "Jeppu, Mangalore",
-  eventTitle: "At-Tabassum Meelad Fest 2026",
-  subTitle: "A smile that brings hearts together",
-  theme: "A smile that brings hearts together",
-  dates: "September 05 2026",
-  location: "MAS Garden, Jeppu",
-  email: "zenith.theorganizer@gmail.com",
+  name: "Imam Rabbani",
+  tagline: "Life Festival",
+  eventTitle: "RENDEZVOUS 26",
+  subTitle: "Decoding Phytolore",
+  theme: "Decoding Phytolore",
+  dates: "2026 September 23, 24",
+  location: "Imam Rabbani Campus",
+  email: "contacthashlay@gmail.com",
   phone: "+91 74831 38340",
   socials: {
-    instagram: "https://instagram.com/zeni.th.in",
-    youtube: "https://tabassum.hashlay.in",
-    facebook: "https://tabassum.hashlay.in"
+    instagram: "https://instagram.com",
+    youtube: "https://youtube.com",
+    facebook: "https://facebook.com"
   }
 };
 

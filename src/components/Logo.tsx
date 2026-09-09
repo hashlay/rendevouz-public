@@ -23,9 +23,9 @@ export const Logo: React.FC<LogoProps> = ({
   showIcon = true,
   customIconUrl = '',
 }) => {
-  const displayTitle = (title !== undefined && title !== null && title !== '') ? title : 'At-Tabassum';
-  const displaySubtitle = (subtitle !== undefined && subtitle !== null && subtitle !== '') ? subtitle : 'MEELAD FEST';
-  const displayBadge = (badge !== undefined && badge !== null && badge !== '') ? badge : 'NOORUL ISLAM MADRASA';
+  const displayTitle = (title !== undefined && title !== null && title !== '') ? title : 'RENDEZVOUS 26';
+  const displaySubtitle = (subtitle !== undefined && subtitle !== null && subtitle !== '') ? subtitle : 'IMAM RABBANI LIFE FESTIVAL';
+  const displayBadge = (badge !== undefined && badge !== null && badge !== '') ? badge : 'DECODING PHYTOLORE';
   // Dimension scales
   const scales = {
     sm: { iconSize: 32, textSize: 'text-sm', subTextSize: 'text-[9px]' },
@@ -42,19 +42,19 @@ export const Logo: React.FC<LogoProps> = ({
       {showIcon && (
         <div className="relative group shrink-0 flex items-center justify-center">
           <img
-            src={customIconUrl || '/tabassum_logo.png'}
-            alt="At-Tabassum Meelad Fest Logo"
+            src={customIconUrl || '/rendezvous_icon.png'}
+            alt="Rendezvous 26 Logo"
             onError={(e) => {
               const target = e.currentTarget;
-              if (!target.src.endsWith('/tabassum_logo.png')) {
-                target.src = '/tabassum_logo.png';
+              if (!target.src.endsWith('/rendezvous_icon.png')) {
+                target.src = '/rendezvous_icon.png';
               }
             }}
-            className="object-contain rounded-full drop-shadow-2xl transition-transform duration-500 group-hover:scale-105"
+            className="object-contain rounded-xl drop-shadow-2xl transition-transform duration-500 group-hover:scale-105"
             style={{ width: iconSize, height: iconSize }}
           />
-          {/* Subtle gold ambient glow */}
-          <div className="absolute inset-0 blur-lg rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ backgroundColor: 'var(--color-primary-accent, #C89A4B)', opacity: 0.2 }} />
+          {/* Subtle green ambient glow */}
+          <div className="absolute inset-0 blur-lg rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{ backgroundColor: 'var(--color-primary-accent, #18BA46)', opacity: 0.25 }} />
         </div>
       )}
 

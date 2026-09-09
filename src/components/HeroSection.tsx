@@ -25,15 +25,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
   const hasCustomDesktop = desktopImages.length > 0;
   const hasCustomMobile = mobileImages.length > 0;
 
-  const handleVideoRef = (el: HTMLVideoElement | null) => {
-    if (el) {
-      el.muted = true;
-      el.play().catch(() => {
-        // Autoplay restricted fallback - hero background remains visible
-      });
-    }
-  };
-
   React.useEffect(() => {
     if (desktopImages.length <= 1 || cmsSettings?.heroDesktopLoopEnabled === false) return;
     const interval = setInterval(() => {
@@ -95,53 +86,25 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
       <div className="absolute inset-0 z-0 overflow-hidden select-none pointer-events-none">
         {/* Mobile View */}
         <div className="block sm:hidden w-full h-full">
-          {hasCustomMobile ? (
-            <img
-              src={mobileImages[mobileIndex]}
-              alt="Festival Atmosphere"
-              className="w-full h-full object-cover filter brightness-[0.75] contrast-[1.05]"
-            />
-          ) : (
-            <video
-              ref={handleVideoRef}
-              autoPlay
-              loop
-              muted
-              playsInline
-              preload="metadata"
-              className="w-full h-full object-cover filter brightness-[0.75] contrast-[1.05]"
-            >
-              <source src="/videos/tabassum-hero-mobile.mp4" type="video/mp4" />
-            </video>
-          )}
+          <img
+            src={hasCustomMobile ? mobileImages[mobileIndex] : "/rendezvous_poster.jpg"}
+            alt="Rendezvous 26 Atmosphere"
+            className="w-full h-full object-cover filter brightness-[0.65] contrast-[1.1]"
+          />
         </div>
 
         {/* Desktop View */}
         <div className="hidden sm:block w-full h-full">
-          {hasCustomDesktop ? (
-            <img
-              src={desktopImages[desktopIndex]}
-              alt="Festival Atmosphere"
-              className="w-full h-full object-cover filter brightness-[0.75] contrast-[1.05]"
-            />
-          ) : (
-            <video
-              ref={handleVideoRef}
-              autoPlay
-              loop
-              muted
-              playsInline
-              preload="metadata"
-              className="w-full h-full object-cover filter brightness-[0.75] contrast-[1.05]"
-            >
-              <source src="/videos/tabassum-hero-desktop.mp4" type="video/mp4" />
-            </video>
-          )}
+          <img
+            src={hasCustomDesktop ? desktopImages[desktopIndex] : "/rendezvous_poster.jpg"}
+            alt="Rendezvous 26 Atmosphere"
+            className="w-full h-full object-cover filter brightness-[0.65] contrast-[1.1]"
+          />
         </div>
 
-        {/* Gradient overlays */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-black/40 to-black/70" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-black/20 to-[#0A0A0A]" />
+        {/* Gradient overlays matching new green theme */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-body-bg)] via-[var(--color-body-bg)]/60 to-[var(--color-body-bg)]/80" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-[var(--color-body-bg)]/30 to-[var(--color-body-bg)]" />
       </div>
 
       {/* Admin Quick Action Button */}
