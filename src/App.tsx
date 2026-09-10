@@ -264,7 +264,6 @@ function PublicWebsiteContent({ onSwitchToApp }: { onSwitchToApp: (mode: 'worksp
                 <HeroSection onNavigate={handleNavigate} cmsSettings={cmsData?.cmsSettings} heroMedia={cmsData?.heroMedia} dragBlocks={cmsData?.dragBlocks} />
                 <AboutSection onOpenConceptModal={() => setIsConceptModalOpen(true)} cmsSettings={cmsData?.cmsSettings} />
                 <ResultsSection onNavigate={handleNavigate} />
-                <GallerySection onNavigate={handleNavigate} />
                 <SmilePhotoPortal cmsSettings={cmsData?.cmsSettings} />
               </>
             )}

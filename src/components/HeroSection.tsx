@@ -16,20 +16,20 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
   const [desktopIndex, setDesktopIndex] = React.useState(0);
   const [mobileIndex, setMobileIndex] = React.useState(0);
 
+  const defaultDesktopImages = ['/rendezvous_hero_desktop.jpg', '/hero1.jpg', '/hero2.jpg'];
+  const defaultMobileImages = ['/rendezvous_hero_mobile.jpg', '/hero1.jpg', '/hero2.jpg'];
+
   const customDesktop = propHeroMedia?.filter(m => m.device !== 'mobile').sort((a, b) => (a.order || 0) - (b.order || 0)).map(m => m.url).filter((url): url is string => Boolean(url && typeof url === 'string' && url.trim().length > 0)) || [];
   const customMobile = propHeroMedia?.filter(m => m.device !== 'desktop').sort((a, b) => (a.order || 0) - (b.order || 0)).map(m => m.url).filter((url): url is string => Boolean(url && typeof url === 'string' && url.trim().length > 0)) || [];
 
-  // Directly use uploaded media. Fallback to default responsive video if zero custom images.
-  const desktopImages = customDesktop;
-  const mobileImages = customMobile;
-  const hasCustomDesktop = desktopImages.length > 0;
-  const hasCustomMobile = mobileImages.length > 0;
+  const desktopImages = customDesktop.length > 0 ? customDesktop : defaultDesktopImages;
+  const mobileImages = customMobile.length > 0 ? customMobile : defaultMobileImages;
 
   React.useEffect(() => {
     if (desktopImages.length <= 1 || cmsSettings?.heroDesktopLoopEnabled === false) return;
     const interval = setInterval(() => {
       setDesktopIndex((prev) => (prev + 1) % desktopImages.length);
-    }, (cmsSettings?.heroDesktopLoopInterval || 3) * 1000);
+    }, (cmsSettings?.heroDesktopLoopInterval || 5) * 1000);
     return () => clearInterval(interval);
   }, [desktopImages.length, cmsSettings?.heroDesktopLoopEnabled, cmsSettings?.heroDesktopLoopInterval]);
 
@@ -37,7 +37,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
     if (mobileImages.length <= 1 || cmsSettings?.heroMobileLoopEnabled === false) return;
     const interval = setInterval(() => {
       setMobileIndex((prev) => (prev + 1) % mobileImages.length);
-    }, (cmsSettings?.heroMobileLoopInterval || 3) * 1000);
+    }, (cmsSettings?.heroMobileLoopInterval || 5) * 1000);
     return () => clearInterval(interval);
   }, [mobileImages.length, cmsSettings?.heroMobileLoopEnabled, cmsSettings?.heroMobileLoopInterval]);
 
@@ -69,12 +69,17 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
         return `<span ${p1} style="color: var(--color-primary-accent)">`;
       });
 
-    // Ensure two-line stacked layout like Image 1 and Image 3 if not already broken
+    // Replace any legacy Tabassum text with Rendezvous 26
+    if (formatted.toUpperCase().includes('TABASSUM')) {
+      formatted = formatted.replace(/(?:At-)?tabassum(?:\s+MEELAD\s+FEST)?/i, 'RENDEZVOUS<br /><span class="block" style="color: var(--color-primary-accent)">26</span>');
+    }
+
+    // Ensure two-line stacked layout for Rendezvous 26
     if (!formatted.includes('<br') && !formatted.includes('display: block') && !formatted.includes('class="block')) {
       if (formatted.includes('<span')) {
         formatted = formatted.replace('<span', '<br /><span class="block"');
-      } else if (formatted.toUpperCase().includes('TABASSUM') && formatted.toUpperCase().includes('MEELAD FEST')) {
-        formatted = formatted.replace(/(?:At-)?tabassum\s+MEELAD\s+FEST/i, 'At-Tabassum<br /><span class="block" style="color: var(--color-primary-accent)">MEELAD FEST</span>');
+      } else if (formatted.toUpperCase().includes('RENDEZVOUS') && formatted.includes('26')) {
+        formatted = formatted.replace(/RENDEZVOUS\s+26/i, 'RENDEZVOUS<br /><span class="block" style="color: var(--color-primary-accent)">26</span>');
       }
     }
     return formatted;
@@ -85,21 +90,31 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
       {/* Background Media */}
       <div className="absolute inset-0 z-0 overflow-hidden select-none pointer-events-none">
         {/* Mobile View */}
-        <div className="block sm:hidden w-full h-full">
-          <img
-            src={hasCustomMobile ? mobileImages[mobileIndex] : "/rendezvous_poster.jpg"}
-            alt="Rendezvous 26 Atmosphere"
-            className="w-full h-full object-cover filter brightness-[0.65] contrast-[1.1]"
-          />
+        <div className="block sm:hidden w-full h-full relative">
+          {mobileImages.map((src, idx) => (
+            <img
+              key={`mob-${idx}-${src}`}
+              src={src}
+              alt="Rendezvous 26 Atmosphere"
+              className={`absolute inset-0 w-full h-full object-cover filter brightness-[0.65] contrast-[1.1] transition-opacity duration-1000 ${
+                idx === mobileIndex ? 'opacity-100' : 'opacity-0'
+              }`}
+            />
+          ))}
         </div>
 
         {/* Desktop View */}
-        <div className="hidden sm:block w-full h-full">
-          <img
-            src={hasCustomDesktop ? desktopImages[desktopIndex] : "/rendezvous_poster.jpg"}
-            alt="Rendezvous 26 Atmosphere"
-            className="w-full h-full object-cover filter brightness-[0.65] contrast-[1.1]"
-          />
+        <div className="hidden sm:block w-full h-full relative">
+          {desktopImages.map((src, idx) => (
+            <img
+              key={`desk-${idx}-${src}`}
+              src={src}
+              alt="Rendezvous 26 Atmosphere"
+              className={`absolute inset-0 w-full h-full object-cover filter brightness-[0.65] contrast-[1.1] transition-opacity duration-1000 ${
+                idx === desktopIndex ? 'opacity-100' : 'opacity-0'
+              }`}
+            />
+          ))}
         </div>
 
         {/* Gradient overlays matching new green theme */}
@@ -146,9 +161,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
             />
           ) : (
             <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-white uppercase tracking-tight max-w-4xl mx-auto leading-[0.95] mb-3 sm:mb-5 drop-shadow-md text-center font-display flex flex-col items-center">
-              <span className="block">At-Tabassum</span>
+              <span className="block">RENDEZVOUS</span>
               <span className="block font-black" style={{ color: 'var(--color-primary-accent)' }}>
-                MEELAD FEST
+                26
               </span>
             </h1>
           )}

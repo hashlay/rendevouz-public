@@ -121,9 +121,9 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings, dragBlo
               <Phone className="w-3 h-3 transition-transform group-hover:scale-110 opacity-70" style={{ color: 'var(--color-primary-accent)' }} />
               +91 74831 38340
             </a>
-            <a href="mailto:zenith.theorganizer@gmail.com" className="flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer group">
+            <a href="mailto:contacthashlay@gmail.com" className="flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer group">
               <Mail className="w-3 h-3 transition-transform group-hover:scale-110 opacity-70" style={{ color: 'var(--color-primary-accent)' }} />
-              zenith.theorganizer@gmail.com
+              contacthashlay@gmail.com
             </a>
           </div>
 
@@ -145,15 +145,15 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings, dragBlo
                   <Logo
                     size="lg"
                     variant="full"
-                    title={cmsSettings?.footerLogoTitle || 'At-Tabassum'}
-                    subtitle={cmsSettings?.footerLogoSubtitle || 'Meelad Fest'}
-                    badge={cmsSettings?.footerLogoBadge || 'NOORUL ISLAM MADRASA'}
-                    customIconUrl={cmsSettings?.footerLogo || '/tabassum_logo.png'}
+                    title={cmsSettings?.footerLogoTitle || 'RENDEZVOUS'}
+                    subtitle={cmsSettings?.footerLogoSubtitle || '26'}
+                    badge={cmsSettings?.footerLogoBadge || 'IMAM RABBANI LIFE FESTIVAL'}
+                    customIconUrl={cmsSettings?.footerLogo || '/rendezvous_icon.png'}
                   />
                 </div>
               </div>
               <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed max-w-md pt-2">
-                {cmsSettings?.footerDescription || 'At-Tabassum Meelad Fest 2026 is a vibrant celebration of talent, creativity, knowledge, and togetherness, proudly organized by Noorul Islam Madrasa, Jeppu, Mangalore, bringing students together through meaningful learning, healthy competition, and shared values.'}
+                {cmsSettings?.footerDescription || 'Rendezvous 26 is a vibrant celebration of talent, creativity, knowledge, and togetherness, proudly organized by Imam Rabbani Life Festival, bringing students together through meaningful learning, healthy competition, and shared values.'}
               </p>
             </div>
 
@@ -216,7 +216,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings, dragBlo
 
           {/* Bottom Bar */}
           <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-zinc-500">
-            <p>{cmsSettings?.footerText || cmsSettings?.copyrightText || '© 2026 Noorul Islam Madrasa Jeppu. All rights reserved. Developed by Zenith.'}</p>
+            <p>{cmsSettings?.footerText || cmsSettings?.copyrightText || '© 2026 Imam Rabbani Life Festival. All rights reserved. Developed by Zenith.'}</p>
 
             <button
               onClick={scrollToTop}

@@ -621,11 +621,11 @@ export const generatePosterShareCaption = (
   results: any[],
   eventSettings?: any
 ): string => {
-  const festivalTitle = (eventSettings?.festivalName || 'TABASSUM MEELAD FEST 2K26').toUpperCase();
+  const festivalTitle = (eventSettings?.festivalName || 'RENDEZVOUS 26').toUpperCase();
   const formattedNum = String(compIndex || 1).padStart(2, '0');
-  const slogan = eventSettings?.festivalTagline || eventSettings?.slogan || 'A Smile That Brings Hearts Together...';
-  const campus = eventSettings?.campusName || eventSettings?.sectorName || 'Noorul Islam Madrasa, Jeppu';
-  const hashtags = eventSettings?.shareHashtags || '#Tabassum2K26 #MeeladFest #Results #NoorulIslamMadrasa #Jeppu #Congratulations';
+  const slogan = eventSettings?.festivalTagline || eventSettings?.slogan || 'Decoding Phytolore';
+  const campus = eventSettings?.campusName || eventSettings?.sectorName || 'Imam Rabbani Life Festival';
+  const hashtags = eventSettings?.shareHashtags || '#Rendezvous26 #ImamRabbani #LifeFestival #DecodingPhytolore #Results #Congratulations';
 
   const rank1List = (results || []).filter((r: any) => r.rank === 1);
   const rank2List = (results || []).filter((r: any) => r.rank === 2);
