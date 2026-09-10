@@ -69,10 +69,10 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenConceptModal, 
               <div className="bg-zinc-900/60 border rounded-xl p-4 mb-5" style={{ borderColor: 'var(--color-primary-accent)' }}>
                 <div className="flex items-center gap-2 text-white font-bold text-xs mb-1.5">
 
-                  <span>Theme: "{cmsSettings?.themeTitle || 'Transcending the Illusions'}"</span>
+                  <span>Theme: "{cmsSettings?.themeTitle || 'Decoding Phytolore'}"</span>
                 </div>
                 <p className="text-xs text-zinc-300 leading-relaxed italic whitespace-pre-line">
-                  "{cmsSettings?.themeDescription || 'In a world crowded with digital superficiality and sensory illusions, \'Transcending the Illusions\' calls upon the youth to pierce through modern worldly deceptions through classical wisdom, spiritual clarity, and moral fortitude.'}"
+                  "{cmsSettings?.themeDescription || 'In an interconnected world, \'Decoding Phytolore\' calls upon the youth to explore the deeper symbiosis between nature, wisdom, spiritual clarity, and moral fortitude.'}"
                 </p>
               </div>
 
@@ -83,7 +83,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenConceptModal, 
                 className="group inline-flex items-center gap-2.5 px-5 py-2.5 hover:opacity-90 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all duration-300 shadow-md cursor-pointer"
               >
                 <BookOpen className="w-3.5 h-3.5" />
-                <span>{cmsSettings?.themeButtonText || 'Read Philosophical Concept'}</span>
+                <span>{cmsSettings?.themeButtonText || 'Read Festival Concept'}</span>
                 <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" />
               </button>
             </div>

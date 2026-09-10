@@ -31,16 +31,16 @@ export const FullConceptModal: React.FC<FullConceptModalProps> = ({ isOpen, onCl
         </div>
 
         <h2 className="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight mb-2">
-          {cmsSettings?.conceptModalTitle || FULL_CONCEPT_TEXT.title}
+          {(!cmsSettings?.conceptModalTitle || cmsSettings.conceptModalTitle.toUpperCase().includes('SMILE') || cmsSettings.conceptModalTitle.toUpperCase().includes('TABASSUM')) ? FULL_CONCEPT_TEXT.title : cmsSettings.conceptModalTitle}
         </h2>
 
         <p className="text-xs font-mono text-zinc-400 border-b border-white/10 pb-4 mb-6">
-          {cmsSettings?.conceptModalSubtitle || FULL_CONCEPT_TEXT.institution}
+          {(!cmsSettings?.conceptModalSubtitle || cmsSettings.conceptModalSubtitle.toUpperCase().includes('NOORUL')) ? FULL_CONCEPT_TEXT.institution : cmsSettings.conceptModalSubtitle}
         </p>
 
         {/* Paragraphs */}
         <div className="space-y-4 text-zinc-300 text-sm sm:text-base leading-relaxed font-sans">
-          {(cmsSettings?.conceptModalDescription ? cmsSettings.conceptModalDescription.split('\n').filter((p: string) => p.trim() !== '') : FULL_CONCEPT_TEXT.paragraphs).map((p: string, idx: number) => (
+          {((cmsSettings?.conceptModalDescription && !cmsSettings.conceptModalDescription.toUpperCase().includes('TABASSUM') && !cmsSettings.conceptModalDescription.toUpperCase().includes('NOORUL')) ? cmsSettings.conceptModalDescription.split('\n').filter((p: string) => p.trim() !== '') : FULL_CONCEPT_TEXT.paragraphs).map((p: string, idx: number) => (
             <p key={idx} className="relative pl-4 border-l-2" style={{ borderColor: primaryColor }}>
               {p}
             </p>
@@ -51,7 +51,7 @@ export const FullConceptModal: React.FC<FullConceptModalProps> = ({ isOpen, onCl
         <div className="mt-8 pt-6 border-t border-white/10 flex flex-wrap items-center justify-between gap-4 text-xs font-mono text-zinc-400">
           <div className="flex items-center gap-2">
             <ShieldCheck className="w-4 h-4" style={{ color: primaryColor }} />
-            <span>{cmsSettings?.conceptModalFooter || (FULL_CONCEPT_TEXT as any).footer || 'Rendezvous 26'}</span>
+            <span>{(!cmsSettings?.conceptModalFooter || cmsSettings.conceptModalFooter.toUpperCase().includes('TABASSUM')) ? 'Rendezvous 26' : cmsSettings.conceptModalFooter}</span>
           </div>
           <button
             onClick={onClose}

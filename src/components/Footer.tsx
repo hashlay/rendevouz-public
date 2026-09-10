@@ -76,6 +76,44 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings, dragBlo
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Sanitization helpers to guarantee clean Rendezvous 26 presentation
+  const sanitizeLogo = (logo?: string) => {
+    if (!logo || logo.includes('tabassum') || logo.includes('zenith_gold') || logo.includes('mas')) return '/rendezvous_icon.png';
+    return logo;
+  };
+  const sanitizeTitle = (title?: string) => {
+    if (!title || title.toUpperCase().includes('TABASSUM')) return 'RENDEZVOUS';
+    return title;
+  };
+  const sanitizeSubtitle = (sub?: string) => {
+    if (!sub || sub.toUpperCase().includes('MEELAD') || sub.toUpperCase().includes('FEST')) return '26';
+    return sub;
+  };
+  const sanitizeBadge = (badge?: string) => {
+    if (!badge || badge.toUpperCase().includes('NOORUL')) return 'IMAM RABBANI LIFE FESTIVAL';
+    return badge;
+  };
+  const sanitizeDesc = (desc?: string) => {
+    if (!desc || desc.toUpperCase().includes('TABASSUM') || desc.toUpperCase().includes('NOORUL')) {
+      return 'Rendezvous 26 is a vibrant celebration of talent, creativity, knowledge, and togetherness, proudly organized by Imam Rabbani Life Festival, bringing students together through meaningful learning, healthy competition, and shared values.';
+    }
+    return desc;
+  };
+  const sanitizeLocation = (loc?: string) => {
+    if (!loc || loc.toUpperCase().includes('JEPPU') || loc.toUpperCase().includes('MAS GARDEN')) return 'Imam Rabbani Campus';
+    return loc;
+  };
+  const sanitizeEmail = (email?: string) => {
+    if (!email || email.includes('zenith.theorganizer')) return 'contacthashlay@gmail.com';
+    return email;
+  };
+  const sanitizeCopyright = (cr?: string) => {
+    if (!cr || cr.toUpperCase().includes('NOORUL') || cr.toUpperCase().includes('TABASSUM')) {
+      return '© 2026 Imam Rabbani Life Festival. All rights reserved. Developed by Zenith.';
+    }
+    return cr;
+  };
+
   return (
     <>
       {/* Developer Banner (Zenith Software) */}
@@ -145,15 +183,15 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings, dragBlo
                   <Logo
                     size="lg"
                     variant="full"
-                    title={cmsSettings?.footerLogoTitle || 'RENDEZVOUS'}
-                    subtitle={cmsSettings?.footerLogoSubtitle || '26'}
-                    badge={cmsSettings?.footerLogoBadge || 'IMAM RABBANI LIFE FESTIVAL'}
-                    customIconUrl={cmsSettings?.footerLogo || '/rendezvous_icon.png'}
+                    title={sanitizeTitle(cmsSettings?.footerLogoTitle)}
+                    subtitle={sanitizeSubtitle(cmsSettings?.footerLogoSubtitle)}
+                    badge={sanitizeBadge(cmsSettings?.footerLogoBadge)}
+                    customIconUrl={sanitizeLogo(cmsSettings?.footerLogo)}
                   />
                 </div>
               </div>
               <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed max-w-md pt-2">
-                {cmsSettings?.footerDescription || 'Rendezvous 26 is a vibrant celebration of talent, creativity, knowledge, and togetherness, proudly organized by Imam Rabbani Life Festival, bringing students together through meaningful learning, healthy competition, and shared values.'}
+                {sanitizeDesc(cmsSettings?.footerDescription)}
               </p>
             </div>
 
@@ -183,11 +221,11 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings, dragBlo
               <div className="space-y-2.5 text-xs text-zinc-300 font-mono">
                 <div className="flex items-center gap-2.5">
                   <MapPin className="w-4 h-4 shrink-0" style={{ color: 'var(--color-primary-accent)' }} />
-                  <span>{cmsSettings?.footerLocation || INSTITUTION.location}</span>
+                  <span>{sanitizeLocation(cmsSettings?.footerLocation || INSTITUTION.location)}</span>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <Mail className="w-4 h-4 shrink-0" style={{ color: 'var(--color-primary-accent)' }} />
-                  <span>{cmsSettings?.footerEmail || INSTITUTION.email}</span>
+                  <span>{sanitizeEmail(cmsSettings?.footerEmail || INSTITUTION.email)}</span>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <Phone className="w-4 h-4 shrink-0" style={{ color: 'var(--color-primary-accent)' }} />
@@ -216,7 +254,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings, dragBlo
 
           {/* Bottom Bar */}
           <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-zinc-500">
-            <p>{cmsSettings?.footerText || cmsSettings?.copyrightText || '© 2026 Imam Rabbani Life Festival. All rights reserved. Developed by Zenith.'}</p>
+            <p>{sanitizeCopyright(cmsSettings?.footerText || cmsSettings?.copyrightText)}</p>
 
             <button
               onClick={scrollToTop}
