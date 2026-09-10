@@ -377,8 +377,9 @@ app.get('/api/public/results', async (req, res) => {
         const p = participants.find(p => p.id === r.participantId);
         if (p) {
           participantName = p.fullName;
-          const chest = chestNumbers.find(c => c.entityId === p.id || (c.participantId === p.id && c.categoryId === p.selectedCategoryId));
-          codeNumber = chest ? (chest.codeNumber || chest.chestNumber?.toString() || '') : '';
+          const chest = chestNumbers.find(c => c.entityId === p.id || (c.participantId === p.id && c.categoryId === p.selectedCategoryId))
+            || chestNumbers.find(c => c.entityId === p.id || c.participantId === p.id);
+          codeNumber = chest ? (chest.codeNumber || chest.chestNumber?.toString() || '') : (p.profilePhoto || '');
           const unit = units.find(u => u.id === p.unitId);
           department = unit ? unit.name : '';
         }
@@ -403,11 +404,15 @@ app.get('/api/public/results', async (req, res) => {
       }
 
       let grade = r.grade || 'A';
+      const compCat = comp ? categories.find(c => c.id === comp.categoryId) : null;
+      const isGenComp = compCat && (compCat.id === 'cat_general' || compCat.name?.toLowerCase() === 'general');
+      const finalCategoryName = isGenComp ? (compCat.name || 'General') : (cat ? cat.name : (compCat ? compCat.name : (r.category || 'General')));
+
       return {
         id: r.id,
         competitionId: r.competitionId,
         eventName: comp ? comp.name : (r.eventName || r.program || 'Competition'),
-        category: cat ? cat.name : (r.category || 'General'),
+        category: finalCategoryName,
         participationType,
         participantName,
         codeNumber,
