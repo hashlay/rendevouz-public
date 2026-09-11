@@ -362,7 +362,7 @@ app.get('/api/public/results', async (req, res) => {
   const { results = [], competitions = [], categories = [], participants = [], teams = [], chestNumbers = [], units = [], eventSettings = {} } = dbState;
 
   const enrichedResults = results
-    .filter(r => !r.deletedAt && (r.publishedStatus || (r.rank !== undefined && r.rank > 0)))
+    .filter(r => !r.deletedAt && (r.publishedStatus === true || r.isPublished === true))
     .map(r => {
       const comp = competitions.find(c => c.id === r.competitionId);
       const cat = categories.find(c => c.id === r.categoryId);
@@ -377,96 +377,76 @@ app.get('/api/public/results', async (req, res) => {
         const p = participants.find(p => p.id === r.participantId);
         if (p) {
           participantName = p.fullName;
-          const chest = chestNumbers.find(c => c.entityId === p.id || (c.participantId === p.id && c.categoryId === p.selectedCategoryId))
-            || chestNumbers.find(c => c.entityId === p.id || c.participantId === p.id);
-          codeNumber = chest ? (chest.codeNumber || chest.chestNumber?.toString() || '') : (p.profilePhoto || '');
+          const chest = chestNumbers.find(c => c.entityId === p.id || (c.participantId === p.id && c.categoryId === p.selectedCategoryId));
+          codeNumber = chest ? (chest.chestNumber || chest.codeNumber) : '';
           const unit = units.find(u => u.id === p.unitId);
           department = unit ? unit.name : '';
-        }
-      } else if (r.teamId) {
-        const t = teams.find(t => t.id === r.teamId);
-        if (t) {
-          teamMemberIds = Array.isArray(t.memberIds) ? t.memberIds : [];
-          if (!participantName) {
-            participantName = t.teamName || t.teamNumber;
-            codeNumber = t.teamNumber;
-            const unit = units.find(u => u.id === t.unitId);
-            department = unit ? unit.name : '';
-          }
         }
       }
 
       let points = r.points || 0;
-      if (!points) {
-        if (r.rank === 1) points = eventSettings.globalPointsRank1 || 20;
-        else if (r.rank === 2) points = eventSettings.globalPointsRank2 || 15;
-        else if (r.rank === 3) points = eventSettings.globalPointsRank3 || 10;
-      }
+      if (r.rank === 1) points = 20;
+      else if (r.rank === 2) points = 14;
+      else if (r.rank === 3) points = 7;
 
-      let grade = r.grade || 'A';
-      const compCat = comp ? categories.find(c => c.id === comp.categoryId) : null;
-      const isGenComp = compCat && (compCat.id === 'cat_general' || compCat.name?.toLowerCase() === 'general');
-      const finalCategoryName = isGenComp ? (compCat.name || 'General') : (cat ? cat.name : (compCat ? compCat.name : (r.category || 'General')));
+      let categoryName = cat?.name || 'General';
 
       return {
         id: r.id,
         competitionId: r.competitionId,
-        eventName: comp ? comp.name : (r.eventName || r.program || 'Competition'),
-        category: finalCategoryName,
-        participationType,
-        participantName,
-        codeNumber,
-        department,
-        teamId: r.teamId,
+        competitionName: comp?.name || r.eventName || 'Competition',
+        categoryId: r.categoryId,
+        categoryName,
         participantId: r.participantId,
-        teamMemberIds,
-        rank: r.rank || 0,
-        grade,
+        participantName,
+        chestNumber: codeNumber,
+        unitName: department || r.unitName || '',
+        rank: r.rank,
+        grade: r.grade || 'A',
+        totalMarks: r.averageMark ?? r.totalMark ?? r.marks ?? 0,
+        judge1Marks: r.judge1Mark,
+        judge2Marks: r.judge2Mark,
         points,
-        raw: {
-          ...r,
-          teamMemberIds
-        }
+        status: r.status || 'participated',
+        remarks: r.remarks || '',
+        participationType,
+        publishedStatus: !!(r.publishedStatus || r.isPublished),
+        isPublished: !!(r.publishedStatus || r.isPublished),
+        teamMemberIds,
+        createdAt: r.createdAt || new Date().toISOString()
       };
     });
 
   res.json(enrichedResults);
 });
 
-// Public Standings / House Scores (Exact match to official CalculationService: Rank 1 = 20, Rank 2 = 14, Rank 3 = 7)
+// Public Unit Standings / Team Points
 app.get('/api/public/standings', async (req, res) => {
   const dbState = await getDbState();
-  const { units = [], results = [], participants = [], teams = [], categories = [], eventSettings = {} } = dbState;
-  const activeUnits = units.filter(u => u.active !== false);
+  const { units = [], participants = [], results = [], teams = [] } = dbState;
+
+  const validUnits = units.filter(u => u.active !== false);
 
   const getRankPoints = (r) => {
-    if (!r.rank || r.rank > 10) return 0;
-    const cat = categories.find(c => c.id === r.categoryId);
-    if (cat) {
-      const key = `pointsRank${r.rank}`;
-      if (cat[key] !== undefined && cat[key] !== null) {
-        const val = Number(cat[key]);
-        if (!isNaN(val)) return val;
-      }
-    }
-    const settingsKey = `globalPointsRank${r.rank}`;
-    const settingsVal = eventSettings[settingsKey];
-    if (settingsVal !== undefined && settingsVal !== null) {
-      const val = Number(settingsVal);
-      if (!isNaN(val)) return val;
-    }
-    const defaultMap = { 1: 20, 2: 14, 3: 7 };
-    return defaultMap[r.rank] || 0;
+    if (r.points !== undefined && r.points !== null && r.points > 0) return Number(r.points);
+    if (r.rank === 1) return 20;
+    if (r.rank === 2) return 14;
+    if (r.rank === 3) return 7;
+    return 0;
   };
 
   const getNormalizedMark = (r) => {
-    return Number(r.averageMark ?? r.totalMark ?? r.marks ?? 0) || 0;
+    if (r.averageMark !== undefined && r.averageMark !== null) return Number(r.averageMark);
+    if (r.totalMark !== undefined && r.totalMark !== null) return Number(r.totalMark);
+    if (r.marks !== undefined && r.marks !== null) return Number(r.marks);
+    return 0;
   };
 
-  const standings = activeUnits.map(unit => {
+  const standings = validUnits.map(unit => {
+    const normTarget = unit.name.toLowerCase().replace(/[-_]/g, '');
+
     const isUnitMatch = (uId, uName) => {
       if (!uId && !uName) return false;
-      const normTarget = unit.id.toLowerCase().replace(/[-_]/g, '');
       const normId = uId ? String(uId).toLowerCase().replace(/[-_]/g, '') : '';
       const normName = uName ? String(uName).toLowerCase().replace(/[-_]/g, '') : '';
       if (normId === normTarget || normName === normTarget) return true;
@@ -480,7 +460,7 @@ app.get('/api/public/standings', async (req, res) => {
 
     const individualResults = results.filter(r => {
       if (r.deletedAt) return false;
-      const isPub = r.publishedStatus || r.isPublished || (r.rank !== undefined && r.rank > 0);
+      const isPub = r.publishedStatus === true || r.isPublished === true;
       if (!isPub) return false;
       const statusOk = !r.status || r.status === 'participated' || String(r.status).toLowerCase() === 'participated';
       if (!statusOk) return false;
@@ -495,7 +475,7 @@ app.get('/api/public/standings', async (req, res) => {
 
     const groupResults = results.filter(r => {
       if (r.deletedAt) return false;
-      const isPub = r.publishedStatus || r.isPublished || (r.rank !== undefined && r.rank > 0);
+      const isPub = r.publishedStatus === true || r.isPublished === true;
       if (!isPub) return false;
       const statusOk = !r.status || r.status === 'participated' || String(r.status).toLowerCase() === 'participated';
       if (!statusOk) return false;
@@ -633,7 +613,7 @@ function buildParticipantPortalData(participant, cNum, cleanChest, dbState) {
 
   // 4. Candidate's results (both individual & group/team results)
   const participantResults = results
-    .filter(r => !r.deletedAt && (r.participantId === participant.id || (r.teamId && candidateTeamIds.includes(r.teamId))))
+    .filter(r => !r.deletedAt && (r.publishedStatus === true || r.isPublished === true) && (r.participantId === participant.id || (r.teamId && candidateTeamIds.includes(r.teamId))))
     .map(r => {
       const comp = competitions.find(c => c.id === r.competitionId);
       const cat = categories.find(c => c.id === r.categoryId);
@@ -648,7 +628,7 @@ function buildParticipantPortalData(participant, cNum, cleanChest, dbState) {
         grade: r.grade || 'A',
         totalMarks: r.averageMark ?? r.totalMark ?? r.marks ?? 0,
         points: r.points || (r.rank === 1 ? 20 : r.rank === 2 ? 14 : r.rank === 3 ? 7 : 0),
-        publishedStatus: r.publishedStatus ?? true,
+        publishedStatus: !!(r.publishedStatus || r.isPublished),
         participantName: participant.fullName,
         codeNumber: cNum ? (cNum.chestNumber || cNum.codeNumber) : (participant.profilePhoto || cleanChest),
         department: unit ? unit.name : (participant.unitName || 'Main Unit'),
