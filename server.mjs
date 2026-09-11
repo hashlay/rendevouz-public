@@ -631,7 +631,7 @@ app.get('/api/public/cms', async (req, res) => {
 
 // Helper: Build 100% genuine participant portal data with real programs, teams, and results
 function buildParticipantPortalData(participant, cNum, cleanChest, dbState) {
-  const { competitions = [], results = [], registrations = [], teams = [], units = [], categories = [] } = dbState;
+  const { competitions = [], results = [], registrations = [], teams = [], units = [], categories = [], eventSettings = {} } = dbState;
 
   // 1. Pre-registered competitions (individual & group)
   const regRecord = registrations.find(r => r.participantId === participant.id && !r.deletedAt);
