@@ -196,6 +196,8 @@ async function getDbState(force = false) {
       teams: [],
       results: [],
       chestNumbers: [],
+      judgmentSheets: [],
+      registrations: [],
       gallery: [],
       videoHighlights: [],
       dragBlocks: [],
@@ -210,7 +212,8 @@ async function getDbState(force = false) {
       const [
         settingsDocs, unitsDocs, categoriesDocs, competitionsDocs,
         participantsDocs, teamsDocs, resultsDocs, chestDocs,
-        galleryDocs, videoDocs, dragBlocksDocs, heroMediaDocs
+        galleryDocs, videoDocs, dragBlocksDocs, heroMediaDocs,
+        judgmentSheetsDocs, registrationsDocs
       ] = await Promise.all([
         db.collection('settings').find({}).toArray().catch(() => []),
         db.collection('units').find({}).toArray().catch(() => []),
@@ -223,7 +226,9 @@ async function getDbState(force = false) {
         db.collection('gallery').find({}).toArray().catch(() => []),
         db.collection('videoHighlights').find({}).toArray().catch(() => []),
         db.collection('dragBlocks').find({}).toArray().catch(() => []),
-        db.collection('heroMedia').find({}).toArray().catch(() => [])
+        db.collection('heroMedia').find({}).toArray().catch(() => []),
+        db.collection('judgmentSheets').find({}).toArray().catch(() => []),
+        db.collection('registrations').find({}).toArray().catch(() => [])
       ]);
 
       settingsDocs.forEach(s => {
@@ -272,6 +277,8 @@ async function getDbState(force = false) {
       if (teamsDocs && teamsDocs.length > 0) state.teams = dedupeDocs(teamsDocs);
       if (resultsDocs && resultsDocs.length > 0) state.results = dedupeDocs(resultsDocs);
       if (chestDocs && chestDocs.length > 0) state.chestNumbers = dedupeDocs(chestDocs);
+      if (judgmentSheetsDocs && judgmentSheetsDocs.length > 0) state.judgmentSheets = dedupeDocs(judgmentSheetsDocs);
+      if (registrationsDocs && registrationsDocs.length > 0) state.registrations = dedupeDocs(registrationsDocs);
       if (galleryDocs && galleryDocs.length > 0) state.gallery = dedupeDocs(galleryDocs);
       if (videoDocs && videoDocs.length > 0) state.videoHighlights = dedupeDocs(videoDocs);
       if (dragBlocksDocs && dragBlocksDocs.length > 0) state.dragBlocks = dedupeDocs(dragBlocksDocs);
@@ -608,7 +615,7 @@ app.get('/api/public/cms', async (req, res) => {
 
 // Helper: Build 100% genuine participant portal data with real programs, teams, and results
 function buildParticipantPortalData(participant, cNum, cleanChest, dbState) {
-  const { competitions = [], results = [], registrations = [], teams = [], units = [], categories = [], eventSettings = {} } = dbState;
+  const { competitions = [], results = [], registrations = [], teams = [], units = [], categories = [], judgmentSheets = [], eventSettings = {} } = dbState;
 
   // 1. Pre-registered competitions (individual & group)
   const regRecord = registrations.find(r => r.participantId === participant.id && !r.deletedAt);
@@ -637,6 +644,9 @@ function buildParticipantPortalData(participant, cNum, cleanChest, dbState) {
     .filter(c => allCompIds.includes(c.id))
     .map(c => {
       const cat = categories.find(cat => cat.id === c.categoryId);
+      const isCompCompleted = (judgmentSheets || []).some(js => !js.deletedAt && js.competitionId === c.id && (js.status === 'completed' || js.status === 'locked')) ||
+        (results || []).some(r => !r.deletedAt && r.competitionId === c.id);
+
       return {
         id: c.id,
         competitionId: c.id,
@@ -647,7 +657,7 @@ function buildParticipantPortalData(participant, cNum, cleanChest, dbState) {
         stage: c.stageType === 'on_stage' ? 'On Stage' : (c.stageType === 'off_stage' ? 'Off Stage' : (c.stage || 'Main Stage')),
         stageType: c.stageType,
         time: c.startTime || '09:00 AM',
-        status: 'upcoming',
+        status: isCompCompleted ? 'completed' : 'upcoming',
         participationType: c.participationType === 'group' ? 'group' : 'individual'
       };
     });
