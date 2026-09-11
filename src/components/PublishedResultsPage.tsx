@@ -368,12 +368,9 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
                                     let g = res.grade;
                                     if (m > 0) {
                                       if (m >= 90) g = 'A+';
-                                      else if (m >= 80) g = 'A';
-                                      else if (m >= 70) g = 'B+';
+                                      else if (m >= 70) g = 'A';
                                       else if (m >= 60) g = 'B';
-                                      else if (m >= 50) g = 'C+';
-                                      else if (m >= 40) g = 'C';
-                                      else if (m >= 30) g = 'D+';
+                                      else if (m >= 50) g = 'C';
                                       else g = 'D';
                                     }
                                     return (

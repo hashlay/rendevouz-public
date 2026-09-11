@@ -384,11 +384,83 @@ app.get('/api/public/results', async (req, res) => {
         }
       }
 
-      let points = r.points || 0;
-      if (r.rank === 1) points = 20;
-      else if (r.rank === 2) points = 14;
-      else if (r.rank === 3) points = 7;
+// Exact Grade Calculation:
+// 90 to 100: A+
+// 70 to 89: A
+// 60 to 69: B
+// 50 to 59: C
+// Below 50: D
+function calculateGrade(mark) {
+  const m = Number(mark);
+  if (isNaN(m)) return 'D';
+  if (m >= 90) return 'A+';
+  if (m >= 70) return 'A';
+  if (m >= 60) return 'B';
+  if (m >= 50) return 'C';
+  return 'D';
+}
 
+function calculatePoints(r, comp, eventSettings) {
+  // Grade Pointing System: enabled by default for this festival
+  const isGradePointSystem = eventSettings?.gradeSystemEnabled !== false;
+  if (isGradePointSystem) {
+    const mark = Number(r.averageMark ?? r.totalMark ?? r.marks ?? 0);
+    const grade = (r.grade && ['A+', 'A', 'B', 'C', 'D'].includes(String(r.grade).trim().toUpperCase()))
+      ? String(r.grade).trim().toUpperCase()
+      : calculateGrade(mark);
+
+    const isGroup = !!r.teamId || comp?.participationType === 'group';
+    if (!isGroup) {
+      // Individual: A+ = 6, A = 5, B = 3, C = 1, D = 0
+      if (grade === 'A+') return 6;
+      if (grade === 'A') return 5;
+      if (grade === 'B') return 3;
+      if (grade === 'C') return 1;
+      return 0;
+    } else {
+      // Group: A+ = 12, A = 10, B = 7, C = 5, D = 0
+      if (grade === 'A+') return 12;
+      if (grade === 'A') return 10;
+      if (grade === 'B') return 7;
+      if (grade === 'C') return 5;
+      return 0;
+    }
+  }
+
+  // Normal rank-based points if grade pointing system is disabled:
+  if (r.points !== undefined && r.points !== null && r.points > 0) return Number(r.points);
+  if (r.rank === 1) return Number(eventSettings?.globalPointsRank1 ?? 20);
+  if (r.rank === 2) return Number(eventSettings?.globalPointsRank2 ?? 14);
+  if (r.rank === 3) return Number(eventSettings?.globalPointsRank3 ?? 7);
+  return 0;
+}
+
+  const enrichedResults = results
+    .filter(r => !r.deletedAt && (r.publishedStatus === true || r.isPublished === true))
+    .map(r => {
+      const comp = competitions.find(c => c.id === r.competitionId);
+      const cat = categories.find(c => c.id === r.categoryId);
+
+      let participantName = r.participantName || '';
+      let codeNumber = r.codeNumber || r.chestNumber || '';
+      let department = r.department || r.unitName || '';
+      let participationType = comp?.participationType === 'group' ? 'Group' : 'Individual';
+      let teamMemberIds = [];
+
+      if (r.participantId && !participantName) {
+        const p = participants.find(p => p.id === r.participantId);
+        if (p) {
+          participantName = p.fullName;
+          const chest = chestNumbers.find(c => c.entityId === p.id || (c.participantId === p.id && c.categoryId === p.selectedCategoryId));
+          codeNumber = chest ? (chest.chestNumber || chest.codeNumber) : '';
+          const unit = units.find(u => u.id === p.unitId);
+          department = unit ? unit.name : '';
+        }
+      }
+
+      const totalMarks = r.averageMark ?? r.totalMark ?? r.marks ?? 0;
+      const grade = calculateGrade(totalMarks);
+      const points = calculatePoints(r, comp, eventSettings);
       let categoryName = cat?.name || 'General';
 
       return {
@@ -402,8 +474,8 @@ app.get('/api/public/results', async (req, res) => {
         chestNumber: codeNumber,
         unitName: department || r.unitName || '',
         rank: r.rank,
-        grade: r.grade || 'A',
-        totalMarks: r.averageMark ?? r.totalMark ?? r.marks ?? 0,
+        grade,
+        totalMarks,
         judge1Marks: r.judge1Mark,
         judge2Marks: r.judge2Mark,
         points,
@@ -423,17 +495,9 @@ app.get('/api/public/results', async (req, res) => {
 // Public Unit Standings / Team Points
 app.get('/api/public/standings', async (req, res) => {
   const dbState = await getDbState();
-  const { units = [], participants = [], results = [], teams = [] } = dbState;
+  const { units = [], participants = [], results = [], teams = [], competitions = [], eventSettings = {} } = dbState;
 
   const validUnits = units.filter(u => u.active !== false);
-
-  const getRankPoints = (r) => {
-    if (r.points !== undefined && r.points !== null && r.points > 0) return Number(r.points);
-    if (r.rank === 1) return 20;
-    if (r.rank === 2) return 14;
-    if (r.rank === 3) return 7;
-    return 0;
-  };
 
   const getNormalizedMark = (r) => {
     if (r.averageMark !== undefined && r.averageMark !== null) return Number(r.averageMark);
@@ -499,7 +563,10 @@ app.get('/api/public/standings', async (req, res) => {
       else if (r.rank >= 4 && r.rank <= 7) fourthToSeventhPlaceCount++;
     });
 
-    const overallPoints = allUnitResults.reduce((sum, r) => sum + getRankPoints(r), 0);
+    const overallPoints = allUnitResults.reduce((sum, r) => {
+      const comp = competitions.find(c => c.id === r.competitionId);
+      return sum + calculatePoints(r, comp, eventSettings);
+    }, 0);
     const overallMarks = Math.round(allUnitResults.reduce((sum, r) => sum + getNormalizedMark(r), 0) * 100) / 100;
 
     return {
@@ -625,9 +692,9 @@ function buildParticipantPortalData(participant, cNum, cleanChest, dbState) {
         program: comp ? comp.name : (r.eventName || r.program || 'Competition'),
         category: cat ? cat.name : (r.category || 'General'),
         rank: r.rank,
-        grade: r.grade || 'A',
+        grade: calculateGrade(r.averageMark ?? r.totalMark ?? r.marks ?? 0),
         totalMarks: r.averageMark ?? r.totalMark ?? r.marks ?? 0,
-        points: r.points || (r.rank === 1 ? 20 : r.rank === 2 ? 14 : r.rank === 3 ? 7 : 0),
+        points: calculatePoints(r, comp, eventSettings),
         publishedStatus: !!(r.publishedStatus || r.isPublished),
         participantName: participant.fullName,
         codeNumber: cNum ? (cNum.chestNumber || cNum.codeNumber) : (participant.profilePhoto || cleanChest),

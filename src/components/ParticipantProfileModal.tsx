@@ -518,12 +518,9 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                 } else if (rawMarks !== undefined && rawMarks !== null) {
                   const m = Number(rawMarks);
                   if (m >= 90) computedGrade = 'A+';
-                  else if (m >= 80) computedGrade = 'A';
-                  else if (m >= 70) computedGrade = 'B+';
+                  else if (m >= 70) computedGrade = 'A';
                   else if (m >= 60) computedGrade = 'B';
-                  else if (m >= 50) computedGrade = 'C+';
-                  else if (m >= 40) computedGrade = 'C';
-                  else if (m >= 30) computedGrade = 'D+';
+                  else if (m >= 50) computedGrade = 'C';
                   else computedGrade = 'D';
                 }
 
