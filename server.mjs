@@ -356,34 +356,6 @@ app.get('/api/public/competitions', async (req, res) => {
   res.json(competitions);
 });
 
-// Public Published Results
-app.get('/api/public/results', async (req, res) => {
-  const dbState = await getDbState();
-  const { results = [], competitions = [], categories = [], participants = [], teams = [], chestNumbers = [], units = [], eventSettings = {} } = dbState;
-
-  const enrichedResults = results
-    .filter(r => !r.deletedAt && (r.publishedStatus === true || r.isPublished === true))
-    .map(r => {
-      const comp = competitions.find(c => c.id === r.competitionId);
-      const cat = categories.find(c => c.id === r.categoryId);
-
-      let participantName = r.participantName || '';
-      let codeNumber = r.codeNumber || r.chestNumber || '';
-      let department = r.department || r.unitName || '';
-      let participationType = comp?.participationType === 'group' ? 'Group' : 'Individual';
-      let teamMemberIds = [];
-
-      if (r.participantId && !participantName) {
-        const p = participants.find(p => p.id === r.participantId);
-        if (p) {
-          participantName = p.fullName;
-          const chest = chestNumbers.find(c => c.entityId === p.id || (c.participantId === p.id && c.categoryId === p.selectedCategoryId));
-          codeNumber = chest ? (chest.chestNumber || chest.codeNumber) : '';
-          const unit = units.find(u => u.id === p.unitId);
-          department = unit ? unit.name : '';
-        }
-      }
-
 // Exact Grade Calculation:
 // 90 to 100: A+
 // 70 to 89: A
@@ -434,6 +406,11 @@ function calculatePoints(r, comp, eventSettings) {
   if (r.rank === 3) return Number(eventSettings?.globalPointsRank3 ?? 7);
   return 0;
 }
+
+// Public Published Results
+app.get('/api/public/results', async (req, res) => {
+  const dbState = await getDbState();
+  const { results = [], competitions = [], categories = [], participants = [], teams = [], chestNumbers = [], units = [], eventSettings = {} } = dbState;
 
   const enrichedResults = results
     .filter(r => !r.deletedAt && (r.publishedStatus === true || r.isPublished === true))
