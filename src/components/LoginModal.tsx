@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Calendar, AlertCircle, Camera } from 'lucide-react';
+import { X, Calendar, AlertCircle, Camera, Loader2 } from 'lucide-react';
 import { useFestival } from '../context/FestivalContext';
 import { Logo } from './Logo';
 
@@ -15,6 +15,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   const [dob, setDob] = useState('');
   const [selectedClass, setSelectedClass] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+  const [isSigningIn, setIsSigningIn] = useState(false);
   const dateInputRef = React.useRef<HTMLInputElement>(null);
 
   const criteriaMode = eventSettings?.participantLoginCriteria || 'class';
@@ -25,6 +26,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   React.useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
+      setIsSigningIn(false);
+      setErrorMsg('');
       const params = new URLSearchParams(window.location.search);
       const userParam = params.get('user') || params.get('chest') || params.get('code');
       if (userParam) {
@@ -32,6 +35,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
       }
     } else {
       document.body.style.overflow = 'unset';
+      setIsSigningIn(false);
+      setErrorMsg('');
     }
     return () => {
       document.body.style.overflow = 'unset';
@@ -42,17 +47,33 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSigningIn) return;
     setErrorMsg('');
-    const secVal = criteriaMode === 'class' ? selectedClass : dob;
-    if (!chestNumber.trim() || !secVal.trim()) {
-      setErrorMsg(`No participant found for that chest number and ${criteriaMode === 'class' ? 'class' : 'date of birth'}.`);
+
+    const trimmedChest = chestNumber.trim();
+    const secVal = (criteriaMode === 'class' ? selectedClass : dob).trim();
+
+    if (!trimmedChest) {
+      setErrorMsg('Please enter your chest number.');
       return;
     }
-    const res = await loginUnified(chestNumber.trim(), secVal.trim());
-    if (!res.success) {
-      setErrorMsg(res.error || `No participant found for that chest number and ${criteriaMode === 'class' ? 'class' : 'date of birth'}.`);
-    } else {
-      onClose();
+    if (!secVal) {
+      setErrorMsg(criteriaMode === 'class' ? 'Please select your class / grade.' : 'Please enter your date of birth.');
+      return;
+    }
+
+    setIsSigningIn(true);
+    try {
+      const res = await loginUnified(trimmedChest, secVal);
+      if (!res.success) {
+        setErrorMsg(res.error || `No participant found for that chest number and ${criteriaMode === 'class' ? 'class' : 'date of birth'}.`);
+      } else {
+        onClose();
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || 'An error occurred while signing in. Please try again.');
+    } finally {
+      setIsSigningIn(false);
     }
   };
 
@@ -109,8 +130,9 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
               type="text"
               placeholder="e.g. 1042"
               value={chestNumber}
+              disabled={isSigningIn}
               onChange={(e) => setChestNumber(e.target.value)}
-              className="w-full bg-[#141416] border border-[#38383C] focus:border-[#DC2626] rounded-xl px-4 py-3 text-sm text-white font-mono placeholder:text-zinc-500 focus:outline-none transition-colors"
+              className="w-full bg-[#141416] border border-[#38383C] focus:border-[#DC2626] rounded-xl px-4 py-3 text-sm text-white font-mono placeholder:text-zinc-500 focus:outline-none transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
             />
           </div>
 
@@ -121,8 +143,9 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
               </label>
               <select
                 value={selectedClass}
+                disabled={isSigningIn}
                 onChange={(e) => setSelectedClass(e.target.value)}
-                className="w-full bg-[#141416] border border-[#38383C] focus:border-[#DC2626] rounded-xl px-4 py-3 text-sm text-white font-mono focus:outline-none transition-colors"
+                className="w-full bg-[#141416] border border-[#38383C] focus:border-[#DC2626] rounded-xl px-4 py-3 text-sm text-white font-mono focus:outline-none transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 <option value="">Select Class</option>
                 {availableClasses.map((cls, idx) => (
@@ -142,13 +165,15 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                   ref={dateInputRef}
                   type="date"
                   value={dob}
+                  disabled={isSigningIn}
                   onChange={(e) => setDob(e.target.value)}
-                  className="w-full bg-[#141416] border border-[#38383C] focus:border-[#DC2626] rounded-xl pl-4 pr-11 py-3 text-sm text-white font-mono placeholder:text-zinc-500 focus:outline-none transition-colors [color-scheme:dark] [&::-webkit-calendar-picker-indicator]:hidden"
+                  className="w-full bg-[#141416] border border-[#38383C] focus:border-[#DC2626] rounded-xl pl-4 pr-11 py-3 text-sm text-white font-mono placeholder:text-zinc-500 focus:outline-none transition-colors [color-scheme:dark] [&::-webkit-calendar-picker-indicator]:hidden disabled:opacity-70 disabled:cursor-not-allowed"
                   placeholder="DD/MM/YYYY"
                 />
                 <Calendar
                   className="absolute right-4 w-5 h-5 text-zinc-500 cursor-pointer hover:text-white transition-colors"
                   onClick={() => {
+                    if (isSigningIn) return;
                     try {
                       dateInputRef.current?.showPicker();
                     } catch (err) {
@@ -168,9 +193,21 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
 
           <button
             type="submit"
-            className="w-full py-3.5 bg-[#EF4444] hover:bg-[#DC2626] active:scale-[0.99] text-white font-extrabold text-xs sm:text-sm uppercase tracking-wider rounded-xl shadow-lg shadow-red-950/40 transition-all flex items-center justify-center gap-2 cursor-pointer mt-2"
+            disabled={isSigningIn}
+            className={`w-full py-3.5 text-white font-extrabold text-xs sm:text-sm uppercase tracking-wider rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 mt-2 select-none ${
+              isSigningIn
+                ? 'bg-[#EF4444]/80 opacity-80 cursor-not-allowed shadow-none'
+                : 'bg-[#EF4444] hover:bg-[#DC2626] active:scale-[0.99] cursor-pointer shadow-red-950/40'
+            }`}
           >
-            <span>SIGN IN</span>
+            {isSigningIn ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin text-white shrink-0" />
+                <span>SIGNING IN...</span>
+              </>
+            ) : (
+              <span>SIGN IN</span>
+            )}
           </button>
         </form>
 
