@@ -17,13 +17,21 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
   const [mobileIndex, setMobileIndex] = React.useState(0);
 
   const defaultDesktopImages = ['/rendezvous_hero_desktop.jpg', '/hero1.jpg', '/hero2.jpg'];
-  const defaultMobileImages = ['/rendezvous_hero_mobile.jpg', '/hero1.jpg', '/hero2.jpg'];
+  const defaultMobileImages = ['/rendezvous_hero_mobile.jpg', '/hero1_mobile.jpg', '/hero2_mobile.jpg'];
 
   const customDesktop = propHeroMedia?.filter(m => m.device !== 'mobile').sort((a, b) => (a.order || 0) - (b.order || 0)).map(m => m.url).filter((url): url is string => Boolean(url && typeof url === 'string' && url.trim().length > 0)) || [];
   const customMobile = propHeroMedia?.filter(m => m.device !== 'desktop').sort((a, b) => (a.order || 0) - (b.order || 0)).map(m => m.url).filter((url): url is string => Boolean(url && typeof url === 'string' && url.trim().length > 0)) || [];
 
-  const desktopImages = customDesktop.length > 0 ? customDesktop : defaultDesktopImages;
-  const mobileImages = customMobile.length > 0 ? customMobile : defaultMobileImages;
+  const cmsDesktop = Array.isArray(cmsSettings?.heroDesktopImages) && cmsSettings.heroDesktopImages.length > 0
+    ? cmsSettings.heroDesktopImages.filter((u: any) => Boolean(u && typeof u === 'string' && u.trim().length > 0))
+    : [];
+
+  const cmsMobile = Array.isArray(cmsSettings?.heroMobileImages) && cmsSettings.heroMobileImages.length > 0
+    ? cmsSettings.heroMobileImages.filter((u: any) => Boolean(u && typeof u === 'string' && u.trim().length > 0))
+    : [];
+
+  const desktopImages = customDesktop.length > 0 ? customDesktop : (cmsDesktop.length > 0 ? cmsDesktop : defaultDesktopImages);
+  const mobileImages = customMobile.length > 0 ? customMobile : (cmsMobile.length > 0 ? cmsMobile : defaultMobileImages);
 
   React.useEffect(() => {
     if (desktopImages.length <= 1 || cmsSettings?.heroDesktopLoopEnabled === false) return;
