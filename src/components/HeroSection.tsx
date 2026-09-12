@@ -90,6 +90,15 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
         formatted = formatted.replace(/RENDEZVOUS\s+26/i, 'RENDEZVOUS<br /><span class="block" style="color: var(--color-primary-accent)">26</span>');
       }
     }
+
+    // Apply Hochland font to RENDEZVOUS
+    if (formatted.toUpperCase().includes('RENDEZVOUS') && !formatted.includes('font-hochland')) {
+      formatted = formatted.replace(
+        /RENDEZVOUS/gi,
+        '<span class="font-hochland tracking-wider inline-block">RENDEZVOUS</span>'
+      );
+    }
+
     return formatted;
   };
 
@@ -169,7 +178,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
             />
           ) : (
             <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-white uppercase tracking-tight max-w-4xl mx-auto leading-[0.95] mb-3 sm:mb-5 drop-shadow-md text-center font-display flex flex-col items-center">
-              <span className="block">RENDEZVOUS</span>
+              <span className="block font-hochland tracking-wider">RENDEZVOUS</span>
               <span className="block font-black" style={{ color: 'var(--color-primary-accent)' }}>
                 26
               </span>

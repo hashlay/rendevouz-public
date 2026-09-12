@@ -104,7 +104,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings, dragBlo
     return loc;
   };
   const sanitizeEmail = (email?: string) => {
-    if (!email || email.includes('zenith.theorganizer')) return 'contacthashlay@gmail.com';
+    if (!email || email.includes('zenith.theorganizer')) return 'zenith.theorganizer@gmail.com';
     return email;
   };
   const sanitizeCopyright = (cr?: string) => {
@@ -159,9 +159,9 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings, dragBlo
               <Phone className="w-3 h-3 transition-transform group-hover:scale-110 opacity-70" style={{ color: 'var(--color-primary-accent)' }} />
               +91 74831 38340
             </a>
-            <a href="mailto:contacthashlay@gmail.com" className="flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer group">
+            <a href="mailto:zenith.theorganizer@gmail.com" className="flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer group">
               <Mail className="w-3 h-3 transition-transform group-hover:scale-110 opacity-70" style={{ color: 'var(--color-primary-accent)' }} />
-              contacthashlay@gmail.com
+              zenith.theorganizer@gmail.com
             </a>
           </div>
 

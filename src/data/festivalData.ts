@@ -8,7 +8,7 @@ export const INSTITUTION = {
   theme: "Decoding Phytolore",
   dates: "2026 September 23, 24",
   location: "Imam Rabbani Campus",
-  email: "contacthashlay@gmail.com",
+  email: "zenith.theorganizer@gmail.com",
   phone: "+91 74831 38340",
   socials: {
     instagram: "https://instagram.com",

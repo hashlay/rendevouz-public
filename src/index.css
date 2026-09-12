@@ -1,9 +1,23 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: 'Hochland';
+  src: url('/fonts/Hochland.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+.font-hochland {
+  font-family: 'Hochland', sans-serif;
+  letter-spacing: 0.05em;
+}
+
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
   --font-display: "Plus Jakarta Sans", "Outfit", "Space Grotesk", sans-serif;
+  --font-hochland: "Hochland", sans-serif;
   --color-brand: var(--color-primary-accent);
   --color-surface: var(--color-body-bg);
   --color-card: var(--color-card-bg);
