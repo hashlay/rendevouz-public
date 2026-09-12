@@ -184,7 +184,8 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
 
       const rCompId = r.competitionId || r.raw?.competitionId;
       const rCategory = (r.category || r.categoryName || r.raw?.categoryName || '').trim().toLowerCase();
-      const rEventName = (r.eventName || r.program || r.raw?.program || '').trim().toLowerCase();
+      const rCompName = (r.eventName || r.competitionName || r.program || r.raw?.program || r.raw?.competitionName || '').trim();
+      const rEventName = rCompName.toLowerCase();
       const cleanEventName = rEventName.replace(/\s*\([^)]*Group[^)]*\)/gi, '').trim();
 
       // Check category compatibility to prevent cross-category matches
@@ -234,15 +235,26 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
       const isDirectParticipantResult = Array.isArray(p.results) && p.results.some(pr => pr === r || (pr.id && r.id && pr.id === r.id));
 
       if (isIndividualMatch || isGroupMatch || isDirectParticipantResult) {
-        // Deduplicate strictly by competition to prevent the same participant from having multiple results for the same event
-        const uniqueKey = cleanEventName || rEventName || rCompId || r.id;
-        if (!seenResultKeys.has(uniqueKey)) {
-          seenResultKeys.add(uniqueKey);
-          resultsList.push({
-            ...r,
-            isGroupEvent: isGroupMatch && !isIndividualMatch
-          });
+        // Deduplicate strictly by competition (both by ID and by normalized competition name)
+        const primaryKey = rCompId ? `comp_${rCompId}` : `name_${cleanEventName || rEventName || r.id}`;
+        const nameKey = cleanEventName ? `name_${cleanEventName}` : '';
+        const idKey = rCompId ? `comp_${rCompId}` : '';
+
+        if (seenResultKeys.has(primaryKey) || (nameKey && seenResultKeys.has(nameKey)) || (idKey && seenResultKeys.has(idKey))) {
+          return;
         }
+
+        seenResultKeys.add(primaryKey);
+        if (nameKey) seenResultKeys.add(nameKey);
+        if (idKey) seenResultKeys.add(idKey);
+
+        resultsList.push({
+          ...r,
+          eventName: rCompName || 'Competition',
+          category: r.category || r.categoryName || 'General',
+          department: r.department || r.unitName || r.team || '',
+          isGroupEvent: isGroupMatch && !isIndividualMatch
+        });
       }
     });
 
@@ -267,8 +279,8 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
 
     wonRanks.forEach((r, idx) => {
       const cId = r.competitionId || r.raw?.competitionId;
-      const ev = (r.eventName || r.program || r.raw?.program || '').trim();
-      const cat = (r.category || r.categoryName || r.raw?.categoryName || p.category || 'Senior').trim();
+      const ev = (r.eventName || r.competitionName || r.program || r.raw?.program || r.raw?.competitionName || 'Competition').trim();
+      const cat = (r.category || r.categoryName || r.raw?.categoryName || p.category || 'General').trim();
 
       const matchedAdminPoster = (competitionPosters || []).find(poster => {
         const firstRes = poster.results?.[0];
@@ -502,7 +514,7 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
           ) : (
             <div className="space-y-4">
               {participantDeclaredResults.map((res) => {
-                const rawMarks = res.averageMark ?? (res.raw ? res.raw.averageMark : undefined) ?? res.totalMark ?? res.marks ?? (res.raw ? (res.raw.totalMark ?? res.raw.judge1Mark) : undefined);
+                const rawMarks = res.totalMark ?? res.marks ?? res.averageMark ?? (res as any).totalMarks ?? (res.raw ? (res.raw.averageMark ?? res.raw.totalMark ?? res.raw.judge1Mark) : undefined);
                 
                 const isAbsentResult = Boolean(
                   res.isAbsent || 
@@ -540,7 +552,7 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                       </div>
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
-                          <h5 className="text-lg font-bold text-white tracking-tight">{res.eventName}</h5>
+                          <h5 className="text-lg font-bold text-white tracking-tight">{res.eventName || res.competitionName || res.program || 'Competition'}</h5>
                           {isGroup && (
                             <span className="text-[10px] font-mono font-bold uppercase px-2.5 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-500/40 text-indigo-300">
                               Group / Team

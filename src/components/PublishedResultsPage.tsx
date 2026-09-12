@@ -37,17 +37,20 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
       setGeneratingKey(group.key);
       const canvas = document.createElement('canvas');
       const compIdx = group.announcementNumber || 1;
+      const safeEvent = group.eventName || (group.items?.[0] as any)?.competitionName || (group.items?.[0] as any)?.eventName || 'Competition';
+      const safeCategory = group.category || (group.items?.[0] as any)?.categoryName || (group.items?.[0] as any)?.category || 'General';
+
       await renderPosterToCanvas(
         canvas,
         group.items,
         eventSettings,
-        group.eventName,
-        group.category,
+        safeEvent,
+        safeCategory,
         compIdx
       );
       
       const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
-      const fileName = `Result_Poster_${group.category}_${group.eventName.replace(/[^a-zA-Z0-9]/g, '_')}.jpg`;
+      const fileName = `Result_Poster_${safeCategory.replace(/[^a-zA-Z0-9]/g, '_')}_${safeEvent.replace(/[^a-zA-Z0-9]/g, '_')}.jpg`;
       const a = document.createElement('a');
       a.href = dataUrl;
       a.download = fileName;
@@ -63,30 +66,33 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
 
   const handleSharePoster = async (group: { eventName: string; category: string; key: string; items: ResultItem[]; announcementNumber?: number }) => {
     const compIdx = group.announcementNumber || 1;
+    const safeEvent = group.eventName || (group.items?.[0] as any)?.competitionName || (group.items?.[0] as any)?.eventName || 'Competition';
+    const safeCategory = group.category || (group.items?.[0] as any)?.categoryName || (group.items?.[0] as any)?.category || 'General';
+
     const caption = generatePosterShareCaption(
-      group.eventName,
-      group.category,
+      safeEvent,
+      safeCategory,
       compIdx,
       group.items,
       eventSettings
     );
-    const cleanCat = group.category.replace(/[^\w\s-]/gi, '').trim().replace(/\s+/g, '_');
-    const cleanEvent = group.eventName.replace(/[^\w\s-]/gi, '').trim().replace(/\s+/g, '_');
+    const cleanCat = safeCategory.replace(/[^\w\s-]/gi, '').trim().replace(/\s+/g, '_');
+    const cleanEvent = safeEvent.replace(/[^\w\s-]/gi, '').trim().replace(/\s+/g, '_');
     const fileName = `Result_Poster_${cleanCat}_${cleanEvent}.jpg`;
 
     try {
       const { blob } = await renderPosterToBlob(
         group.items,
         eventSettings,
-        group.eventName,
-        group.category,
+        safeEvent,
+        safeCategory,
         compIdx
       );
       const file = new File([blob], fileName, { type: 'image/jpeg' });
 
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({
-          title: `🏆 ${group.eventName} (${group.category}) Result`,
+          title: `🏆 ${safeEvent} (${safeCategory}) Result`,
           text: caption,
           files: [file]
         });
@@ -109,9 +115,11 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
 
   const handleCopyLink = (group: { eventName: string; category: string; key: string; items: ResultItem[]; announcementNumber?: number }) => {
     const compIdx = group.announcementNumber || 1;
+    const safeEvent = group.eventName || (group.items?.[0] as any)?.competitionName || (group.items?.[0] as any)?.eventName || 'Competition';
+    const safeCategory = group.category || (group.items?.[0] as any)?.categoryName || (group.items?.[0] as any)?.category || 'General';
     const caption = generatePosterShareCaption(
-      group.eventName,
-      group.category,
+      safeEvent,
+      safeCategory,
       compIdx,
       group.items,
       eventSettings
@@ -132,13 +140,15 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
     const validResults = (results || []).filter(r => r.rank !== undefined && r.rank > 0 && r.rank <= 3);
     
     validResults.forEach((res) => {
-      const key = res.competitionId || `${res.eventName}__${res.category}`;
+      const eventName = res.eventName || (res as any).competitionName || (res as any).program || 'Competition';
+      const category = res.category || (res as any).categoryName || 'General';
+      const key = res.competitionId || `${eventName}__${category}`;
       const updatedAt = res.raw?.updatedAt || res.raw?.createdAt || '';
       if (!map.has(key)) {
         map.set(key, {
           key,
-          eventName: res.eventName,
-          category: res.category,
+          eventName,
+          category,
           competitionId: res.competitionId,
           items: [],
           latestUpdatedAt: updatedAt
@@ -359,12 +369,12 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
                                     {res.participantName}
                                   </div>
                                 </td>
-                                <td className="py-3 px-4 text-zinc-300 font-sans text-xs font-medium">
-                                  {res.department}
-                                </td>
-                                <td className="py-3 px-4 text-right">
-                                  {(() => {
-                                    const m = res.averageMark ?? (res.raw ? res.raw.averageMark : undefined) ?? res.totalMark ?? res.marks ?? (res.raw ? res.raw.totalMark : 0);
+                                 <td className="py-3 px-4 text-zinc-300 font-sans text-xs font-medium">
+                                   {res.department || (res as any).unitName || (res as any).team || (res as any).teamName || ''}
+                                 </td>
+                                 <td className="py-3 px-4 text-right">
+                                   {(() => {
+                                     const m = res.totalMark ?? res.marks ?? res.averageMark ?? (res as any).totalMarks ?? (res.raw ? (res.raw.averageMark ?? res.raw.totalMark) : 0);
                                     let g = res.grade;
                                     if (m > 0) {
                                       if (m >= 90) g = 'A+';

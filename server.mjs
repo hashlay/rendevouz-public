@@ -427,39 +427,66 @@ app.get('/api/public/results', async (req, res) => {
 
       let participantName = r.participantName || '';
       let codeNumber = r.codeNumber || r.chestNumber || '';
-      let department = r.department || r.unitName || '';
+      let department = r.department || r.unitName || r.team || '';
       let participationType = comp?.participationType === 'group' ? 'Group' : 'Individual';
-      let teamMemberIds = [];
+      let teamMemberIds = Array.isArray(r.teamMemberIds) ? r.teamMemberIds : [];
 
-      if (r.participantId && !participantName) {
-        const p = participants.find(p => p.id === r.participantId);
-        if (p) {
-          participantName = p.fullName;
+      const p = r.participantId ? participants.find(p => p.id === r.participantId) : null;
+      if (p) {
+        if (!participantName) {
+          participantName = p.fullName || p.name || '';
+        }
+        if (!codeNumber) {
           const chest = chestNumbers.find(c => c.entityId === p.id || (c.participantId === p.id && c.categoryId === p.selectedCategoryId));
-          codeNumber = chest ? (chest.chestNumber || chest.codeNumber) : '';
-          const unit = units.find(u => u.id === p.unitId);
-          department = unit ? unit.name : '';
+          codeNumber = chest ? (chest.chestNumber || chest.codeNumber) : (p.chestNumber || p.codeNumber || '');
+        }
+        if (!department) {
+          const unit = units.find(u => u.id === p.unitId) || teams.find(t => t.id === p.unitId || t.id === p.teamId);
+          department = unit ? unit.name : (p.unitName || p.department || p.teamName || '');
+        }
+      }
+
+      if (!department && r.teamId) {
+        const t = teams.find(t => t.id === r.teamId) || units.find(u => u.id === r.teamId);
+        if (t) department = t.name;
+      }
+
+      if (comp?.participationType === 'group') {
+        participationType = 'Group';
+        if (!participantName && department) {
+          participantName = department;
         }
       }
 
       const totalMarks = r.averageMark ?? r.totalMark ?? r.marks ?? 0;
       const grade = calculateGrade(totalMarks);
       const points = calculatePoints(r, comp, eventSettings);
-      let categoryName = cat?.name || 'General';
+      const categoryName = cat?.name || r.category || r.categoryName || 'General';
+      const eventName = comp?.name || r.eventName || r.competitionName || r.program || 'Competition';
 
       return {
         id: r.id,
         competitionId: r.competitionId,
-        competitionName: comp?.name || r.eventName || 'Competition',
+        competitionName: eventName,
+        eventName,
+        program: eventName,
         categoryId: r.categoryId,
         categoryName,
+        category: categoryName,
         participantId: r.participantId,
         participantName,
         chestNumber: codeNumber,
-        unitName: department || r.unitName || '',
+        codeNumber,
+        unitName: department,
+        department,
+        team: department,
+        teamName: department,
         rank: r.rank,
         grade,
         totalMarks,
+        totalMark: totalMarks,
+        marks: totalMarks,
+        averageMark: r.averageMark ?? totalMarks,
         judge1Marks: r.judge1Mark,
         judge2Marks: r.judge2Mark,
         points,

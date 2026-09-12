@@ -394,8 +394,8 @@ export const renderPosterToCanvas = async (
     ctx.textAlign = 'left';
     ctx.font = parseFontForCanvas(c.categoryFont || c.fontFamily, c.categorySize ?? 32, '800');
     ctx.fillStyle = c.categoryColor || 'rgba(255, 255, 255, 0.7)';
-    const rawCat = activeCategory?.name || 'GENERAL';
-    const catText = c.categoryUppercase !== false ? rawCat.toUpperCase() : rawCat;
+    const rawCat = activeCategory?.name || categoryName || 'GENERAL';
+    const catText = (c.categoryUppercase !== false ? rawCat.toUpperCase() : rawCat) || 'GENERAL';
     const catMetrics = ctx.measureText(catText);
     const catX = c.categoryX ?? 540;
     const catY = c.categoryY ?? 260;
@@ -406,9 +406,9 @@ export const renderPosterToCanvas = async (
     ctx.textAlign = 'left';
     ctx.font = parseFontForCanvas(c.compNameFont || c.fontFamily, c.compNameSize ?? 52, '900');
     ctx.fillStyle = c.compNameColor || '#ffffff';
-    const rawComp = c.compNameOverride !== undefined && c.compNameOverride !== '' ? c.compNameOverride : activeComp.name;
-    const compText = c.compNameUppercase ? rawComp.toUpperCase() : rawComp;
-    const compLines = compText.split('\n').filter(Boolean);
+    const rawComp = c.compNameOverride !== undefined && c.compNameOverride !== '' ? c.compNameOverride : (activeComp.name || compName || 'Competition');
+    const compText = (c.compNameUppercase ? rawComp.toUpperCase() : rawComp) || 'COMPETITION';
+    const compLines = (compText ? compText.split('\n') : []).filter(Boolean);
     const compGap = (c.compNameSize ?? 52) * 1.15;
     const compX = c.compNameX ?? 540;
     const compY = c.compNameY ?? 330;
@@ -446,7 +446,7 @@ export const renderPosterToCanvas = async (
         const rawWinnerName = hasNameOverride ? overrideName : (res?.participantName || 'Participant Name');
         const winnerName = c.winnerUppercase === false && !c.uppercaseNames ? rawWinnerName : rawWinnerName.toUpperCase();
 
-        const rawWinnerUnit = hasUnitOverride ? overrideUnit : (res?.department || res?.unitName || 'Unit Name');
+        const rawWinnerUnit = hasUnitOverride ? overrideUnit : (res?.department || res?.unitName || res?.team || res?.teamName || 'Unit Name');
         const winnerUnit = c.unitUppercase !== false ? rawWinnerUnit.toUpperCase() : rawWinnerUnit;
 
         const defaultYOffset = isSecond ? 80 : 0;
