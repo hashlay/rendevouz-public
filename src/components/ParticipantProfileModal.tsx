@@ -581,11 +581,12 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                               eventName: res.eventName || 'All'
                             });
                           }}
-                          className="px-3 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 active:scale-95 text-emerald-400 border border-emerald-500/30 text-xs font-bold font-mono transition-all flex items-center gap-1.5 cursor-pointer hover:border-emerald-500/50"
+                          style={{ color: '#ffffff' }}
+                          className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white border border-emerald-400/40 text-xs font-bold font-mono transition-all flex items-center gap-1.5 cursor-pointer shadow-sm hover:shadow-emerald-900/30"
                           title="View official standings for this competition"
                         >
-                          <span>View Result</span>
-                          <ExternalLink className="w-3.5 h-3.5" />
+                          <span style={{ color: '#ffffff' }} className="font-bold tracking-wide text-white">View Result</span>
+                          <ExternalLink className="w-3.5 h-3.5 text-white shrink-0" style={{ color: '#ffffff' }} />
                         </button>
                       )}
                       <div className="text-xs font-mono text-zinc-400 bg-white/5 border border-white/10 px-3 py-1.5 rounded-xl text-center">
