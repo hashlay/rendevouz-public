@@ -10,6 +10,7 @@ import { PosterImage } from './PosterImage';
 interface ParticipantProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onNavigate?: (sectionId: string, filter?: { category?: any; eventName?: string }) => void;
 }
 
 // Helper to format Date of Birth nicely (e.g. 2007-09-27 -> 27-Sep-2007)
@@ -36,7 +37,7 @@ function formatDobDisplay(dob?: string): string {
   return dob;
 }
 
-export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = ({ isOpen, onClose }) => {
+export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = ({ isOpen, onClose, onNavigate }) => {
   const { authUser, logout, updateParticipant, results: allResults = [], eventSettings } = useFestival();
 
   if (!isOpen || !authUser || authUser.role !== 'participant' || !authUser.participant) {
@@ -569,8 +570,27 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                         </p>
                       </div>
                     </div>
-                    <div className="text-xs font-mono text-zinc-400 bg-white/5 border border-white/10 px-3 py-1.5 rounded-xl text-center self-start md:self-center">
-                      {isGroup ? 'Group Team Event' : 'Individual Event'}
+                    <div className="flex items-center gap-2.5 self-start md:self-center">
+                      {onNavigate && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            onClose();
+                            onNavigate('results', {
+                              category: res.category || 'All',
+                              eventName: res.eventName || 'All'
+                            });
+                          }}
+                          className="px-3 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 active:scale-95 text-emerald-400 border border-emerald-500/30 text-xs font-bold font-mono transition-all flex items-center gap-1.5 cursor-pointer hover:border-emerald-500/50"
+                          title="View official standings for this competition"
+                        >
+                          <span>View Result</span>
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                      <div className="text-xs font-mono text-zinc-400 bg-white/5 border border-white/10 px-3 py-1.5 rounded-xl text-center">
+                        {isGroup ? 'Group Team Event' : 'Individual Event'}
+                      </div>
                     </div>
                   </div>
                 );

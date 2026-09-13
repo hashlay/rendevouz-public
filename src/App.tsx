@@ -288,6 +288,7 @@ function PublicWebsiteContent({ onSwitchToApp }: { onSwitchToApp: (mode: 'worksp
       <ParticipantProfileModal
         isOpen={activeModalView === 'participant-profile'}
         onClose={() => setActiveModalView('none')}
+        onNavigate={handleNavigate}
       />
 
       <FaceScannerModal
