@@ -363,45 +363,74 @@ app.get('/api/public/competitions', async (req, res) => {
   res.json(competitions);
 });
 
-// Exact Grade Calculation:
-// 90 to 100: A+
-// 70 to 89: A
-// 60 to 69: B
-// 50 to 59: C
-// Below 50: D
-function calculateGrade(mark) {
-  const m = Number(mark);
-  if (isNaN(m)) return 'D';
-  if (m >= 90) return 'A+';
-  if (m >= 70) return 'A';
-  if (m >= 60) return 'B';
-  if (m >= 50) return 'C';
-  return 'D';
+function calculateGrade(mark, isGroup = false) {
+  const m = Math.round(Number(mark) || 0);
+  if (m <= 0) return '';
+
+  if (isGroup) {
+    if (m >= 95) return 'A+';
+    if (m >= 80) return 'A';
+    if (m >= 55) return 'B';
+    if (m >= 30) return 'C';
+    return '';
+  } else {
+    if (m >= 95) return 'A+';
+    if (m >= 85) return 'A';
+    if (m >= 70) return 'B';
+    if (m >= 50) return 'C';
+    return '';
+  }
+}
+
+function getNormalizedMark(r) {
+  if (!r) return 0;
+  if (r.status === 'absent' || r.isAbsent) return 0;
+  if (r.averageMark !== undefined && r.averageMark !== null && !isNaN(r.averageMark)) return Number(r.averageMark);
+  const j1 = Number(r.judge1Mark) || 0;
+  const j2 = Number(r.judge2Mark) || 0;
+  if (j1 > 0 || j2 > 0) {
+    const activeJudges = (j1 > 0 ? 1 : 0) + (j2 > 0 ? 1 : 0) || 1;
+    return Math.round(((j1 + j2) / activeJudges) * 100) / 100;
+  }
+  if (r.totalMark !== undefined && r.totalMark !== null && !isNaN(r.totalMark)) return Number(r.totalMark);
+  if (r.marks !== undefined && r.marks !== null && !isNaN(r.marks)) return Number(r.marks);
+  return 0;
 }
 
 function calculatePoints(r, comp, eventSettings) {
   // Grade Pointing System: enabled by default for this festival
   const isGradePointSystem = eventSettings?.gradeSystemEnabled !== false;
   if (isGradePointSystem) {
-    const mark = Number(r.averageMark ?? r.totalMark ?? r.marks ?? 0);
-    const grade = (r.grade && ['A+', 'A', 'B', 'C', 'D'].includes(String(r.grade).trim().toUpperCase()))
-      ? String(r.grade).trim().toUpperCase()
-      : calculateGrade(mark);
+    if (r.status === 'absent' || r.isAbsent) return 0;
+    const mark = getNormalizedMark(r);
+    const m = Math.round(Number(mark) || 0);
+    if (m <= 0) return 0;
 
-    const isGroup = !!r.teamId || comp?.participationType === 'group';
-    if (!isGroup) {
-      // Individual: A+ = 6, A = 5, B = 3, C = 1, D = 0
-      if (grade === 'A+') return 6;
-      if (grade === 'A') return 5;
-      if (grade === 'B') return 3;
-      if (grade === 'C') return 1;
-      return 0;
+    const isGroup = !!r.teamId || comp?.participationType === 'group' || (comp && comp.isGroup === true);
+    if (isGroup) {
+      if (m >= 95) return 20;
+      if (m >= 90) return 19;
+      if (m >= 85) return 18;
+      if (m >= 80) return 17;
+      if (m >= 75) return 16;
+      if (m >= 70) return 15;
+      if (m >= 65) return 14;
+      if (m >= 55) return 13;
+      if (m >= 50) return 12;
+      if (m >= 40) return 11;
+      if (m >= 30) return 10;
+      return 5;
     } else {
-      // Group: A+ = 12, A = 10, B = 7, C = 5, D = 0
-      if (grade === 'A+') return 12;
-      if (grade === 'A') return 10;
-      if (grade === 'B') return 7;
-      if (grade === 'C') return 5;
+      if (m >= 95) return 10;
+      if (m >= 90) return 9;
+      if (m >= 85) return 8;
+      if (m >= 80) return 7;
+      if (m >= 75) return 6;
+      if (m >= 70) return 5;
+      if (m >= 65) return 4;
+      if (m >= 55) return 3;
+      if (m >= 50) return 2;
+      if (m >= 40) return 1;
       return 0;
     }
   }
@@ -458,8 +487,9 @@ app.get('/api/public/results', async (req, res) => {
         }
       }
 
-      const totalMarks = r.averageMark ?? r.totalMark ?? r.marks ?? 0;
-      const grade = calculateGrade(totalMarks);
+      const totalMarks = getNormalizedMark(r);
+      const isGroup = comp?.participationType === 'group' || !!r.teamId;
+      const grade = calculateGrade(totalMarks, isGroup);
       const points = calculatePoints(r, comp, eventSettings);
       const categoryName = cat?.name || r.category || r.categoryName || 'General';
       const eventName = comp?.name || r.eventName || r.competitionName || r.program || 'Competition';
@@ -509,13 +539,6 @@ app.get('/api/public/standings', async (req, res) => {
   const { units = [], participants = [], results = [], teams = [], competitions = [], eventSettings = {} } = dbState;
 
   const validUnits = units.filter(u => u.active !== false);
-
-  const getNormalizedMark = (r) => {
-    if (r.averageMark !== undefined && r.averageMark !== null) return Number(r.averageMark);
-    if (r.totalMark !== undefined && r.totalMark !== null) return Number(r.totalMark);
-    if (r.marks !== undefined && r.marks !== null) return Number(r.marks);
-    return 0;
-  };
 
   const standings = validUnits.map(unit => {
     const normTarget = unit.name.toLowerCase().replace(/[-_]/g, '');
@@ -699,6 +722,7 @@ function buildParticipantPortalData(participant, cNum, cleanChest, dbState) {
       const comp = competitions.find(c => c.id === r.competitionId);
       const cat = categories.find(c => c.id === r.categoryId);
       const isGroup = comp?.participationType === 'group' || !!r.teamId;
+      const normMark = getNormalizedMark(r);
       return {
         id: r.id,
         competitionId: r.competitionId,
@@ -706,8 +730,8 @@ function buildParticipantPortalData(participant, cNum, cleanChest, dbState) {
         program: comp ? comp.name : (r.eventName || r.program || 'Competition'),
         category: cat ? cat.name : (r.category || 'General'),
         rank: r.rank,
-        grade: calculateGrade(r.averageMark ?? r.totalMark ?? r.marks ?? 0),
-        totalMarks: r.averageMark ?? r.totalMark ?? r.marks ?? 0,
+        grade: calculateGrade(normMark, isGroup),
+        totalMarks: normMark,
         points: calculatePoints(r, comp, eventSettings),
         publishedStatus: !!(r.publishedStatus || r.isPublished),
         participantName: participant.fullName,

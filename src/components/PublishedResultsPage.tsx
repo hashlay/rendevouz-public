@@ -373,26 +373,41 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
                                    {res.department || (res as any).unitName || (res as any).team || (res as any).teamName || ''}
                                  </td>
                                  <td className="py-3 px-4 text-right">
-                                   {(() => {
-                                     const m = res.totalMark ?? res.marks ?? res.averageMark ?? (res as any).totalMarks ?? (res.raw ? (res.raw.averageMark ?? res.raw.totalMark) : 0);
-                                    let g = res.grade;
-                                    if (m > 0) {
-                                      if (m >= 90) g = 'A+';
-                                      else if (m >= 70) g = 'A';
-                                      else if (m >= 60) g = 'B';
-                                      else if (m >= 50) g = 'C';
-                                      else g = 'D';
-                                    }
-                                    return (
-                                      <div className="flex flex-col items-end gap-0.5">
-                                        <span className="inline-flex items-center justify-center px-2 py-0.5 rounded border border-[#3F3F46] bg-[#18181B] text-[11px] font-mono font-bold text-emerald-400 min-w-[28px] shadow-xs">
-                                          {g || 'A'}
-                                        </span>
-                                        {m > 0 && <span className="text-[10px] text-zinc-400 font-mono">{m} marks</span>}
-                                      </div>
-                                    );
-                                  })()}
-                                </td>
+                                    {(() => {
+                                      const m = Math.round(Number(res.totalMark ?? res.marks ?? res.averageMark ?? (res as any).totalMarks ?? (res.raw ? (res.raw.averageMark ?? res.raw.totalMark) : 0)) || 0);
+                                      const isGroup = (res as any).participationType === 'Group' || (res as any).participationType === 'group' || !!(res as any).teamId;
+                                      let g = res.grade;
+                                      if (!g && m > 0) {
+                                        if (isGroup) {
+                                          if (m >= 95) g = 'A+';
+                                          else if (m >= 80) g = 'A';
+                                          else if (m >= 55) g = 'B';
+                                          else if (m >= 30) g = 'C';
+                                          else g = '';
+                                        } else {
+                                          if (m >= 95) g = 'A+';
+                                          else if (m >= 85) g = 'A';
+                                          else if (m >= 70) g = 'B';
+                                          else if (m >= 50) g = 'C';
+                                          else g = '';
+                                        }
+                                      }
+                                      return (
+                                        <div className="flex flex-col items-end gap-0.5">
+                                          {g ? (
+                                            <span className="inline-flex items-center justify-center px-2 py-0.5 rounded border border-[#3F3F46] bg-[#18181B] text-[11px] font-mono font-bold text-emerald-400 min-w-[28px] shadow-xs">
+                                              {g}
+                                            </span>
+                                          ) : (
+                                            <span className="inline-flex items-center justify-center px-2 py-0.5 rounded border border-zinc-800 bg-zinc-900/50 text-[10px] font-mono text-zinc-500 min-w-[28px]">
+                                              —
+                                            </span>
+                                          )}
+                                          {m > 0 && <span className="text-[10px] text-zinc-400 font-mono">{m} marks</span>}
+                                        </div>
+                                      );
+                                    })()}
+                                  </td>
                               </tr>
                             );
                           })}

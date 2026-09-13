@@ -525,19 +525,31 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                   ((!res.rank || res.rank === 0) && (rawMarks === 0 || rawMarks === '0' || rawMarks === undefined))
                 );
 
+                const isGroup = res.isGroupEvent || res.participationType === 'group' || res.participationType === 'Group Event' || res.participationType === 'Group' || (res.raw && res.raw.participationType === 'group');
+
                 let computedGrade = res.grade;
                 if (isAbsentResult) {
                   computedGrade = 'N/A';
                 } else if (rawMarks !== undefined && rawMarks !== null) {
-                  const m = Number(rawMarks);
-                  if (m >= 90) computedGrade = 'A+';
-                  else if (m >= 70) computedGrade = 'A';
-                  else if (m >= 60) computedGrade = 'B';
-                  else if (m >= 50) computedGrade = 'C';
-                  else computedGrade = 'D';
+                  const m = Math.round(Number(rawMarks) || 0);
+                  if (m <= 0) {
+                    computedGrade = '';
+                  } else if (!computedGrade) {
+                    if (isGroup) {
+                      if (m >= 95) computedGrade = 'A+';
+                      else if (m >= 80) computedGrade = 'A';
+                      else if (m >= 55) computedGrade = 'B';
+                      else if (m >= 30) computedGrade = 'C';
+                      else computedGrade = '';
+                    } else {
+                      if (m >= 95) computedGrade = 'A+';
+                      else if (m >= 85) computedGrade = 'A';
+                      else if (m >= 70) computedGrade = 'B';
+                      else if (m >= 50) computedGrade = 'C';
+                      else computedGrade = '';
+                    }
+                  }
                 }
-
-                const isGroup = res.isGroupEvent || res.participationType === 'group' || res.participationType === 'Group Event' || res.participationType === 'Group' || (res.raw && res.raw.participationType === 'group');
 
                 return (
                   <div key={res.id || `res-${Math.random()}`} className="bg-[#18181B] border border-white/10 rounded-3xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 transition-all">
@@ -561,7 +573,7 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                           )}
                         </div>
                         <p className="text-sm text-zinc-400 font-mono">
-                          Grade: <strong className={isAbsentResult ? "text-rose-400 font-bold" : "text-emerald-400"}>{computedGrade || 'A'}</strong>
+                          Grade: <strong className={isAbsentResult ? "text-rose-400 font-bold" : "text-emerald-400"}>{computedGrade || 'No Grade'}</strong>
                           {isAbsentResult ? (
                             <> • Total Marks: <strong className="text-rose-400 font-bold">N/A</strong></>
                           ) : rawMarks !== undefined ? (
