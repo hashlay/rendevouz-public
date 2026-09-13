@@ -97,7 +97,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
       >
         {/* Card Header Bar */}
         <div className="flex items-center justify-between border-b border-[#333338] pb-3">
-          <Logo size="sm" showSubBadge={false} />
+          <Logo size="md" showSubBadge={false} />
           <button
             onClick={onClose}
             className="p-1.5 text-zinc-400 hover:text-white bg-white/5 border border-white/10 rounded-lg transition-colors cursor-pointer"

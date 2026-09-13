@@ -79,24 +79,15 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
 
     // Replace any legacy Tabassum text with Rendezvous 26
     if (formatted.toUpperCase().includes('TABASSUM')) {
-      formatted = formatted.replace(/(?:At-)?tabassum(?:\s+MEELAD\s+FEST)?/i, 'RENDEZVOUS<br /><span class="block" style="color: var(--color-primary-accent)">26</span>');
+      formatted = 'RENDEZVOUS 26';
     }
 
-    // Ensure two-line stacked layout for Rendezvous 26
-    if (!formatted.includes('<br') && !formatted.includes('display: block') && !formatted.includes('class="block')) {
-      if (formatted.includes('<span')) {
-        formatted = formatted.replace('<span', '<br /><span class="block"');
-      } else if (formatted.toUpperCase().includes('RENDEZVOUS') && formatted.includes('26')) {
-        formatted = formatted.replace(/RENDEZVOUS\s+26/i, 'RENDEZVOUS<br /><span class="block" style="color: var(--color-primary-accent)">26</span>');
-      }
-    }
-
-    // Apply Hochland font to RENDEZVOUS
-    if (formatted.toUpperCase().includes('RENDEZVOUS') && !formatted.includes('font-hochland')) {
-      formatted = formatted.replace(
-        /RENDEZVOUS/gi,
-        '<span class="font-hochland tracking-wider inline-block">RENDEZVOUS</span>'
-      );
+    // Apply clean Hochland styling for Rendezvous 26 without awkward gap
+    if (formatted.toUpperCase().includes('RENDEZVOUS')) {
+      return `
+        <span class="block font-hochland text-white leading-[0.85] tracking-normal text-6xl sm:text-7xl md:text-8xl lg:text-9xl xl:text-[10.5rem] transform scale-y-[1.08] origin-bottom drop-shadow-lg">RENDEZVOUS</span>
+        <span class="block font-hochland leading-[0.85] tracking-normal text-6xl sm:text-7xl md:text-8xl lg:text-9xl xl:text-[10.5rem] transform scale-y-[1.08] origin-top -mt-0.5 sm:-mt-1 md:-mt-2 lg:-mt-3 drop-shadow-md" style="color: var(--color-primary-accent, #18BA46)">26</span>
+      `.trim();
     }
 
     return formatted;
@@ -152,59 +143,55 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
       )}
 
       <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 w-full z-20 text-center">
-        {cmsSettings?.heroHideLogo === false && (
-          <div className="flex justify-center mb-4 sm:mb-6">
-            <div className="scale-75 sm:scale-100 flex items-center justify-center p-4">
-              <Logo
-                size="xl"
-                variant="full"
-                title={cmsSettings?.heroLogoTitle}
-                subtitle={cmsSettings?.heroLogoSubtitle}
-                badge={cmsSettings?.heroLogoBadge}
-                customIconUrl={cmsSettings?.heroLogo}
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Dynamic Titles from CMS or fallback */}
-        <div className="flex flex-col items-center">
-          {cmsSettings?.heroTitle ? (
-            <h1
-              className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-white leading-[0.95] tracking-tight flex flex-col items-center mb-3 sm:mb-5 uppercase font-display text-center"
-              dangerouslySetInnerHTML={{
-                __html: formatHeroTitle(cmsSettings.heroTitle)
+        <div className="flex flex-col items-center select-none">
+          {/* 1. Top 3 Logos (Exact updated emblems) */}
+          <div className="flex justify-center items-center mb-2.5 sm:mb-3.5">
+            <img
+              src="/hero_three_logos.png"
+              alt="Festival Emblems"
+              className="object-contain select-none pointer-events-none"
+              style={{
+                height: 'clamp(38px, 4.8vw, 56px)',
+                width: 'auto',
+                maxWidth: '240px'
               }}
             />
-          ) : (
-            <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-white uppercase tracking-tight max-w-4xl mx-auto leading-[0.95] mb-3 sm:mb-5 drop-shadow-md text-center font-display flex flex-col items-center">
-              <span className="block font-hochland tracking-wider">RENDEZVOUS</span>
-              <span className="block font-black" style={{ color: 'var(--color-primary-accent)' }}>
-                26
-              </span>
-            </h1>
-          )}
+          </div>
 
-          <p className="text-sm sm:text-xl font-light text-zinc-200 tracking-wide mb-2 sm:mb-3 font-sans drop-shadow-sm max-w-2xl mx-auto text-center">
-            {cmsSettings?.heroSubtitle || INSTITUTION.subTitle}
+          {/* 2. Quoted Theme Subtitle: Regular font, refined scale */}
+          <p className="font-sora text-[11.5px] min-[380px]:text-[12.5px] sm:text-sm md:text-base font-normal text-white/85 tracking-wide mb-1.5 sm:mb-2 select-none">
+            “{(cmsSettings?.heroSubtitle || INSTITUTION.subTitle || 'Decoding Phytolore').replace(/^["“']+|["”']+$/g, '')}”
           </p>
 
-          {/* Institutional Credit Tag */}
-          <p className="text-[11px] sm:text-xs font-medium text-zinc-300 max-w-xl mx-auto mb-6 flex items-center justify-center gap-1.5 sm:gap-2 flex-wrap drop-shadow-sm text-center">
-            <span style={{ color: 'var(--color-primary-accent)' }} className="font-bold">{cmsSettings?.heroInstitutionLeft || INSTITUTION.name}</span>
-            <span className="text-zinc-500">•</span>
-            <span>{cmsSettings?.heroInstitutionRight || INSTITUTION.tagline}</span>
+          {/* 3. Main Brand Title: Single line on both mobile & desktop, pure full white */}
+          <div className="flex flex-row items-baseline justify-center gap-1.5 min-[380px]:gap-2 sm:gap-3 md:gap-4 uppercase select-none my-1 sm:my-2 max-w-full overflow-hidden">
+            <span className="hero-rendezvous-title text-white text-[3.35rem] min-[360px]:text-[3.75rem] min-[390px]:text-[4.15rem] min-[420px]:text-[4.5rem] sm:text-6xl md:text-8xl lg:text-[9.2rem] xl:text-[10.5rem] leading-none tracking-normal transform scale-y-[1.08] whitespace-nowrap">
+              RENDEZVOUS
+            </span>
+            <span className="hero-rendezvous-title text-white text-[3.35rem] min-[360px]:text-[3.75rem] min-[390px]:text-[4.15rem] min-[420px]:text-[4.5rem] sm:text-6xl md:text-8xl lg:text-[9.2rem] xl:text-[10.5rem] leading-none tracking-normal transform scale-y-[1.08] whitespace-nowrap">
+              26
+            </span>
+          </div>
+
+          {/* 4. Institutional Name Subtitle: Regular font, scaled proportionately, with spaced letters */}
+          <p className="font-sora text-[9.5px] min-[380px]:text-[10.5px] sm:text-xs md:text-sm font-normal text-white/80 tracking-[0.26em] sm:tracking-[0.38em] md:tracking-[0.42em] uppercase mt-2 sm:mt-3 mb-6 sm:mb-8 select-none">
+            {cmsSettings?.heroInstitutionLeft && cmsSettings?.heroInstitutionRight
+              ? `${cmsSettings.heroInstitutionLeft} ${cmsSettings.heroInstitutionRight}`
+              : 'IMAM RABBANI LIFE FESTIVAL'}
           </p>
 
           <div className="flex justify-center mb-8 sm:mb-10">
-            <div className="inline-flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 bg-black/60 backdrop-blur-xl border border-white/10 px-6 sm:px-8 py-3 rounded-full shadow-2xl">
-              <div className="flex items-center gap-2 text-zinc-300 font-mono text-[10px] sm:text-xs">
-                <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4" style={{ color: 'var(--color-primary-accent)' }} />
+            <div
+              className="inline-flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 bg-black/60 backdrop-blur-xl border px-6 sm:px-8 py-3 rounded-full shadow-2xl"
+              style={{ borderColor: 'var(--color-primary-accent, #18BA46)' }}
+            >
+              <div className="flex items-center gap-2 text-white font-mono text-[10.5px] sm:text-xs font-normal">
+                <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" style={{ color: 'var(--color-primary-accent, #18BA46)' }} />
                 <span>{cmsSettings?.heroDate || INSTITUTION.dates}</span>
               </div>
-              <div className="hidden sm:block w-1.5 h-1.5 rounded-full opacity-40" style={{ backgroundColor: 'var(--color-primary-accent)' }} />
-              <div className="flex items-center gap-2 text-zinc-300 font-mono text-[10px] sm:text-xs">
-                <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4" style={{ color: 'var(--color-primary-accent)' }} />
+              <div className="hidden sm:block w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: 'var(--color-primary-accent, #18BA46)' }} />
+              <div className="flex items-center gap-2 text-white font-mono text-[10.5px] sm:text-xs font-normal">
+                <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" style={{ color: 'var(--color-primary-accent, #18BA46)' }} />
                 <span>{cmsSettings?.heroLocation || INSTITUTION.location}</span>
               </div>
             </div>
