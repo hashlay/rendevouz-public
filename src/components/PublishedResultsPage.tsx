@@ -369,12 +369,13 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
                                     {res.participantName}
                                   </div>
                                 </td>
-                                 <td className="py-3 px-4 text-zinc-300 font-sans text-xs font-medium">
-                                   {res.department || (res as any).unitName || (res as any).team || (res as any).teamName || ''}
-                                 </td>
-                                 <td className="py-3 px-4 text-right">
+                                <td className="py-3 px-4 text-zinc-300 font-sans text-xs font-medium">
+                                  {res.department || (res as any).unitName || (res as any).team || (res as any).teamName || ''}
+                                </td>
+                                <td className="py-3 px-4 text-right">
                                     {(() => {
-                                      const m = Math.round(Number(res.totalMark ?? res.marks ?? res.averageMark ?? (res as any).totalMarks ?? (res.raw ? (res.raw.averageMark ?? res.raw.totalMark) : 0)) || 0);
+                                      const rawVal = res.totalMark ?? res.marks ?? res.averageMark ?? (res as any).totalMarks ?? (res.raw ? (res.raw.averageMark ?? res.raw.totalMark) : 0);
+                                      const m = Number(rawVal) || 0;
                                       const isGroup = (res as any).participationType === 'Group' || (res as any).participationType === 'group' || !!(res as any).teamId;
                                       let g = res.grade;
                                       if (!g && m > 0) {
@@ -403,7 +404,7 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
                                               —
                                             </span>
                                           )}
-                                          {m > 0 && <span className="text-[10px] text-zinc-400 font-mono">{m} marks</span>}
+                                          {m > 0 && <span className="text-[10px] text-zinc-400 font-mono">{rawVal} marks</span>}
                                         </div>
                                       );
                                     })()}

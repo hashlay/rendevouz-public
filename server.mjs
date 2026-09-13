@@ -364,7 +364,7 @@ app.get('/api/public/competitions', async (req, res) => {
 });
 
 function calculateGrade(mark, isGroup = false) {
-  const m = Math.round(Number(mark) || 0);
+  const m = Number(mark) || 0;
   if (m <= 0) return '';
 
   if (isGroup) {
@@ -403,7 +403,7 @@ function calculatePoints(r, comp, eventSettings) {
   if (isGradePointSystem) {
     if (r.status === 'absent' || r.isAbsent) return 0;
     const mark = getNormalizedMark(r);
-    const m = Math.round(Number(mark) || 0);
+    const m = Number(mark) || 0;
     if (m <= 0) return 0;
 
     const isGroup = !!r.teamId || comp?.participationType === 'group' || (comp && comp.isGroup === true);
