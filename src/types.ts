@@ -325,6 +325,8 @@ export interface JudgeScore {
   totalMark: number;
   averageMark: number;
   rank?: number;
+  grade?: string;
+  points?: number;
   status: JudgeScoreStatus;
   remarks?: string;
   enteredBy: string;
