@@ -10,33 +10,24 @@ const body2 = 'export function migrateOldConfig' + content.split('function migra
 const overlayLogicStr = content.split('const drawPosterOverlay = (ctx: CanvasRenderingContext2D, W: number, H: number, compIdx: number, themeIdx: number) => {')[1].split('hitRegions.current = regions;')[0];
 
 const finalFile = `
-export const getPosterTeamColor = (unitOrTeamName?: string, defaultColor: string = '#34d399'): string => {
+export const getPosterTeamColor = (unitOrTeamName?: string, defaultColor: string = '#34d399', config?: any): string => {
   if (!unitOrTeamName) return defaultColor;
+  if (config && config.useTeamColors === false) {
+    return defaultColor;
+  }
   const str = unitOrTeamName.toString().trim().toLowerCase();
-  const normalized = str.replace(/[\\s\\-_]/g, '');
+  const normalized = str.replace(/[\s\-_]/g, '');
 
-  if (
-    normalized.includes('shukr') ||
-    normalized.includes('shukur') ||
-    normalized.includes('shukoor') ||
-    normalized.includes('ശുക്') ||
-    normalized.includes('ശുക്കൂർ') ||
-    normalized === 'shk' ||
-    str === 'shk'
-  ) {
-    return '#2b2bc3';
+  if (config?.unitColors) {
+    if (config.unitColors[unitOrTeamName]) return config.unitColors[unitOrTeamName];
   }
 
-  if (
-    normalized.includes('sabr') ||
-    normalized.includes('sabar') ||
-    normalized.includes('സ്വബ്') ||
-    normalized.includes('സബ്ർ') ||
-    normalized.includes('സ്വബർ') ||
-    normalized === 'sbr' ||
-    str === 'sbr'
-  ) {
-    return '#1b5e20';
+  if (config?.useTeamColors === true) {
+    if (normalized.includes('sirafi') || normalized.includes('سيرافي')) return '#0284c7';
+    if (normalized.includes('tabrizi') || normalized.includes('تبريزي')) return '#d97706';
+    if (normalized.includes('zanzibari') || normalized.includes('زنجباري')) return '#16a34a';
+    if (normalized.includes('shukr')) return '#2b2bc3';
+    if (normalized.includes('sabr')) return '#1b5e20';
   }
 
   return defaultColor;
