@@ -10,8 +10,8 @@
 
 @font-face {
   font-family: 'Fractul Alt';
-  src: url('/fonts/FractulAlt.ttf') format('truetype');
-  font-weight: normal;
+  src: url('/fonts/FractulAlt-Hairline.ttf') format('truetype');
+  font-weight: 100 500;
   font-style: normal;
   font-display: swap;
 }
@@ -19,7 +19,23 @@
 @font-face {
   font-family: 'Fractul Alt';
   src: url('/fonts/FractulAlt.ttf') format('truetype');
-  font-weight: bold;
+  font-weight: 600 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Thunder ExtraLight LC';
+  src: url('/fonts/Thunder-ExtraLightLC.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Thunder';
+  src: url('/fonts/Thunder-ExtraLightLC.otf') format('opentype');
+  font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
@@ -37,6 +53,10 @@
   font-family: 'Sora', sans-serif;
 }
 
+.font-thunder {
+  font-family: 'Thunder ExtraLight LC', 'Thunder', sans-serif;
+}
+
 .hero-rendezvous-title {
   font-family: 'Hochland', sans-serif;
   color: #ffffff;
@@ -48,6 +68,8 @@
   --font-display: "Plus Jakarta Sans", "Outfit", "Space Grotesk", sans-serif;
   --font-hochland: "Hochland", sans-serif;
   --font-fractul: "Fractul Alt", sans-serif;
+  --font-sora: "Sora", sans-serif;
+  --font-thunder: "Thunder ExtraLight LC", "Thunder", sans-serif;
   --color-brand: var(--color-primary-accent);
   --color-surface: var(--color-body-bg);
   --color-card: var(--color-card-bg);

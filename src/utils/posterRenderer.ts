@@ -95,66 +95,154 @@ export const getPosterDisplayUnitName = (unitOrTeamName?: string, config?: any):
 export function getDefaultThemeConfig(themeIdx: number = 0): any {
   if (themeIdx === 0) {
     return {
-      titleColor: '#18BA46',
+      titleColor: '#7FBFC8',
       winnerColor: '#ffffff',
-      unitColor: '#18BA46',
+      unitColor: '#7FBFC8',
       titleSize: 36,
       resultLabelText: '',
       resultLabelX: -9999,
       resultLabelY: -9999,
       resultLabelSize: 0,
       resultLabelColor: '#ffffff',
-      resultNumX: 140,
-      resultNumY: 405,
-      resultNumSize: 84,
-      resultNumColor: '#18BA46',
-      resultNumFont: 'bold "Fractul Alt", sans-serif',
+      resultNumX: 350,
+      resultNumY: 414,
+      resultNumSize: 96,
+      resultNumColor: '#7FBFC8',
+      resultNumFont: '200 "Thunder ExtraLight LC", "Thunder", sans-serif',
       categorySize: 26,
       categoryColor: '#ffffff',
-      categoryX: 240,
-      categoryY: 340,
-      categoryFont: 'bold "Fractul Alt", sans-serif',
-      compNameX: 240,
-      compNameY: 405,
-      compNameSize: 56,
-      compNameColor: '#18BA46',
-      compNameFont: 'bold "Fractul Alt", sans-serif',
-      winnerSize: 30,
-      unitSize: 18,
-      rankSize: 26,
+      categoryX: 450,
+      categoryY: 348,
+      categoryFont: '200 "Sora", sans-serif',
+      compNameX: 450,
+      compNameY: 414,
+      compNameSize: 64,
+      compNameColor: '#7FBFC8',
+      compNameFont: '500 "Sora", sans-serif',
+      winnerSize: 32,
+      unitSize: 20,
+      rankSize: 24,
       titleX: 540,
       titleY: 110,
       rankBadgeShape: 'none',
       rankBadgeShapeSize: 20,
-      rankFont: 'bold "Fractul Alt", sans-serif',
+      rankFont: '400 "Fractul Alt", sans-serif',
       rankTextColor: '#ffffff',
-      rank1Color: '#18BA46',
-      rank2Color: '#18BA46',
-      rank3Color: '#18BA46',
+      rank1Color: '#ffffff',
+      rank2Color: '#ffffff',
+      rank3Color: '#ffffff',
       rank1Text: 'I',
       rank2Text: 'II',
       rank3Text: 'III',
-      winnerFont: 'bold "Fractul Alt", sans-serif',
-      unitFont: 'bold "Fractul Alt", sans-serif',
-      rank1BadgeX: 208,
-      rank1BadgeY: 505,
-      rank1NameX: 240,
-      rank1NameY: 505,
-      rank1UnitX: 240,
-      rank1UnitY: 532,
-      rank2BadgeX: 208,
-      rank2BadgeY: 585,
-      rank2NameX: 240,
-      rank2NameY: 585,
-      rank2UnitX: 240,
-      rank2UnitY: 612,
-      rank3BadgeX: 208,
-      rank3BadgeY: 670,
-      rank3NameX: 240,
-      rank3NameY: 670,
-      rank3UnitX: 240,
-      rank3UnitY: 697,
-      fontFamily: 'bold "Fractul Alt", sans-serif',
+      winnerFont: '400 "Fractul Alt", sans-serif',
+      unitFont: '400 "Fractul Alt", sans-serif',
+      rank1BadgeX: 416,
+      rank1BadgeY: 512,
+      rank1NameX: 450,
+      rank1NameY: 512,
+      rank1UnitX: 450,
+      rank1UnitY: 538,
+      rank2BadgeX: 416,
+      rank2BadgeY: 590,
+      rank2NameX: 450,
+      rank2NameY: 590,
+      rank2UnitX: 450,
+      rank2UnitY: 618,
+      rank3BadgeX: 416,
+      rank3BadgeY: 680,
+      rank3NameX: 450,
+      rank3NameY: 680,
+      rank3UnitX: 450,
+      rank3UnitY: 708,
+      fontFamily: '400 "Fractul Alt", sans-serif',
+      uppercaseNames: false,
+      showCampusName: false,
+      showFestName: false,
+      showFooter: false,
+      showFooterBg: false,
+      footerLine1: '',
+      footerLine2: '',
+      campusNameUppercase: true,
+      festNameUppercase: true,
+      resultLabelUppercase: true,
+      resultNumUppercase: false,
+      categoryUppercase: false,
+      compNameUppercase: false,
+      winnerUppercase: false,
+      unitUppercase: false,
+      useTeamColors: false,
+      unitColors: {} as Record<string, string>,
+      unitLanguage: 'en',
+      unitArabicNames: {
+        'Sirafi Seafarers': 'TEAM السِّيرَافِي',
+        'Tabrizi Taraz': 'TEAM التَّبْرِيزِي',
+        'Zanzibari Souqs': 'TEAM الزَّنْجَبَارِي',
+      },
+    };
+  }
+
+  if (themeIdx === 1) {
+    return {
+      titleColor: '#E6007E',
+      winnerColor: '#ffffff',
+      unitColor: '#E6007E',
+      titleSize: 36,
+      resultLabelText: '',
+      resultLabelX: -9999,
+      resultLabelY: -9999,
+      resultLabelSize: 0,
+      resultLabelColor: '#ffffff',
+      resultNumX: 135,
+      resultNumY: 375,
+      resultNumSize: 96,
+      resultNumColor: '#E6007E',
+      resultNumFont: '200 "Thunder ExtraLight LC", "Thunder", sans-serif',
+      categorySize: 26,
+      categoryColor: '#ffffff',
+      categoryX: 235,
+      categoryY: 315,
+      categoryFont: '200 "Sora", sans-serif',
+      compNameX: 235,
+      compNameY: 375,
+      compNameSize: 64,
+      compNameColor: '#E6007E',
+      compNameFont: '500 "Sora", sans-serif',
+      winnerSize: 32,
+      unitSize: 20,
+      rankSize: 24,
+      titleX: 540,
+      titleY: 110,
+      rankBadgeShape: 'none',
+      rankBadgeShapeSize: 20,
+      rankFont: '400 "Fractul Alt", sans-serif',
+      rankTextColor: '#ffffff',
+      rank1Color: '#ffffff',
+      rank2Color: '#ffffff',
+      rank3Color: '#ffffff',
+      rank1Text: 'I',
+      rank2Text: 'II',
+      rank3Text: 'III',
+      winnerFont: '400 "Fractul Alt", sans-serif',
+      unitFont: '400 "Fractul Alt", sans-serif',
+      rank1BadgeX: 205,
+      rank1BadgeY: 475,
+      rank1NameX: 235,
+      rank1NameY: 475,
+      rank1UnitX: 235,
+      rank1UnitY: 505,
+      rank2BadgeX: 205,
+      rank2BadgeY: 555,
+      rank2NameX: 235,
+      rank2NameY: 555,
+      rank2UnitX: 235,
+      rank2UnitY: 585,
+      rank3BadgeX: 205,
+      rank3BadgeY: 645,
+      rank3NameX: 235,
+      rank3NameY: 645,
+      rank3UnitX: 235,
+      rank3UnitY: 675,
+      fontFamily: '400 "Fractul Alt", sans-serif',
       uppercaseNames: false,
       showCampusName: false,
       showFestName: false,
@@ -337,15 +425,14 @@ export const renderPosterToCanvas = async (
   const rawTemplateConfig = eventSettings?.posterTemplateConfig || {};
   const defaultThemes = [
     '/themes/theme_phytolore_green.jpg',
-    '/themes/theme_brown.jpg',
-    '/themes/theme_green.jpg',
-    '/themes/theme_purple.jpg'
+    '/themes/theme_phytolore_dark_green.jpg'
   ];
   let inputThemes = rawTemplateConfig.customThemes;
   if (Array.isArray(inputThemes) && inputThemes.length > 0) {
-    inputThemes = [...inputThemes];
-    if (inputThemes.length === 3) inputThemes.push('/themes/theme_purple.jpg');
-    else if (inputThemes.length >= 4 && (!inputThemes[3] || inputThemes[3].startsWith('data:image/svg'))) inputThemes[3] = '/themes/theme_purple.jpg';
+    inputThemes = [
+      inputThemes[0] || defaultThemes[0],
+      defaultThemes[1]
+    ];
   } else {
     inputThemes = defaultThemes;
   }
@@ -385,7 +472,67 @@ export const renderPosterToCanvas = async (
   };
 
   const themeIdx = getThemeIndexForResult(compIdx, categoryName);
-  const baseConf = { ...getDefaultThemeConfig(), ...(themeConfigs[themeIdx] || {}) };
+  const defaultConf = getDefaultThemeConfig(themeIdx);
+  const userConf = { ...(themeConfigs[themeIdx] || {}) };
+  
+  // Gracefully migrate old green theme 0 placeholders if present in stored config
+  if (themeIdx === 0) {
+    if (userConf.compNameColor === '#18BA46') {
+      userConf.compNameColor = defaultConf.compNameColor;
+      userConf.resultNumColor = defaultConf.resultNumColor;
+      userConf.unitColor = defaultConf.unitColor;
+      userConf.rank1Color = defaultConf.rank1Color;
+      userConf.rank2Color = defaultConf.rank2Color;
+      userConf.rank3Color = defaultConf.rank3Color;
+    }
+    if (!userConf.resultNumFont || userConf.resultNumFont.includes('bold "Fractul Alt"')) {
+      userConf.resultNumFont = defaultConf.resultNumFont;
+    }
+    if (!userConf.categoryFont || userConf.categoryFont.includes('bold "Fractul Alt"')) {
+      userConf.categoryFont = defaultConf.categoryFont;
+    }
+    if (!userConf.compNameFont || userConf.compNameFont.includes('bold "Fractul Alt"')) {
+      userConf.compNameFont = defaultConf.compNameFont;
+    }
+    if (!userConf.winnerFont || userConf.winnerFont.includes('bold "Fractul Alt"')) {
+      userConf.winnerFont = defaultConf.winnerFont;
+    }
+    if (!userConf.rankFont || userConf.rankFont.includes('bold "Fractul Alt"')) {
+      userConf.rankFont = defaultConf.rankFont;
+    }
+    if (!userConf.unitFont || userConf.unitFont.includes('bold "Fractul Alt"')) {
+      userConf.unitFont = defaultConf.unitFont;
+    }
+    if (userConf.resultNumX === 140) {
+      userConf.resultNumX = defaultConf.resultNumX;
+      userConf.resultNumY = defaultConf.resultNumY;
+      userConf.resultNumSize = defaultConf.resultNumSize;
+      userConf.categoryX = defaultConf.categoryX;
+      userConf.categoryY = defaultConf.categoryY;
+      userConf.compNameX = defaultConf.compNameX;
+      userConf.compNameY = defaultConf.compNameY;
+      userConf.rank1BadgeX = defaultConf.rank1BadgeX;
+      userConf.rank1BadgeY = defaultConf.rank1BadgeY;
+      userConf.rank1NameX = defaultConf.rank1NameX;
+      userConf.rank1NameY = defaultConf.rank1NameY;
+      userConf.rank1UnitX = defaultConf.rank1UnitX;
+      userConf.rank1UnitY = defaultConf.rank1UnitY;
+      userConf.rank2BadgeX = defaultConf.rank2BadgeX;
+      userConf.rank2BadgeY = defaultConf.rank2BadgeY;
+      userConf.rank2NameX = defaultConf.rank2NameX;
+      userConf.rank2NameY = defaultConf.rank2NameY;
+      userConf.rank2UnitX = defaultConf.rank2UnitX;
+      userConf.rank2UnitY = defaultConf.rank2UnitY;
+      userConf.rank3BadgeX = defaultConf.rank3BadgeX;
+      userConf.rank3BadgeY = defaultConf.rank3BadgeY;
+      userConf.rank3NameX = defaultConf.rank3NameX;
+      userConf.rank3NameY = defaultConf.rank3NameY;
+      userConf.rank3UnitX = defaultConf.rank3UnitX;
+      userConf.rank3UnitY = defaultConf.rank3UnitY;
+    }
+  }
+
+  const baseConf = { ...defaultConf, ...userConf };
   
   const backgroundSource = customThemes[themeIdx] || customThemes[0];
   
