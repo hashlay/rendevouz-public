@@ -8,9 +8,29 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: 'Fractul Alt';
+  src: url('/fonts/FractulAlt.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Fractul Alt';
+  src: url('/fonts/FractulAlt.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
 .font-hochland {
   font-family: 'Hochland', sans-serif;
   letter-spacing: 0.01em;
+}
+
+.font-fractul {
+  font-family: 'Fractul Alt', sans-serif;
 }
 
 .font-sora {
@@ -27,6 +47,7 @@
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
   --font-display: "Plus Jakarta Sans", "Outfit", "Space Grotesk", sans-serif;
   --font-hochland: "Hochland", sans-serif;
+  --font-fractul: "Fractul Alt", sans-serif;
   --color-brand: var(--color-primary-accent);
   --color-surface: var(--color-body-bg);
   --color-card: var(--color-card-bg);
