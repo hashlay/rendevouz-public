@@ -235,6 +235,11 @@ async function getDbState(force = false) {
         const { _id, ...rest } = s;
         if (_id === 'eventSettings') state.eventSettings = { ...state.eventSettings, ...rest };
         if (_id === 'cmsSettings') state.cmsSettings = { ...rest };
+        if (_id === 'posterOverrides') {
+          const loadedOverrides = rest.overrides || rest;
+          state.posterOverrides = { ...(state.posterOverrides || {}), ...loadedOverrides };
+          state.eventSettings.posterOverrides = { ...(state.eventSettings.posterOverrides || {}), ...loadedOverrides };
+        }
         if (_id === 'posterTemplateConfig') {
           state.posterTemplateConfig = { ...rest };
           state.eventSettings.posterTemplateConfig = { ...rest };
@@ -329,8 +334,8 @@ app.get('/api/public/cms', async (req, res) => {
   });
 });
 
-// Public Event Settings
-app.get('/api/public/settings', async (req, res) => {
+// Settings: GET (both public & authenticated)
+app.get(['/api/settings', '/api/public/settings'], async (req, res) => {
   const dbState = await getDbState();
   const raw = dbState.eventSettings || dbState.settings || {};
   const settings = {
@@ -340,6 +345,68 @@ app.get('/api/public/settings', async (req, res) => {
     posterOverrides: raw.posterOverrides || dbState.posterOverrides || {}
   };
   res.json(settings);
+});
+
+// Settings: PUT (save posterOverrides, posterTemplateConfig, eventSettings)
+app.put('/api/settings', async (req, res) => {
+  try {
+    const db = await getMongoDb();
+    if (!db) {
+      return res.status(500).json({ error: 'Database connection unavailable' });
+    }
+
+    const { posterTemplateConfig, certificateTemplateConfig, posterOverrides, ...otherSettings } = req.body;
+    const tasks = [];
+
+    // 1. Update eventSettings
+    const settingsUpdate = { ...otherSettings };
+    if (posterOverrides) {
+      settingsUpdate.posterOverrides = posterOverrides;
+    }
+    if (Object.keys(settingsUpdate).length > 0) {
+      tasks.push(db.collection('settings').updateOne(
+        { _id: 'eventSettings' },
+        { $set: settingsUpdate },
+        { upsert: true }
+      ));
+    }
+
+    // 2. Update posterOverrides specifically in its own doc if provided
+    if (posterOverrides) {
+      tasks.push(db.collection('settings').updateOne(
+        { _id: 'posterOverrides' },
+        { $set: { overrides: posterOverrides, ...posterOverrides } },
+        { upsert: true }
+      ));
+    }
+
+    // 3. Update posterTemplateConfig if provided
+    if (posterTemplateConfig) {
+      tasks.push(db.collection('settings').updateOne(
+        { _id: 'posterTemplateConfig' },
+        { $set: posterTemplateConfig },
+        { upsert: true }
+      ));
+    }
+
+    // 4. Update certificateTemplateConfig if provided
+    if (certificateTemplateConfig) {
+      tasks.push(db.collection('settings').updateOne(
+        { _id: 'certificateTemplateConfig' },
+        { $set: certificateTemplateConfig },
+        { upsert: true }
+      ));
+    }
+
+    await Promise.all(tasks);
+    invalidateDbCache();
+
+    console.log('✅ [Settings] Successfully updated settings in MongoDB sahityotsav.');
+    res.json({ message: 'Settings updated successfully', success: true });
+  } catch (err) {
+    console.error('❌ Failed to save settings in server.mjs:', err);
+    res.status(500).json({ error: 'Failed to update settings', details: err.message });
+  }
 });
 
 // Public Units
