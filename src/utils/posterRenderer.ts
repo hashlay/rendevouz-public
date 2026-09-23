@@ -106,27 +106,27 @@ export function getDefaultThemeConfig(themeIdx: number = 0): any {
       resultLabelColor: '#ffffff',
       resultNumX: 350,
       resultNumY: 414,
-      resultNumSize: 96,
+      resultNumSize: 76,
       resultNumColor: '#7FBFC8',
-      resultNumFont: '200 "Thunder ExtraLight LC", "Thunder", sans-serif',
+      resultNumFont: '600 "Sora", sans-serif',
       categorySize: 26,
       categoryColor: '#ffffff',
       categoryX: 450,
       categoryY: 348,
-      categoryFont: '200 "Sora", sans-serif',
+      categoryFont: '300 "Sora", sans-serif',
       compNameX: 450,
       compNameY: 414,
-      compNameSize: 64,
+      compNameSize: 52,
       compNameColor: '#7FBFC8',
-      compNameFont: '500 "Sora", sans-serif',
-      winnerSize: 32,
-      unitSize: 20,
-      rankSize: 24,
+      compNameFont: '600 "Sora", sans-serif',
+      winnerSize: 34,
+      unitSize: 22,
+      rankSize: 32,
       titleX: 540,
       titleY: 110,
       rankBadgeShape: 'none',
       rankBadgeShapeSize: 20,
-      rankFont: '400 "Fractul Alt", sans-serif',
+      rankFont: '500 "Fractul Alt", sans-serif',
       rankTextColor: '#ffffff',
       rank1Color: '#ffffff',
       rank2Color: '#ffffff',
@@ -134,8 +134,8 @@ export function getDefaultThemeConfig(themeIdx: number = 0): any {
       rank1Text: 'I',
       rank2Text: 'II',
       rank3Text: 'III',
-      winnerFont: '400 "Fractul Alt", sans-serif',
-      unitFont: '400 "Fractul Alt", sans-serif',
+      winnerFont: '500 "Fractul Alt", sans-serif',
+      unitFont: '500 "Fractul Alt", sans-serif',
       rank1BadgeX: 416,
       rank1BadgeY: 512,
       rank1NameX: 450,
@@ -154,7 +154,7 @@ export function getDefaultThemeConfig(themeIdx: number = 0): any {
       rank3NameY: 680,
       rank3UnitX: 450,
       rank3UnitY: 708,
-      fontFamily: '400 "Fractul Alt", sans-serif',
+      fontFamily: '500 "Fractul Alt", sans-serif',
       uppercaseNames: false,
       showCampusName: false,
       showFestName: false,
@@ -194,27 +194,27 @@ export function getDefaultThemeConfig(themeIdx: number = 0): any {
       resultLabelColor: '#ffffff',
       resultNumX: 135,
       resultNumY: 375,
-      resultNumSize: 96,
+      resultNumSize: 76,
       resultNumColor: '#E6007E',
-      resultNumFont: '200 "Thunder ExtraLight LC", "Thunder", sans-serif',
+      resultNumFont: '600 "Sora", sans-serif',
       categorySize: 26,
       categoryColor: '#ffffff',
       categoryX: 235,
       categoryY: 315,
-      categoryFont: '200 "Sora", sans-serif',
+      categoryFont: '300 "Sora", sans-serif',
       compNameX: 235,
       compNameY: 375,
-      compNameSize: 64,
+      compNameSize: 52,
       compNameColor: '#E6007E',
-      compNameFont: '500 "Sora", sans-serif',
-      winnerSize: 32,
-      unitSize: 20,
-      rankSize: 24,
+      compNameFont: '600 "Sora", sans-serif',
+      winnerSize: 34,
+      unitSize: 22,
+      rankSize: 32,
       titleX: 540,
       titleY: 110,
       rankBadgeShape: 'none',
       rankBadgeShapeSize: 20,
-      rankFont: '400 "Fractul Alt", sans-serif',
+      rankFont: '500 "Fractul Alt", sans-serif',
       rankTextColor: '#ffffff',
       rank1Color: '#ffffff',
       rank2Color: '#ffffff',
@@ -222,8 +222,8 @@ export function getDefaultThemeConfig(themeIdx: number = 0): any {
       rank1Text: 'I',
       rank2Text: 'II',
       rank3Text: 'III',
-      winnerFont: '400 "Fractul Alt", sans-serif',
-      unitFont: '400 "Fractul Alt", sans-serif',
+      winnerFont: '500 "Fractul Alt", sans-serif',
+      unitFont: '500 "Fractul Alt", sans-serif',
       rank1BadgeX: 205,
       rank1BadgeY: 475,
       rank1NameX: 235,
@@ -242,7 +242,7 @@ export function getDefaultThemeConfig(themeIdx: number = 0): any {
       rank3NameY: 645,
       rank3UnitX: 235,
       rank3UnitY: 675,
-      fontFamily: '400 "Fractul Alt", sans-serif',
+      fontFamily: '500 "Fractul Alt", sans-serif',
       uppercaseNames: false,
       showCampusName: false,
       showFestName: false,
@@ -475,6 +475,25 @@ export const renderPosterToCanvas = async (
   const defaultConf = getDefaultThemeConfig(themeIdx);
   const userConf = { ...(themeConfigs[themeIdx] || {}) };
   
+  // Auto-upgrade obsolete fonts and oversized dimensions across all themes
+  if (userConf.resultNumFont && (userConf.resultNumFont.includes('Thunder') || userConf.resultNumFont.includes('bold "Fractul Alt"'))) {
+    userConf.resultNumFont = defaultConf.resultNumFont;
+    userConf.resultNumSize = defaultConf.resultNumSize;
+  }
+  if (userConf.compNameFont && (userConf.compNameFont.includes('Thunder') || userConf.compNameFont.includes('bold "Fractul Alt"'))) {
+    userConf.compNameFont = defaultConf.compNameFont;
+    userConf.compNameSize = defaultConf.compNameSize;
+  }
+  if (userConf.categoryFont && (userConf.categoryFont.includes('Thunder') || userConf.categoryFont.includes('bold "Fractul Alt"'))) {
+    userConf.categoryFont = defaultConf.categoryFont;
+  }
+  if (userConf.compNameSize && userConf.compNameSize > 56) {
+    userConf.compNameSize = 52;
+  }
+  if (userConf.resultNumSize && userConf.resultNumSize > 85) {
+    userConf.resultNumSize = 76;
+  }
+
   // Gracefully migrate old green theme 0 placeholders if present in stored config
   if (themeIdx === 0) {
     if (userConf.compNameColor === '#18BA46') {
@@ -740,43 +759,79 @@ export const renderPosterToCanvas = async (
           ctx.fill();
         }
 
-        ctx.fillStyle = c.rankTextColor || '#000000';
+        const rankFill = c.rankTextColor || '#ffffff';
+        ctx.fillStyle = rankFill;
         ctx.textAlign = 'center';
-        ctx.fillText(rankText, bx, by);
+        const isRankHairline = (c.rankFont || c.fontFamily || '').includes('200') || (c.rankFont || c.fontFamily || '').includes('Hairline');
+        if (isRankHairline) {
+          ctx.save();
+          ctx.strokeStyle = rankFill;
+          ctx.lineWidth = 0.5;
+          ctx.lineJoin = 'round';
+          ctx.strokeText(rankText, bx, by);
+          ctx.fillText(rankText, bx, by);
+          ctx.restore();
+        } else {
+          ctx.fillText(rankText, bx, by);
+        }
         addRegion(badgeRegionId, bx - badgeW / 2 - 5, badgeCenterY - badgeH / 2 - 5, badgeW + 10, badgeH + 10);
 
         // Winner name (supports multi-line \n)
         ctx.textAlign = 'left';
-        ctx.font = parseFontForCanvas(c.winnerFont || c.fontFamily, c.winnerSize, '800');
-        ctx.fillStyle = c.winnerColor;
+        ctx.font = parseFontForCanvas(c.winnerFont || c.fontFamily, c.winnerSize || 34, '500');
+        const winnerFill = c.winnerColor || '#ffffff';
+        ctx.fillStyle = winnerFill;
         const nameLines = winnerName.split('\n').filter(Boolean);
-        const nameGap = (c.winnerSize ?? 44) * 1.15;
+        const nameGap = (c.winnerSize ?? 34) * 1.15;
         let maxNameW = 0;
+        const isWinnerHairline = (c.winnerFont || c.fontFamily || '').includes('200') || (c.winnerFont || c.fontFamily || '').includes('Hairline');
         nameLines.forEach((line: string, i: number) => {
-          ctx.fillText(line, nx, ny + i * nameGap);
+          if (isWinnerHairline) {
+            ctx.save();
+            ctx.strokeStyle = winnerFill;
+            ctx.lineWidth = 0.5;
+            ctx.lineJoin = 'round';
+            ctx.strokeText(line, nx, ny + i * nameGap);
+            ctx.fillText(line, nx, ny + i * nameGap);
+            ctx.restore();
+          } else {
+            ctx.fillText(line, nx, ny + i * nameGap);
+          }
           const w = ctx.measureText(line).width;
           if (w > maxNameW) maxNameW = w;
         });
-        addRegion(nameRegionId, nx - 5, ny - (c.winnerSize ?? 44) - 5, maxNameW + 10, (nameLines.length * nameGap) + 10);
+        addRegion(nameRegionId, nx - 5, ny - (c.winnerSize ?? 34) - 5, maxNameW + 10, (nameLines.length * nameGap) + 10);
 
         // Unit name (supports multi-line \n)
         const isArabic = c.unitLanguage === 'ar';
         const arabicFont = (c.unitFont && c.unitFont !== 'monospace') ? c.unitFont : "'Cairo', 'Amiri', sans-serif";
-        ctx.font = parseFontForCanvas(isArabic ? arabicFont : (c.unitFont || 'monospace'), c.unitSize, '700');
-        ctx.fillStyle = getPosterTeamColor(rawWinnerUnit || winnerUnit, c.unitColor, c);
+        ctx.font = parseFontForCanvas(isArabic ? arabicFont : (c.unitFont || 'monospace'), c.unitSize || 22, '500');
+        const unitFill = getPosterTeamColor(rawWinnerUnit || winnerUnit, c.unitColor, c);
+        ctx.fillStyle = unitFill;
         const displayUnitName = getPosterDisplayUnitName(rawWinnerUnit || winnerUnit, c);
         const unitText = isArabic ? displayUnitName : (c.unitUppercase !== false ? displayUnitName.toUpperCase() : displayUnitName);
         const unitLines = unitText.split('\n').filter(Boolean);
-        const unitGap = (c.unitSize ?? 30) * 1.15;
+        const unitGap = (c.unitSize ?? 22) * 1.15;
         const calcUx = nx; 
         const calcUy = ny + (nameLines.length * nameGap) + 5;
         let maxUnitW = 0;
+        const isUnitHairline = (c.unitFont || c.fontFamily || '').includes('200') || (c.unitFont || c.fontFamily || '').includes('Hairline');
         unitLines.forEach((line: string, i: number) => {
-          ctx.fillText(line, ux ?? calcUx, (uy ?? calcUy) + i * unitGap);
+          if (isUnitHairline) {
+            ctx.save();
+            ctx.strokeStyle = unitFill;
+            ctx.lineWidth = 0.5;
+            ctx.lineJoin = 'round';
+            ctx.strokeText(line, ux ?? calcUx, (uy ?? calcUy) + i * unitGap);
+            ctx.fillText(line, ux ?? calcUx, (uy ?? calcUy) + i * unitGap);
+            ctx.restore();
+          } else {
+            ctx.fillText(line, ux ?? calcUx, (uy ?? calcUy) + i * unitGap);
+          }
           const w = ctx.measureText(line).width;
           if (w > maxUnitW) maxUnitW = w;
         });
-        addRegion(unitRegionId, (ux ?? calcUx) - 5, (uy ?? calcUy) - (c.unitSize ?? 30) - 5, maxUnitW + 10, (unitLines.length * unitGap) + 10);
+        addRegion(unitRegionId, (ux ?? calcUx) - 5, (uy ?? calcUy) - (c.unitSize ?? 22) - 5, maxUnitW + 10, (unitLines.length * unitGap) + 10);
       }
     });
 
@@ -801,8 +856,11 @@ export const renderPosterToCanvas = async (
   };
 
   return new Promise((resolve) => {
-    const drawBackgroundAndOverlay = (bgImg?: HTMLImageElement) => {
+    const drawBackgroundAndOverlay = async (bgImg?: HTMLImageElement) => {
       try {
+        if (typeof document !== 'undefined' && document.fonts) {
+          await document.fonts.ready;
+        }
         const W = bgImg ? (bgImg.naturalWidth || bgImg.width || 1080) : 1080;
         const H = bgImg ? (bgImg.naturalHeight || bgImg.height || 1350) : 1350;
         canvas.width = W;

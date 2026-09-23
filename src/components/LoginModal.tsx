@@ -128,7 +128,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
             </label>
             <input
               type="text"
-              placeholder="e.g. 1042"
+              placeholder="e.g. 2023JMF268"
               value={chestNumber}
               disabled={isSigningIn}
               onChange={(e) => setChestNumber(e.target.value)}

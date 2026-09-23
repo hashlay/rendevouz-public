@@ -669,7 +669,10 @@ function buildParticipantPortalData(participant, cNum, cleanChest, dbState) {
 
   // 1. Pre-registered competitions (individual & group)
   const regRecord = registrations.find(r => r.participantId === participant.id && !r.deletedAt);
-  const indCompIds = regRecord?.selectedIndividualCompetitionIds || participant.registeredEvents || [];
+  const indCompIds = Array.from(new Set([
+    ...(regRecord?.selectedIndividualCompetitionIds || []),
+    ...(participant.registeredEvents || [])
+  ]));
   const groupCompIds = regRecord?.selectedGroupTeamIds ? [...regRecord.selectedGroupTeamIds] : [];
 
   // 2. Teams where participant is a member

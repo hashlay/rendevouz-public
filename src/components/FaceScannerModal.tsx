@@ -249,12 +249,12 @@ export const FaceScannerModal: React.FC<FaceScannerModalProps> = ({ isOpen, onCl
                     <p className="text-xs text-zinc-400">
                       Scan the QR code or click below to access the complete Google Drive folder containing all uncompressed high-resolution festival photos.
                     </p>
-                    <a href="https://drive.google.com/drive/folders/1cQNek6Q2EiThqdFrUDb1I8cfsmQneP1J" target="_blank" rel="noreferrer" className="inline-block mt-2 text-xs font-bold text-emerald-400 hover:text-emerald-300 underline underline-offset-4 transition-colors">
+                    <a href="https://drive.google.com/drive/folders/1PyLeWulSJqRPGFAk5Nb7copC1ZN7BRbL" target="_blank" rel="noreferrer" className="inline-block mt-2 text-xs font-bold text-emerald-400 hover:text-emerald-300 underline underline-offset-4 transition-colors">
                       Open Drive Link Directly &rarr;
                     </a>
                   </div>
                   <div className="bg-white p-2 rounded-xl shrink-0">
-                    <QRCode value="https://drive.google.com/drive/folders/1cQNek6Q2EiThqdFrUDb1I8cfsmQneP1J" size={90} level="M" />
+                    <QRCode value="https://drive.google.com/drive/folders/1PyLeWulSJqRPGFAk5Nb7copC1ZN7BRbL" size={90} level="M" />
                   </div>
                 </div>
               </div>

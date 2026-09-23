@@ -9,9 +9,9 @@ interface SmilePhotoPortalProps {
 
 export const SmilePhotoPortal: React.FC<SmilePhotoPortalProps> = ({ cmsSettings }) => {
   const { eventSettings } = useFestival();
-  
+
   // Link set by admin in CMS Website Studio (or event settings fallback)
-  const driveLink = cmsSettings?.photoHubDriveLink || eventSettings?.photoHubDriveLink || 'https://drive.google.com/drive/folders/1cQNek6Q2EiThqdFrUDb1I8cfsmQneP1J';
+  const driveLink = cmsSettings?.photoHubDriveLink || eventSettings?.photoHubDriveLink || 'https://drive.google.com/drive/folders/1PyLeWulSJqRPGFAk5Nb7copC1ZN7BRbL';
 
   return (
     <section id="smile" className="py-10 sm:py-14 bg-[#0A0A0A] relative overflow-hidden border-b border-white/10 font-sans">
