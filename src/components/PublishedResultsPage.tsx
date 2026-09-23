@@ -132,9 +132,9 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
   };
 
   // Group all results by unique competition (competitionId or eventName + category)
-  // Sort by announcement time: latest updatedAt at TOP of page
+  // Sort by announcement number descending: latest announced at TOP of page
   const groupedEvents = useMemo(() => {
-    const map = new Map<string, { key: string; eventName: string; category: string; competitionId?: string; items: ResultItem[]; latestUpdatedAt: string }>();
+    const map = new Map<string, { key: string; eventName: string; category: string; competitionId?: string; items: ResultItem[]; latestUpdatedAt: string; announcementNumber: number }>();
     
     // Filter to valid published ranks (Rank 1, 2, 3)
     const validResults = (results || []).filter(r => r.rank !== undefined && r.rank > 0 && r.rank <= 3);
@@ -143,7 +143,9 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
       const eventName = res.eventName || (res as any).competitionName || (res as any).program || 'Competition';
       const category = res.category || (res as any).categoryName || 'General';
       const key = res.competitionId || `${eventName}__${category}`;
-      const updatedAt = res.raw?.updatedAt || res.raw?.createdAt || '';
+      const updatedAt = (res as any).updatedAt || res.raw?.updatedAt || res.raw?.createdAt || '';
+      const announcementNumber = Number((res as any).announcementNumber || (res.raw as any)?.announcementNumber || 0);
+
       if (!map.has(key)) {
         map.set(key, {
           key,
@@ -151,28 +153,34 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
           category,
           competitionId: res.competitionId,
           items: [],
-          latestUpdatedAt: updatedAt
+          latestUpdatedAt: updatedAt,
+          announcementNumber
         });
       }
       const group = map.get(key)!;
       group.items.push(res);
-      // Track the latest updatedAt for this competition
+      if (announcementNumber > 0 && (!group.announcementNumber || group.announcementNumber <= 0)) {
+        group.announcementNumber = announcementNumber;
+      }
       if (updatedAt > group.latestUpdatedAt) {
         group.latestUpdatedAt = updatedAt;
       }
     });
+
+    const groups = Array.from(map.values());
+    const hasBackendNumbers = groups.some(g => g.announcementNumber > 0);
+    if (hasBackendNumbers) {
+      // Sort descending so highest announcement number (latest announced) appears at the top
+      return groups.sort((a, b) => b.announcementNumber - a.announcementNumber);
+    }
     
-    // Sort ascending by updatedAt first to assign announcement numbers (1 = first announced)
-    const sorted = Array.from(map.values()).sort((a, b) => 
+    // Fallback if no announcement numbers were attached
+    const sorted = groups.sort((a, b) => 
       a.latestUpdatedAt.localeCompare(b.latestUpdatedAt)
     );
-    
-    // Assign announcement numbers (1 = earliest, N = latest)
     sorted.forEach((group, idx) => {
-      (group as any).announcementNumber = idx + 1;
+      group.announcementNumber = idx + 1;
     });
-    
-    // Reverse so latest announced appears at the top of the page
     return sorted.reverse();
   }, [results]);
 

@@ -446,10 +446,38 @@ function calculatePoints(r, comp, eventSettings) {
 // Public Published Results
 app.get('/api/public/results', async (req, res) => {
   const dbState = await getDbState();
-  const { results = [], competitions = [], categories = [], participants = [], teams = [], chestNumbers = [], units = [], eventSettings = {} } = dbState;
+  const { results = [], competitions = [], categories = [], participants = [], teams = [], chestNumbers = [], units = [], eventSettings = {}, judgmentSheets = [] } = dbState;
 
-  const enrichedResults = results
-    .filter(r => !r.deletedAt && (r.publishedStatus === true || r.isPublished === true))
+  // Build fixed announcement order for all announced competitions
+  const publishedResults = results.filter(r => !r.deletedAt && (r.publishedStatus === true || r.isPublished === true));
+  const publishedCompIds = Array.from(new Set(publishedResults.map(r => r.competitionId).filter(Boolean)));
+
+  const compTimes = publishedCompIds.map(compId => {
+    const sheet = judgmentSheets.find(s => s.competitionId === compId && s.publishedToResults);
+    const compResults = publishedResults.filter(r => r.competitionId === compId);
+    const dates = [];
+    if (sheet?.updatedAt) dates.push(new Date(sheet.updatedAt).getTime());
+    if (sheet?.createdAt) dates.push(new Date(sheet.createdAt).getTime());
+    compResults.forEach(r => {
+      if (r.updatedAt) dates.push(new Date(r.updatedAt).getTime());
+      if (r.createdAt) dates.push(new Date(r.createdAt).getTime());
+    });
+    const validDates = dates.filter(d => !isNaN(d) && d > 0);
+    const earliestTime = validDates.length > 0 ? Math.min(...validDates) : 0;
+    const sheetUpdateTime = sheet?.updatedAt ? new Date(sheet.updatedAt).getTime() : 0;
+    return {
+      compId,
+      sortTime: sheetUpdateTime || earliestTime || 0
+    };
+  });
+
+  compTimes.sort((a, b) => a.sortTime - b.sortTime);
+  const compAnnouncementMap = new Map();
+  compTimes.forEach((c, idx) => {
+    compAnnouncementMap.set(c.compId, idx + 1);
+  });
+
+  const enrichedResults = publishedResults
     .map(r => {
       const comp = competitions.find(c => c.id === r.competitionId);
       const cat = categories.find(c => c.id === r.categoryId);
@@ -526,7 +554,16 @@ app.get('/api/public/results', async (req, res) => {
         publishedStatus: !!(r.publishedStatus || r.isPublished),
         isPublished: !!(r.publishedStatus || r.isPublished),
         teamMemberIds,
-        createdAt: r.createdAt || new Date().toISOString()
+        announcementNumber: compAnnouncementMap.get(r.competitionId) || 1,
+        announcementOrder: compAnnouncementMap.get(r.competitionId) || 1,
+        createdAt: r.createdAt || new Date().toISOString(),
+        updatedAt: r.updatedAt || r.createdAt || new Date().toISOString(),
+        raw: {
+          ...r,
+          announcementNumber: compAnnouncementMap.get(r.competitionId) || 1,
+          announcementOrder: compAnnouncementMap.get(r.competitionId) || 1,
+          updatedAt: r.updatedAt || r.createdAt || new Date().toISOString()
+        }
       };
     });
 
