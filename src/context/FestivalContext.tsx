@@ -335,7 +335,7 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       
       const isIdMatch = Boolean(rPartId && p.id && rPartId === p.id);
       const isCodeMatch = Boolean(rCode && cleanChest && rCode === cleanChest);
-      const isNameMatch = Boolean(!rCode && !rPartId && rName && p.name && rName === p.name.trim().toLowerCase());
+      const isNameMatch = Boolean(!rCode && !rPartId && rName && p.name && typeof p.name === 'string' && rName === p.name.trim().toLowerCase());
       const isTeamMatch = Boolean(
         (r.teamId && candidateTeamIds.includes(r.teamId)) ||
         (r.raw && r.raw.teamMemberIds && Array.isArray(r.raw.teamMemberIds) && (r.raw.teamMemberIds.includes(p.id) || r.raw.teamMemberIds.includes(cleanChest))) ||
@@ -402,7 +402,7 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         
         const isIdMatch = Boolean(rPartId && found.id && rPartId === found.id);
         const isCodeMatch = Boolean(rCode && cleanChest && rCode === cleanChest.toLowerCase());
-        const isNameMatch = Boolean(!rCode && !rPartId && rName && found.name && rName === found.name.trim().toLowerCase());
+        const isNameMatch = Boolean(!rCode && !rPartId && rName && found.name && typeof found.name === 'string' && rName === found.name.trim().toLowerCase());
         const isTeamMatch = Boolean(
           (r.teamId && candidateTeamIds.includes(r.teamId)) ||
           (r.raw && r.raw.teamMemberIds && Array.isArray(r.raw.teamMemberIds) && (r.raw.teamMemberIds.includes(found.id) || r.raw.teamMemberIds.includes(cleanChest))) ||
@@ -526,7 +526,7 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         
         const isIdMatch = Boolean(rPartId && found.id && rPartId === found.id);
         const isCodeMatch = Boolean(rCode && cleanChest && rCode === cleanChest.toLowerCase());
-        const isNameMatchFallback = Boolean(!rCode && !rPartId && rName && found.name && rName === found.name.trim().toLowerCase());
+        const isNameMatchFallback = Boolean(!rCode && !rPartId && rName && found.name && typeof found.name === 'string' && rName === found.name.trim().toLowerCase());
         const isTeamMatch = Boolean(
           (r.teamId && candidateTeamIds.includes(r.teamId)) ||
           (r.raw && r.raw.teamMemberIds && Array.isArray(r.raw.teamMemberIds) && (r.raw.teamMemberIds.includes(found.id) || r.raw.teamMemberIds.includes(cleanChest))) ||

@@ -187,18 +187,23 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
   // Filtered grouped events
   const filteredEvents = useMemo(() => {
     return groupedEvents.filter((group) => {
+      const gEvent = (group.eventName || '').toLowerCase();
+      const gCat = (group.category || '').toLowerCase();
+      const sEvent = (selectedEvent || '').toLowerCase();
+      const q = (searchQuery || '').trim().toLowerCase();
+
       const matchesCategory = selectedCategory === 'All' || group.category === selectedCategory;
-      const matchesEvent = selectedEvent === 'All' || group.eventName.toLowerCase() === selectedEvent.toLowerCase();
+      const matchesEvent = selectedEvent === 'All' || gEvent === sEvent;
       const matchesQuery =
-        searchQuery === '' ||
-        group.eventName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        group.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        group.items.some(
-          (i) =>
-            i.participantName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            i.codeNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            i.department.toLowerCase().includes(searchQuery.toLowerCase())
-        );
+        q === '' ||
+        gEvent.includes(q) ||
+        gCat.includes(q) ||
+        group.items.some((i) => {
+          const pName = (i.participantName || (i as any).candidateName || (i as any).name || (i as any).teamName || '').toLowerCase();
+          const cNum = (i.codeNumber || (i as any).chestNumber || (i as any).chestNo || (i as any).teamNumber || '').toLowerCase();
+          const dept = (i.department || (i as any).unitName || (i as any).team || (i as any).teamName || '').toLowerCase();
+          return pName.includes(q) || cNum.includes(q) || dept.includes(q);
+        });
 
       return matchesCategory && matchesEvent && matchesQuery;
     });
@@ -327,7 +332,7 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
                         {group.eventName}
                       </h3>
                       <p className="text-[11px] text-zinc-400 font-mono mt-0.5">
-                        {group.category} · {group.items[0]?.participationType || (group.eventName.toLowerCase().includes('group') || group.eventName.toLowerCase().includes('team') || group.eventName.toLowerCase().includes('choral') ? 'Group' : 'Individual')}
+                        {group.category} · {group.items[0]?.participationType || ((group.eventName || '').toLowerCase().includes('group') || (group.eventName || '').toLowerCase().includes('team') || (group.eventName || '').toLowerCase().includes('choral') ? 'Group' : 'Individual')}
                       </p>
                     </div>
                   </div>
@@ -374,7 +379,7 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
                                     className={`font-sans text-xs sm:text-sm font-extrabold uppercase tracking-wide ${isFirst ? '' : 'text-white'
                                       }`}
                                   >
-                                    {res.participantName}
+                                    {res.participantName || (res as any).teamName || (res as any).candidateName || (res as any).department || 'Team'}
                                   </div>
                                 </td>
                                 <td className="py-3 px-4 text-zinc-300 font-sans text-xs font-medium">

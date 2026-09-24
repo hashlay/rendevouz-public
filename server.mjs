@@ -570,15 +570,53 @@ app.get('/api/public/results', async (req, res) => {
         }
       }
 
-      if (!department && r.teamId) {
-        const t = teams.find(t => t.id === r.teamId) || units.find(u => u.id === r.teamId);
-        if (t) department = t.name;
-      }
-
-      if (comp?.participationType === 'group') {
+      if (r.teamId || comp?.participationType === 'group' || (comp && comp.isGroup === true)) {
         participationType = 'Group';
-        if (!participantName && department) {
-          participantName = department;
+        const t = r.teamId ? teams.find(t => t.id === r.teamId) : null;
+        if (t) {
+          if (!department) {
+            const unit = units.find(u => u.id === t.unitId || u.name === t.unitId);
+            department = unit ? unit.name : (t.unitName || t.unitId || '');
+          }
+
+          if (!participantName || participantName === department) {
+            let leaderName = '';
+            const leaderId = t.leaderId || t.teamLeaderId || t.captainId;
+            if (leaderId) {
+              const leader = participants.find(p => p.id === leaderId);
+              if (leader) leaderName = leader.fullName || leader.name || '';
+            }
+            const membersList = Array.isArray(t.members) && t.members.length > 0 ? t.members : (Array.isArray(t.memberIds) ? t.memberIds : []);
+            if (!leaderName && membersList.length > 0) {
+              const firstMemberId = typeof membersList[0] === 'string' ? membersList[0] : (membersList[0]?.id || membersList[0]?.participantId);
+              const firstMember = participants.find(p => p.id === firstMemberId);
+              if (firstMember) leaderName = firstMember.fullName || firstMember.name || '';
+            }
+
+            if (t.teamName) {
+              if (t.teamName.includes('& Team') || t.teamName.includes('& team')) {
+                participantName = t.teamName;
+              } else if (leaderName) {
+                participantName = `${leaderName} & Team`;
+              } else {
+                participantName = `${t.teamName} & Team`;
+              }
+            } else if (leaderName) {
+              participantName = `${leaderName} & Team`;
+            } else if (t.teamNumber) {
+              participantName = `Team ${t.teamNumber}`;
+            } else {
+              participantName = department ? `${department} Team` : 'Group Team';
+            }
+          }
+
+          if (!codeNumber) {
+            codeNumber = t.teamNumber || t.codeNumber || t.chestNumber || '';
+          }
+
+          if (Array.isArray(t.memberIds) && teamMemberIds.length === 0) {
+            teamMemberIds = t.memberIds;
+          }
         }
       }
 
@@ -599,13 +637,13 @@ app.get('/api/public/results', async (req, res) => {
         categoryName,
         category: categoryName,
         participantId: r.participantId,
-        participantName,
-        chestNumber: codeNumber,
-        codeNumber,
-        unitName: department,
-        department,
-        team: department,
-        teamName: department,
+        participantName: participantName || department || 'Participant',
+        chestNumber: codeNumber || '',
+        codeNumber: codeNumber || '',
+        unitName: department || '',
+        department: department || '',
+        team: department || '',
+        teamName: department || '',
         rank: r.rank,
         grade,
         totalMarks,

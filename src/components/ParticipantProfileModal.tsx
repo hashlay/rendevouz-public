@@ -212,7 +212,7 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
       const rCodeNumber = (r.codeNumber || r.chestNumber || r.raw?.codeNumber || r.raw?.chestNumber || '').toString().trim().toLowerCase();
       const rParticipantName = (r.participantName || r.raw?.participantName || '').trim().toLowerCase();
       const rTeamId = r.teamId || r.raw?.teamId;
-      const rTeamMemberIds: string[] = (r.teamMemberIds || r.raw?.teamMemberIds || []).map((id: any) => id.toString().trim().toLowerCase());
+      const rTeamMemberIds: string[] = (r.teamMemberIds || r.raw?.teamMemberIds || []).map((id: any) => (id ? id.toString().trim().toLowerCase() : '')).filter(Boolean);
 
       const isGroupEvent = Boolean(
         r.participationType === 'group' || r.participationType === 'Group' || r.participationType === 'Group Event' || r.raw?.participationType === 'group'

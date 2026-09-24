@@ -733,8 +733,8 @@ export const renderPosterToCanvas = async (
       if (r.type === 'category' || r.categoryId || r.categoryName) {
         if (catId && r.categoryId && r.categoryId === catId) return true;
         if (catName && (r.categoryName || r.category)) {
-          const rCat = (r.categoryName || r.category).toString().trim().toLowerCase();
-          if (rCat === catName.trim().toLowerCase()) return true;
+          const rCat = (r.categoryName || r.category || '').toString().trim().toLowerCase();
+          if (rCat === (catName || '').toString().trim().toLowerCase()) return true;
         }
         return false;
       }
