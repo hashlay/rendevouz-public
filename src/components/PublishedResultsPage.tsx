@@ -349,7 +349,7 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
                           <th className="py-2.5 px-4 w-16 text-center">RANK</th>
                           <th className="py-2.5 px-4">PARTICIPANT</th>
                           <th className="py-2.5 px-4">TEAM</th>
-                          <th className="py-2.5 px-4 text-right">GRADE</th>
+                          <th className="py-2.5 px-4 text-right">GRADE / POINTS</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-[#202028]">
@@ -401,20 +401,51 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
                                           else g = '';
                                         }
                                       }
-                                      return (
-                                        <div className="flex flex-col items-end gap-0.5">
-                                          {g ? (
-                                            <span className="inline-flex items-center justify-center px-2 py-0.5 rounded border border-[#3F3F46] bg-[#18181B] text-[11px] font-mono font-bold text-emerald-400 min-w-[28px] shadow-xs">
-                                              {g}
+                                                                              const pts = res.points !== undefined && res.points !== null ? Number(res.points) : (() => {
+                                          if (m <= 0) return 0;
+                                          if (isGroup) {
+                                            if (m >= 95) return 20;
+                                            if (m >= 90) return 19;
+                                            if (m >= 85) return 18;
+                                            if (m >= 80) return 17;
+                                            if (m >= 75) return 16;
+                                            if (m >= 70) return 15;
+                                            if (m >= 65) return 14;
+                                            if (m >= 55) return 13;
+                                            if (m >= 50) return 12;
+                                            if (m >= 40) return 11;
+                                            if (m >= 30) return 10;
+                                            return 5;
+                                          } else {
+                                            if (m >= 95) return 10;
+                                            if (m >= 90) return 9;
+                                            if (m >= 85) return 8;
+                                            if (m >= 80) return 7;
+                                            if (m >= 75) return 6;
+                                            if (m >= 70) return 5;
+                                            if (m >= 65) return 4;
+                                            if (m >= 55) return 3;
+                                            if (m >= 50) return 2;
+                                            if (m >= 40) return 1;
+                                            return 0;
+                                          }
+                                        })();
+                                        return (
+                                          <div className="flex flex-col items-end gap-0.5">
+                                            {g ? (
+                                              <span className="inline-flex items-center justify-center px-2 py-0.5 rounded border border-[#3F3F46] bg-[#18181B] text-[11px] font-mono font-bold text-emerald-400 min-w-[28px] shadow-xs">
+                                                {g}
+                                              </span>
+                                            ) : (
+                                              <span className="inline-flex items-center justify-center px-2 py-0.5 rounded border border-zinc-800 bg-zinc-900/50 text-[10px] font-mono text-zinc-500 min-w-[28px]">
+                                                —
+                                              </span>
+                                            )}
+                                            <span className="text-[10px] text-zinc-400 font-mono">
+                                              {pts > 0 ? `${pts} points` : '0 points'}
                                             </span>
-                                          ) : (
-                                            <span className="inline-flex items-center justify-center px-2 py-0.5 rounded border border-zinc-800 bg-zinc-900/50 text-[10px] font-mono text-zinc-500 min-w-[28px]">
-                                              —
-                                            </span>
-                                          )}
-                                          {m > 0 && <span className="text-[10px] text-zinc-400 font-mono">{rawVal} marks</span>}
-                                        </div>
-                                      );
+                                          </div>
+                                        );
                                     })()}
                                   </td>
                               </tr>

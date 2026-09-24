@@ -95,7 +95,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenConceptModal, 
               {/* Photo Frame */}
               <div className="relative aspect-[4/3] sm:aspect-[16/11] overflow-hidden">
                 <img
-                  src={cmsSettings?.aboutImage || "https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3?auto=format&fit=crop&w=1200&q=80"}
+                  src={cmsSettings?.aboutImage || "/main_stage.jpeg"}
                   alt="Students at Imam Rabbani on Stage"
                   className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 filter brightness-95 contrast-105"
                   referrerPolicy="no-referrer"
@@ -108,7 +108,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenConceptModal, 
                 <div className="absolute top-3 left-3 bg-black/70 backdrop-blur-md border border-white/20 px-2.5 py-1 rounded-full flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full animate-ping" style={{ backgroundColor: 'var(--color-primary-accent)' }} />
                   <span className="text-[9px] font-mono font-bold text-white uppercase tracking-wider">
-                    {cmsSettings?.aboutImageBadge || 'Inauguration Session'}
+                    {cmsSettings?.aboutImageBadge || 'Main Stage'}
                   </span>
                 </div>
 
@@ -118,10 +118,10 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenConceptModal, 
                     {cmsSettings?.aboutImageTitle || 'Kulliyathu Imam Rabbani'}
                   </span>
                   <h4 className="text-base font-extrabold text-white leading-tight">
-                    {cmsSettings?.aboutImageSubtitle || 'Distinguished Scholars & Dignitaries at Grand Assembly'}
+                    {cmsSettings?.aboutImageSubtitle || 'Grand Assembly & Festival Inauguration'}
                   </h4>
                   <p className="text-[11px] text-zinc-300 mt-0.5">
-                    {cmsSettings?.aboutImageLocation || 'Main Stage Auditorium • Markaz Garden Campus'}
+                    {cmsSettings?.aboutImageLocation || 'Main Stage Auditorium • Imam Rabbani Campus'}
                   </p>
                 </div>
               </div>
@@ -130,7 +130,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenConceptModal, 
               <div className="p-3 bg-[#141414] border-t border-white/10 flex items-center justify-between text-[11px] text-zinc-400">
                 <div className="flex items-center gap-1.5">
                   <Award className="w-3.5 h-3.5" style={{ color: 'var(--color-primary-accent)' }} />
-                  <span>{cmsSettings?.aboutImageFooter || 'Markaz Garden Off-Campus'}</span>
+                  <span>{cmsSettings?.aboutImageFooter || 'Imam Rabbani Life Festival'}</span>
                 </div>
               </div>
             </div>

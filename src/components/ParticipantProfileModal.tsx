@@ -551,6 +551,37 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                   }
                 }
 
+                const computedPoints = res.points !== undefined && res.points !== null ? Number(res.points) : (() => {
+                  const m = Math.round(Number(rawMarks) || 0);
+                  if (m <= 0 || isAbsentResult) return 0;
+                  if (isGroup) {
+                    if (m >= 95) return 20;
+                    if (m >= 90) return 19;
+                    if (m >= 85) return 18;
+                    if (m >= 80) return 17;
+                    if (m >= 75) return 16;
+                    if (m >= 70) return 15;
+                    if (m >= 65) return 14;
+                    if (m >= 55) return 13;
+                    if (m >= 50) return 12;
+                    if (m >= 40) return 11;
+                    if (m >= 30) return 10;
+                    return 5;
+                  } else {
+                    if (m >= 95) return 10;
+                    if (m >= 90) return 9;
+                    if (m >= 85) return 8;
+                    if (m >= 80) return 7;
+                    if (m >= 75) return 6;
+                    if (m >= 70) return 5;
+                    if (m >= 65) return 4;
+                    if (m >= 55) return 3;
+                    if (m >= 50) return 2;
+                    if (m >= 40) return 1;
+                    return 0;
+                  }
+                })();
+
                 return (
                   <div key={res.id || `res-${Math.random()}`} className="bg-[#18181B] border border-white/10 rounded-3xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 transition-all">
                     <div className="flex items-center gap-4">
@@ -575,10 +606,10 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                         <p className="text-sm text-zinc-400 font-mono">
                           Grade: <strong className={isAbsentResult ? "text-rose-400 font-bold" : "text-emerald-400"}>{computedGrade || 'No Grade'}</strong>
                           {isAbsentResult ? (
-                            <> • Total Marks: <strong className="text-rose-400 font-bold">N/A</strong></>
-                          ) : rawMarks !== undefined ? (
-                            <> • Total Marks: <strong className="text-amber-400">{rawMarks} marks</strong></>
-                          ) : null}
+                            <> • Points: <strong className="text-rose-400 font-bold">0 points</strong></>
+                          ) : (
+                            <> • Points: <strong className="text-amber-400">{computedPoints > 0 ? `${computedPoints} points` : '0 points'}</strong></>
+                          )}
                         </p>
                       </div>
                     </div>

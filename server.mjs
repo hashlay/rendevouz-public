@@ -642,6 +642,23 @@ app.get('/api/public/standings', async (req, res) => {
   const dbState = await getDbState();
   const { units = [], participants = [], results = [], teams = [], competitions = [], eventSettings = {} } = dbState;
 
+  // Check if admin has published a frozen snapshot of team standings
+  let publishedSnapshot = dbState.settings?.publishedTeamStandings;
+  if (!publishedSnapshot && dbState.db) {
+    try {
+      const snapDoc = await dbState.db.collection('settings').findOne({ _id: 'publishedTeamStandings' });
+      if (snapDoc && Array.isArray(snapDoc.standings)) {
+        publishedSnapshot = snapDoc;
+      }
+    } catch (_) {}
+  }
+
+  if (publishedSnapshot && Array.isArray(publishedSnapshot.standings) && publishedSnapshot.standings.length > 0) {
+    res.setHeader('x-standings-results-count', String(publishedSnapshot.resultsCount || 0));
+    res.setHeader('x-standings-published-at', String(publishedSnapshot.publishedAt || ''));
+    return res.json(publishedSnapshot.standings);
+  }
+
   const validUnits = units.filter(u => u.active !== false);
 
   const standings = validUnits.map(unit => {
@@ -740,6 +757,28 @@ app.get('/api/public/standings', async (req, res) => {
   });
 
   res.json(finalStandings);
+});
+
+// Standings metadata endpoint
+app.get('/api/public/standings/meta', async (req, res) => {
+  const dbState = await getDbState();
+  let publishedSnapshot = dbState.settings?.publishedTeamStandings;
+  if (!publishedSnapshot && dbState.db) {
+    try {
+      const snapDoc = await dbState.db.collection('settings').findOne({ _id: 'publishedTeamStandings' });
+      if (snapDoc && Array.isArray(snapDoc.standings)) {
+        publishedSnapshot = snapDoc;
+      }
+    } catch (_) {}
+  }
+  const publishedResults = (dbState.results || []).filter(r => !r.deletedAt && (r.publishedStatus === true || r.isPublished === true));
+  const publishedCompIds = new Set(publishedResults.map(r => r.competitionId).filter(Boolean));
+  res.json({
+    resultsCount: publishedSnapshot?.resultsCount ?? publishedCompIds.size,
+    publishedAt: publishedSnapshot?.publishedAt || null,
+    isSnapshot: !!publishedSnapshot,
+    liveResultsCount: publishedCompIds.size
+  });
 });
 
 // Public Gallery
