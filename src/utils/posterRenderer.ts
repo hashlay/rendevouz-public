@@ -831,6 +831,13 @@ export const renderPosterToCanvas = async (
   }
 
   const baseConf = { ...defaultConf, ...userConf };
+  // Theme configs must NEVER supply winner name or unit overrides across all posters
+  Object.keys(baseConf).forEach((k) => {
+    if (k.toLowerCase().includes('override') && (k.toLowerCase().includes('name') || k.toLowerCase().includes('unit'))) {
+      delete (baseConf as any)[k];
+    }
+  });
+  delete (baseConf as any).compNameOverride;
   
   const backgroundSource = customThemes[themeIdx] || customThemes[0];
   

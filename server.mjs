@@ -233,8 +233,21 @@ async function getDbState(force = false) {
 
       settingsDocs.forEach(s => {
         const { _id, ...rest } = s;
-        if (_id === 'eventSettings') state.eventSettings = { ...state.eventSettings, ...rest };
-        if (_id === 'cmsSettings') state.cmsSettings = { ...rest };
+        if (_id === 'eventSettings') {
+          state.eventSettings = { ...state.eventSettings, ...rest };
+          if (rest.publishedTeamStandings) {
+            state.settings.publishedTeamStandings = rest.publishedTeamStandings;
+          }
+        }
+        if (_id === 'cmsSettings') {
+          state.cmsSettings = { ...rest };
+          if (rest.publishedTeamStandings) {
+            state.settings.publishedTeamStandings = rest.publishedTeamStandings;
+          }
+        }
+        if (_id === 'publishedTeamStandings') {
+          state.settings.publishedTeamStandings = { ...rest };
+        }
         if (_id === 'posterOverrides') {
           const loadedOverrides = rest.overrides || rest;
           state.posterOverrides = { ...(state.posterOverrides || {}), ...loadedOverrides };
@@ -249,6 +262,7 @@ async function getDbState(force = false) {
           state.eventSettings.certificateTemplateConfig = { ...rest };
         }
       });
+      state.db = db;
 
       // Ensure Theme 4 exists in posterTemplateConfig
       const ptc = state.posterTemplateConfig || state.eventSettings?.posterTemplateConfig;
