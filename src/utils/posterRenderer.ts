@@ -754,26 +754,7 @@ export const renderPosterToCanvas = async (
   const defaultConf = getDefaultThemeConfig(themeIdx);
   const userConf = { ...(themeConfigs[themeIdx] || {}) };
   
-  // Auto-upgrade obsolete fonts and oversized dimensions across all themes
-  if (userConf.resultNumFont && (userConf.resultNumFont.includes('Thunder') || userConf.resultNumFont.includes('bold "Fractul Alt"'))) {
-    userConf.resultNumFont = defaultConf.resultNumFont;
-    userConf.resultNumSize = defaultConf.resultNumSize;
-  }
-  if (userConf.compNameFont && (userConf.compNameFont.includes('Thunder') || userConf.compNameFont.includes('bold "Fractul Alt"'))) {
-    userConf.compNameFont = defaultConf.compNameFont;
-    userConf.compNameSize = defaultConf.compNameSize;
-  }
-  if (userConf.categoryFont && (userConf.categoryFont.includes('Thunder') || userConf.categoryFont.includes('bold "Fractul Alt"'))) {
-    userConf.categoryFont = defaultConf.categoryFont;
-  }
-  if (userConf.compNameSize && userConf.compNameSize > 56) {
-    userConf.compNameSize = 52;
-  }
-  if (userConf.resultNumSize && userConf.resultNumSize > 85) {
-    userConf.resultNumSize = 76;
-  }
-
-  // Gracefully migrate old green theme 0 placeholders if present in stored config
+  // Theme 0 default color fallback
   if (themeIdx === 0) {
     if (userConf.compNameColor === '#18BA46') {
       userConf.compNameColor = defaultConf.compNameColor;
@@ -842,10 +823,24 @@ export const renderPosterToCanvas = async (
   const backgroundSource = customThemes[themeIdx] || customThemes[0];
   
   // Merge individual poster position overrides if saved for this specific poster/competition
-  // Only apply if the override was saved for the SAME theme AND the SAME background image
-  const compId = compResults && compResults[0] ? compResults[0].competitionId : null;
-  const compOverride = (eventSettings?.posterOverrides && compName && eventSettings.posterOverrides[compName]) ||
-                       (eventSettings?.posterOverrides && compId && eventSettings.posterOverrides[compId]);
+  const compId = compResults && compResults[0] ? (compResults[0].competitionId || compResults[0].id) : null;
+  const overrides = eventSettings?.posterOverrides || {};
+  let compOverride = null;
+  if (compId && overrides[compId]) {
+    compOverride = overrides[compId];
+  } else if (compName && overrides[compName]) {
+    compOverride = overrides[compName];
+  } else if (compName && overrides[compName.trim()]) {
+    compOverride = overrides[compName.trim()];
+  } else if (compName) {
+    const target = compName.trim().toLowerCase();
+    for (const [k, v] of Object.entries(overrides)) {
+      if (k.trim().toLowerCase() === target) {
+        compOverride = v;
+        break;
+      }
+    }
+  }
   
   const isOverrideValid = !!compOverride;
   const c = isOverrideValid ? { ...baseConf, ...compOverride } : baseConf;
@@ -946,23 +941,38 @@ export const renderPosterToCanvas = async (
     ctx.fillText(catText, catX, catY);
     addRegion('category', catX - 10, catY - (c.categorySize ?? 32) - 5, catMetrics.width + 20, (c.categorySize ?? 32) + 20);
 
-    // Competition Name
+    // Competition Name with Generic Auto-Fit
     ctx.textAlign = 'left';
-    ctx.font = parseFontForCanvas(c.compNameFont || c.fontFamily, c.compNameSize ?? 52, '900');
-    ctx.fillStyle = c.compNameColor || '#ffffff';
     const rawComp = c.compNameOverride !== undefined && c.compNameOverride !== '' ? c.compNameOverride : (activeComp.name || compName || 'Competition');
     const compText = (c.compNameUppercase ? rawComp.toUpperCase() : rawComp) || 'COMPETITION';
     const compLines = (compText ? compText.split('\n') : []).filter(Boolean);
-    const compGap = (c.compNameSize ?? 52) * 1.15;
     const compX = c.compNameX ?? 540;
     const compY = c.compNameY ?? 330;
+    
+    // Auto-fit competition name so long multi-word or 2-line titles scale down cleanly
+    let compNameSize = c.compNameSize ?? 52;
+    const maxCompAllowedWidth = c.compNameMaxWidth || Math.max(W - compX - 60, 420);
+    ctx.font = parseFontForCanvas(c.compNameFont || c.fontFamily, compNameSize, '900');
+    let longestCompLine = compLines.length > 0 ? Math.max(...compLines.map((l: string) => ctx.measureText(l).width)) : 0;
+    while (longestCompLine > maxCompAllowedWidth && compNameSize > 18) {
+      compNameSize -= 1;
+      ctx.font = parseFontForCanvas(c.compNameFont || c.fontFamily, compNameSize, '900');
+      longestCompLine = Math.max(...compLines.map((l: string) => ctx.measureText(l).width));
+    }
+    const compGap = compNameSize * 1.15;
+    ctx.fillStyle = c.compNameColor || '#ffffff';
     let maxCompW = 0;
     compLines.forEach((line: string, i: number) => {
       ctx.fillText(line, compX, compY + i * compGap);
       const w = ctx.measureText(line).width;
       if (w > maxCompW) maxCompW = w;
     });
-    addRegion('compName', compX - 10, compY - (c.compNameSize ?? 52) - 5, maxCompW + 20, (compLines.length * compGap) + 10);
+    addRegion('compName', compX - 10, compY - compNameSize - 5, maxCompW + 20, (compLines.length * compGap) + 10);
+
+    // Dynamic vertical shift to prevent tied winners from overlapping downstream ranks
+    let cumulativeShiftY = 0;
+    // Generic max width for winner names and unit names to prevent artwork collisions
+    const maxWinnerAllowedWidth = c.winnerMaxWidth || Math.max(Math.min(W - (c.rank1NameX ?? 260) - 60, 520), 380);
 
     // Draw each rank with per-rank positions (supports multiple tied winners per rank)
     [1, 2, 3].forEach((rank) => {
@@ -972,6 +982,8 @@ export const renderPosterToCanvas = async (
 
       const winnerCount = Math.max(rankWinners.length, hasRank2Override ? 2 : hasRank1Override ? 1 : 0);
       if (winnerCount === 0) return;
+
+      const hasTie = winnerCount > 1;
 
       for (let wIdx = 0; wIdx < Math.max(winnerCount, 1); wIdx++) {
         const res = rankWinners[wIdx];
@@ -993,18 +1005,25 @@ export const renderPosterToCanvas = async (
         const rawWinnerUnit = hasUnitOverride ? overrideUnit : (res?.department || res?.unitName || res?.team || res?.teamName || 'Unit Name');
         const winnerUnit = c.unitUppercase !== false ? rawWinnerUnit.toUpperCase() : rawWinnerUnit;
 
-        const defaultYOffset = isSecond ? 80 : 0;
         const baseBadgeY = c[`rank${rank}BadgeY`] ?? (460 + (rank - 1) * 180);
-        const bx = isSecond ? (c[`rank${rank}_2_BadgeX`] ?? (c[`rank${rank}BadgeX`] ?? 140)) : (c[`rank${rank}BadgeX`] ?? 140);
-        const by = isSecond ? (c[`rank${rank}_2_BadgeY`] ?? (baseBadgeY + defaultYOffset)) : baseBadgeY;
-
         const baseNameY = c[`rank${rank}NameY`] ?? (448 + (rank - 1) * 180);
-        const nx = isSecond ? (c[`rank${rank}_2_NameX`] ?? (c[`rank${rank}NameX`] ?? 260)) : (c[`rank${rank}NameX`] ?? 260);
-        const ny = isSecond ? (c[`rank${rank}_2_NameY`] ?? (baseNameY + defaultYOffset)) : baseNameY;
-
         const baseUnitY = c[`rank${rank}UnitY`] ?? (483 + (rank - 1) * 180);
+
+        const tieOffset = 68;
+        const bx = isSecond ? (c[`rank${rank}_2_BadgeX`] ?? (c[`rank${rank}BadgeX`] ?? 140)) : (c[`rank${rank}BadgeX`] ?? 140);
+        const by = isSecond 
+          ? (c[`rank${rank}_2_BadgeY`] !== undefined ? c[`rank${rank}_2_BadgeY`] : (baseBadgeY + cumulativeShiftY + tieOffset)) 
+          : (baseBadgeY + cumulativeShiftY);
+
+        const nx = isSecond ? (c[`rank${rank}_2_NameX`] ?? (c[`rank${rank}NameX`] ?? 260)) : (c[`rank${rank}NameX`] ?? 260);
+        const ny = isSecond 
+          ? (c[`rank${rank}_2_NameY`] !== undefined ? c[`rank${rank}_2_NameY`] : (baseNameY + cumulativeShiftY + tieOffset)) 
+          : (baseNameY + cumulativeShiftY);
+
         const ux = isSecond ? (c[`rank${rank}_2_UnitX`] ?? (c[`rank${rank}UnitX`] ?? 260)) : (c[`rank${rank}UnitX`] ?? 260);
-        const uy = isSecond ? (c[`rank${rank}_2_UnitY`] ?? (baseUnitY + defaultYOffset)) : baseUnitY;
+        const uy = isSecond 
+          ? (c[`rank${rank}_2_UnitY`] !== undefined ? c[`rank${rank}_2_UnitY`] : (baseUnitY + cumulativeShiftY + tieOffset)) 
+          : (baseUnitY + cumulativeShiftY);
 
         const rColor = rank === 1 ? c.rank1Color : rank === 2 ? c.rank2Color : c.rank3Color;
         const rankText = rank === 1 ? c.rank1Text : rank === 2 ? c.rank2Text : c.rank3Text;
@@ -1013,7 +1032,7 @@ export const renderPosterToCanvas = async (
         const nameRegionId = isSecond ? `rank${rank}_2_Name` : `rank${rank}Name`;
         const unitRegionId = isSecond ? `rank${rank}_2_Unit` : `rank${rank}Unit`;
 
-        // Rank badge (drawn twice if tied, exactly like reference)
+        // Rank badge
         const rankFontSize = c.rankSize || 38;
         ctx.font = parseFontForCanvas(c.rankFont || c.fontFamily, rankFontSize, '900');
         const textWidth = ctx.measureText(rankText).width;
@@ -1062,13 +1081,21 @@ export const renderPosterToCanvas = async (
         }
         addRegion(badgeRegionId, bx - badgeW / 2 - 5, badgeCenterY - badgeH / 2 - 5, badgeW + 10, badgeH + 10);
 
-        // Winner name (supports multi-line \n)
+        // Winner name (supports multi-line \n and Auto-Fit scaling for long names)
         ctx.textAlign = 'left';
-        ctx.font = parseFontForCanvas(c.winnerFont || c.fontFamily, c.winnerSize || 34, '500');
+        let winnerFontSize = c.winnerSize || 34;
+        const nameLines = winnerName.split('\n').filter(Boolean);
+        ctx.font = parseFontForCanvas(c.winnerFont || c.fontFamily, winnerFontSize, '500');
+        let longestNameLine = nameLines.length > 0 ? Math.max(...nameLines.map((l: string) => ctx.measureText(l).width)) : 0;
+        while (longestNameLine > maxWinnerAllowedWidth && winnerFontSize > 14) {
+          winnerFontSize -= 1;
+          ctx.font = parseFontForCanvas(c.winnerFont || c.fontFamily, winnerFontSize, '500');
+          longestNameLine = Math.max(...nameLines.map((l: string) => ctx.measureText(l).width));
+        }
+
+        const nameGap = winnerFontSize * 1.15;
         const winnerFill = c.winnerColor || '#ffffff';
         ctx.fillStyle = winnerFill;
-        const nameLines = winnerName.split('\n').filter(Boolean);
-        const nameGap = (c.winnerSize ?? 34) * 1.15;
         let maxNameW = 0;
         const isWinnerHairline = (c.winnerFont || c.fontFamily || '').includes('200') || (c.winnerFont || c.fontFamily || '').includes('Hairline');
         nameLines.forEach((line: string, i: number) => {
@@ -1086,20 +1113,30 @@ export const renderPosterToCanvas = async (
           const w = ctx.measureText(line).width;
           if (w > maxNameW) maxNameW = w;
         });
-        addRegion(nameRegionId, nx - 5, ny - (c.winnerSize ?? 34) - 5, maxNameW + 10, (nameLines.length * nameGap) + 10);
+        addRegion(nameRegionId, nx - 5, ny - winnerFontSize - 5, maxNameW + 10, (nameLines.length * nameGap) + 10);
 
-        // Unit name (supports multi-line \n)
+        // Unit name (supports multi-line \n and Auto-Fit scaling)
         const isArabic = c.unitLanguage === 'ar';
         const arabicFont = (c.unitFont && c.unitFont !== 'monospace') ? c.unitFont : "'Cairo', 'Amiri', sans-serif";
-        ctx.font = parseFontForCanvas(isArabic ? arabicFont : (c.unitFont || 'monospace'), c.unitSize || 22, '500');
-        const unitFill = getPosterTeamColor(rawWinnerUnit || winnerUnit, c.unitColor, c);
-        ctx.fillStyle = unitFill;
+        const unitFontFamily = isArabic ? arabicFont : (c.unitFont || 'monospace');
+        let unitFontSize = c.unitSize || 22;
         const displayUnitName = getPosterDisplayUnitName(rawWinnerUnit || winnerUnit, c);
         const unitText = isArabic ? displayUnitName : (c.unitUppercase !== false ? displayUnitName.toUpperCase() : displayUnitName);
         const unitLines = unitText.split('\n').filter(Boolean);
-        const unitGap = (c.unitSize ?? 22) * 1.15;
+
+        ctx.font = parseFontForCanvas(unitFontFamily, unitFontSize, '500');
+        let longestUnitLine = unitLines.length > 0 ? Math.max(...unitLines.map((l: string) => ctx.measureText(l).width)) : 0;
+        while (longestUnitLine > maxWinnerAllowedWidth && unitFontSize > 12) {
+          unitFontSize -= 1;
+          ctx.font = parseFontForCanvas(unitFontFamily, unitFontSize, '500');
+          longestUnitLine = Math.max(...unitLines.map((l: string) => ctx.measureText(l).width));
+        }
+
+        const unitGap = unitFontSize * 1.15;
         const calcUx = nx; 
         const calcUy = ny + (nameLines.length * nameGap) + 5;
+        const unitFill = getPosterTeamColor(rawWinnerUnit || winnerUnit, c.unitColor, c);
+        ctx.fillStyle = unitFill;
         let maxUnitW = 0;
         const isUnitHairline = (c.unitFont || c.fontFamily || '').includes('200') || (c.unitFont || c.fontFamily || '').includes('Hairline');
         unitLines.forEach((line: string, i: number) => {
@@ -1117,7 +1154,12 @@ export const renderPosterToCanvas = async (
           const w = ctx.measureText(line).width;
           if (w > maxUnitW) maxUnitW = w;
         });
-        addRegion(unitRegionId, (ux ?? calcUx) - 5, (uy ?? calcUy) - (c.unitSize ?? 22) - 5, maxUnitW + 10, (unitLines.length * unitGap) + 10);
+        addRegion(unitRegionId, (ux ?? calcUx) - 5, (uy ?? calcUy) - unitFontSize - 5, maxUnitW + 10, (unitLines.length * unitGap) + 10);
+      }
+
+      // Smoothly shift down subsequent ranks if there was a tie
+      if (hasTie) {
+        cumulativeShiftY += (c.tiedWinnerRowGap || 72);
       }
     });
 

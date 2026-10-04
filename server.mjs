@@ -529,8 +529,16 @@ app.get('/api/public/results', async (req, res) => {
   const dbState = await getDbState();
   const { results = [], competitions = [], categories = [], participants = [], teams = [], chestNumbers = [], units = [], eventSettings = {}, judgmentSheets = [] } = dbState;
 
-  // Build fixed announcement order for all announced competitions
-  const publishedResults = results.filter(r => !r.deletedAt && (r.publishedStatus === true || r.isPublished === true));
+  // Set of competitions that are published via judgment sheets
+  const publishedSheetCompIds = new Set(
+    (judgmentSheets || [])
+      .filter(s => !s.deletedAt && (s.publishedToResults === true || s.status === 'published' || s.isPublished === true))
+      .map(s => s.competitionId)
+      .filter(Boolean)
+  );
+
+  // Build fixed announcement order for all announced competitions (results with publishedStatus flag OR published judgment sheet)
+  const publishedResults = results.filter(r => !r.deletedAt && (r.publishedStatus === true || r.isPublished === true || publishedSheetCompIds.has(r.competitionId)));
   const publishedCompIds = Array.from(new Set(publishedResults.map(r => r.competitionId).filter(Boolean)));
 
   const compTimes = publishedCompIds.map(compId => {
@@ -713,6 +721,13 @@ app.get('/api/public/standings', async (req, res) => {
 
   const validUnits = units.filter(u => u.active !== false);
 
+  const publishedSheetCompIds = new Set(
+    (dbState.judgmentSheets || [])
+      .filter(s => !s.deletedAt && (s.publishedToResults === true || s.status === 'published' || s.isPublished === true))
+      .map(s => s.competitionId)
+      .filter(Boolean)
+  );
+
   const standings = validUnits.map(unit => {
     const normTarget = unit.name.toLowerCase().replace(/[-_]/g, '');
 
@@ -731,7 +746,7 @@ app.get('/api/public/standings', async (req, res) => {
 
     const individualResults = results.filter(r => {
       if (r.deletedAt) return false;
-      const isPub = r.publishedStatus === true || r.isPublished === true;
+      const isPub = r.publishedStatus === true || r.isPublished === true || publishedSheetCompIds.has(r.competitionId);
       if (!isPub) return false;
       const statusOk = !r.status || r.status === 'participated' || String(r.status).toLowerCase() === 'participated';
       if (!statusOk) return false;
@@ -746,7 +761,7 @@ app.get('/api/public/standings', async (req, res) => {
 
     const groupResults = results.filter(r => {
       if (r.deletedAt) return false;
-      const isPub = r.publishedStatus === true || r.isPublished === true;
+      const isPub = r.publishedStatus === true || r.isPublished === true || publishedSheetCompIds.has(r.competitionId);
       if (!isPub) return false;
       const statusOk = !r.status || r.status === 'participated' || String(r.status).toLowerCase() === 'participated';
       if (!statusOk) return false;
@@ -812,6 +827,27 @@ app.get('/api/public/standings', async (req, res) => {
 });
 
 // Standings metadata endpoint
+
+// Unpublish Standings snapshot
+app.post('/api/standings/unpublish', async (req, res) => {
+  const dbState = await getDbState();
+  if (dbState.settings) {
+    delete dbState.settings.publishedTeamStandings;
+  }
+  if (dbState.db) {
+    try {
+      await dbState.db.collection('settings').deleteOne({ _id: 'publishedTeamStandings' });
+      await dbState.db.collection('settings').updateOne(
+        { $or: [{ id: 'app_settings' }, { _id: 'cmsSettings' }, { _id: 'eventSettings' }] },
+        { $unset: { publishedTeamStandings: "" }, $set: { updatedAt: new Date().toISOString() } }
+      );
+    } catch (e) {
+      console.error('Failed to unpublish standings in mongo:', e);
+    }
+  }
+  res.json({ success: true, message: 'Team standings snapshot removed. Public site will now reflect live published results.' });
+});
+
 app.get('/api/public/standings/meta', async (req, res) => {
   const dbState = await getDbState();
   let publishedSnapshot = dbState.settings?.publishedTeamStandings;
@@ -823,7 +859,13 @@ app.get('/api/public/standings/meta', async (req, res) => {
       }
     } catch (_) {}
   }
-  const publishedResults = (dbState.results || []).filter(r => !r.deletedAt && (r.publishedStatus === true || r.isPublished === true));
+  const publishedSheetCompIds = new Set(
+    (dbState.judgmentSheets || [])
+      .filter(s => !s.deletedAt && (s.publishedToResults === true || s.status === 'published' || s.isPublished === true))
+      .map(s => s.competitionId)
+      .filter(Boolean)
+  );
+  const publishedResults = (dbState.results || []).filter(r => !r.deletedAt && (r.publishedStatus === true || r.isPublished === true || publishedSheetCompIds.has(r.competitionId)));
   const publishedCompIds = new Set(publishedResults.map(r => r.competitionId).filter(Boolean));
   res.json({
     resultsCount: publishedSnapshot?.resultsCount ?? publishedCompIds.size,

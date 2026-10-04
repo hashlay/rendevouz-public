@@ -6,3 +6,8 @@ coverage/
 *.log
 .env*
 !.env.example
+scratch/
+data/
+WhatsApp*
+assets/WhatsApp*
+

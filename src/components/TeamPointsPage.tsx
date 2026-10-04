@@ -3,7 +3,7 @@ import { useFestival } from '../context/FestivalContext';
 import { Search } from 'lucide-react';
 
 export const TeamPointsPage: React.FC = () => {
-  const { houseScores = [] } = useFestival();
+  const { houseScores = [], standingsMeta } = useFestival();
   const [searchQuery, setSearchQuery] = useState('');
 
   // Sorted house scores
@@ -36,6 +36,21 @@ export const TeamPointsPage: React.FC = () => {
           <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight font-sans">
             Team Points <span style={{ color: 'var(--color-primary-accent)' }}>Standings</span>
           </h1>
+          {standingsMeta?.resultsCount !== undefined && standingsMeta.resultsCount > 0 && (
+            <div className="mt-2.5 flex items-center justify-center sm:justify-start gap-2">
+              <span 
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold tracking-wider uppercase border"
+                style={{ 
+                  borderColor: 'var(--color-primary-accent)', 
+                  color: 'var(--color-primary-accent)',
+                  backgroundColor: 'rgba(239, 6, 106, 0.08)'
+                }}
+              >
+                <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: 'var(--color-primary-accent)' }} />
+                After {standingsMeta.resultsCount} results published
+              </span>
+            </div>
+          )}
         </div>
 
         {sortedHouses.length === 0 ? (

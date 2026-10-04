@@ -8,7 +8,7 @@ interface ResultsSectionProps {
 }
 
 export const ResultsSection: React.FC<ResultsSectionProps> = ({ onNavigate }) => {
-  const { houseScores = [], results = [], categories = [] } = useFestival();
+  const { houseScores = [], results = [], categories = [], standingsMeta } = useFestival();
   const [selectedCategory, setSelectedCategory] = useState<Category>('All');
   const [selectedEvent, setSelectedEvent] = useState<string>('All');
 
@@ -40,9 +40,24 @@ export const ResultsSection: React.FC<ResultsSectionProps> = ({ onNavigate }) =>
         {/* Section Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 gap-3 border-b border-white/10 pb-5">
           <div>
-            <span style={{ color: 'var(--color-primary-accent)' }} className="font-mono text-[10px] font-bold tracking-[0.25em] uppercase mb-1 block">
-              STANDINGS & RESULTS
-            </span>
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
+              <span style={{ color: 'var(--color-primary-accent)' }} className="font-mono text-[10px] font-bold tracking-[0.25em] uppercase">
+                STANDINGS & RESULTS
+              </span>
+              {standingsMeta?.resultsCount !== undefined && standingsMeta.resultsCount > 0 && (
+                <span 
+                  className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold tracking-wider uppercase border"
+                  style={{ 
+                    borderColor: 'var(--color-primary-accent)', 
+                    color: 'var(--color-primary-accent)',
+                    backgroundColor: 'rgba(239, 6, 106, 0.08)'
+                  }}
+                >
+                  <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: 'var(--color-primary-accent)' }} />
+                  After {standingsMeta.resultsCount} published
+                </span>
+              )}
+            </div>
             <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight font-sans">
               Who's leading
             </h2>

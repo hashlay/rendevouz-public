@@ -94,6 +94,7 @@ interface FestivalContextType {
   
   // Dynamic Standings
   houseScores: HouseScore[];
+  standingsMeta: { resultsCount?: number; publishedAt?: string | null; isSnapshot?: boolean; liveResultsCount?: number } | null;
 
   // Categories from backend
   categories: any[];
@@ -205,6 +206,7 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [categories, setCategories] = useState<any[]>([]);
   const [isFaceScanning, setIsFaceScanning] = useState(false);
   const [houseScores, setHouseScores] = useState<HouseScore[]>([]);
+  const [standingsMeta, setStandingsMeta] = useState<{ resultsCount?: number; publishedAt?: string | null; isSnapshot?: boolean; liveResultsCount?: number } | null>(null);
 
   // CMS States
   const [participants, setParticipants] = useState<any[]>([]);
@@ -212,17 +214,22 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [judges, setJudges] = useState<any[]>([]);
   const [marks, setMarks] = useState<any[]>([]);
 
-  // Unified Initial Data Fetch (Eliminating Waterfall: All 5 endpoints fetched in parallel)
+  // Unified Initial Data Fetch (Eliminating Waterfall: All endpoints fetched in parallel)
   useEffect(() => {
     const fetchAllPublicData = async () => {
       try {
-        const [resResults, resSettings, resCategories, resStandings, resUnits] = await Promise.all([
+        const [resResults, resSettings, resCategories, resStandings, resUnits, resMeta] = await Promise.all([
           fetch('/api/public/results').then(r => r.ok ? r.json() : []).catch(() => []),
           fetch('/api/public/settings').then(r => r.ok ? r.json() : null).catch(() => null),
           fetch('/api/public/categories').then(r => r.ok ? r.json() : []).catch(() => []),
           fetch('/api/public/standings').then(r => r.ok ? r.json() : []).catch(() => []),
-          fetch('/api/public/units').then(r => r.ok ? r.json() : []).catch(() => [])
+          fetch('/api/public/units').then(r => r.ok ? r.json() : []).catch(() => []),
+          fetch('/api/public/standings/meta').then(r => r.ok ? r.json() : null).catch(() => null)
         ]);
+
+        if (resMeta && typeof resMeta === 'object') {
+          setStandingsMeta(resMeta);
+        }
 
         const rawResults = Array.isArray(resResults) ? resResults : [];
         setResults(rawResults);
@@ -823,7 +830,9 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
         categories,
 
-        eventSettings
+        eventSettings,
+
+        standingsMeta
       }}
     >
       {children}
