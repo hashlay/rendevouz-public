@@ -55,7 +55,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenConceptModal, 
               <div className="text-zinc-300 text-xs sm:text-sm leading-relaxed mb-5 whitespace-pre-line">
                 {cmsSettings?.aboutDescription || (
                   <>
-                    <strong>Swalahul Huda Academy</strong> presents <strong>FANOUS 2K26 (Meelad Fest)</strong>, an annual celebration of intellectual, creative, and moral excellence.
+                    <strong>Swalahul Huda Academy</strong>, functioning under the guidance and management of <strong>Rifayiya Juma Masjid Muchila</strong>, proudly presents <strong>FANOUS 2K26</strong> in grand commemoration of <strong>Meelad Fest</strong>. This annual celebration serves as a distinguished platform for promoting academic brilliance, creative expression, and moral integrity.
                   </>
                 )}
               </div>
@@ -63,11 +63,10 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenConceptModal, 
               {/* Theme Breakdown Box */}
               <div className="bg-zinc-900/60 border rounded-xl p-4 mb-5" style={{ borderColor: 'var(--color-primary-accent)' }}>
                 <div className="flex items-center gap-2 text-white font-bold text-xs mb-1.5">
-
                   <span>Theme: "{cmsSettings?.themeTitle || 'Meelad Fest'}"</span>
                 </div>
                 <p className="text-xs text-zinc-300 leading-relaxed italic whitespace-pre-line">
-                  "{cmsSettings?.themeDescription || 'In an interconnected world, \'Decoding Phytolore\' calls upon the youth to explore the deeper symbiosis between nature, wisdom, spiritual clarity, and moral fortitude.'}"
+                  "{cmsSettings?.themeDescription || 'An inspiring confluence of artistic devotion, ethical scholarship, and youth talent commemorating Meelad Fest at Rifayiya Juma Masjid Muchila.'}"
                 </p>
               </div>
 

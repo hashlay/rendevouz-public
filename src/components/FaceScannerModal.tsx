@@ -203,7 +203,7 @@ export const FaceScannerModal: React.FC<FaceScannerModalProps> = ({ isOpen, onCl
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {scanResults.matchedPhotos.map((photo: any) => (
+                    {(scanResults?.matchedPhotos || []).map((photo: any) => (
                       <div
                         key={photo.id}
                         className="group bg-black/60 border border-white/10 hover:border-[#FF2B2B] rounded-2xl overflow-hidden transition-all duration-300"

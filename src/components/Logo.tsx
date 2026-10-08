@@ -43,21 +43,16 @@ export const Logo: React.FC<LogoProps> = ({
       {showIcon && (
         <div className="relative group shrink-0 flex items-center justify-center">
           <img
-            src={customIconUrl || '/fanous_logo.jpg'}
+            src={customIconUrl || '/fanous_logo.png'}
             alt="FANOUS 2K26 Logo"
             onError={(e) => {
               const target = e.currentTarget;
-              if (!target.src.endsWith('/fanous_logo.jpg')) {
-                target.src = '/fanous_logo.jpg';
+              if (!target.src.endsWith('/fanous_logo.png')) {
+                target.src = '/fanous_logo.png';
               }
             }}
-            className="object-contain rounded-xl drop-shadow-xl transition-transform duration-300 group-hover:scale-105"
+            className="object-contain transition-transform duration-300 group-hover:scale-105"
             style={{ width: iconSize, height: iconSize }}
-          />
-          {/* Subtle purple ambient glow */}
-          <div
-            className="absolute inset-0 blur-lg rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-            style={{ backgroundColor: 'var(--color-primary-accent, #18BA46)', opacity: 0.3 }}
           />
         </div>
       )}

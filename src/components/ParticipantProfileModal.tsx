@@ -360,6 +360,11 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
+            <img
+              src="/fanous_logo.png"
+              alt="FANOUS 2K26"
+              className="h-10 w-auto object-contain shrink-0 mr-2 drop-shadow-md"
+            />
             <button
               onClick={logout}
               style={{ backgroundColor: 'var(--color-primary-accent)', color: '#ffffff' }}

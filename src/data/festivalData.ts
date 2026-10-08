@@ -47,8 +47,14 @@ export const GALLERY_DATA: GalleryItem[] = [];
 
 export const VIDEO_HIGHLIGHTS: VideoHighlight[] = [];
 
-export const FULL_CONCEPT_TEXT = `FANOUS 2K26 — MEELAD FEST
-
-Swalahul Huda Academy proudly presents FANOUS 2K26, a grand celebration of intellectual, literary, and moral excellence commemorating Meelad Fest. 
-
-The festival creates an inspiring platform where talent meets devotion, promoting healthy competitive spirit, community unity, and high academic standards.`;
+export const FULL_CONCEPT_TEXT = {
+  title: "FANOUS 2K26 — MEELAD FEST",
+  institution: "Swalahul Huda Academy • Under Rifayiya Juma Masjid Muchila",
+  badge: "Festival Concept & Vision",
+  paragraphs: [
+    "FANOUS 2K26 is the premier annual arts, literary, and cultural festival presented by Swalahul Huda Academy, functioning under the guidance and management of Rifayiya Juma Masjid Muchila. Commemorating the auspicious occasion of Meelad Fest, FANOUS stands as a radiant beacon of intellectual illumination, spiritual devotion, and artistic excellence.",
+    "The festival is designed to nurture and showcase the multidimensional talents of students across diverse artistic, literary, and oratory disciplines. Through rigorous academic competitions, creative writing, elocution, calligraphy, and cultural renditions, participants are inspired to achieve the highest benchmarks of performance and moral integrity.",
+    "FANOUS—meaning 'The Lantern of Guidance'—symbolizes the radiant light of knowledge that dispels ignorance. Rooted in traditional Islamic ethics and progressive scholastic aspirations, this grand platform fosters brotherhood, healthy competitive spirit, and collaborative leadership among students.",
+    "With comprehensive judging standards, dynamic digital tabulation, and an inspiring celebration of youth potential, FANOUS 2K26 unites students, teachers, and the broader community in a joyous commemoration of love, wisdom, and creative devotion for Meelad Fest."
+  ]
+};

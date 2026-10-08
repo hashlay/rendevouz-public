@@ -78,7 +78,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings, dragBlo
 
   // Sanitization helpers to guarantee clean Rendezvous 26 presentation
   const sanitizeLogo = (logo?: string) => {
-    if (!logo || logo.includes('tabassum') || logo.includes('zenith_gold') || logo.includes('mas')) return '/fanous_logo.jpg';
+    if (!logo || logo.includes('tabassum') || logo.includes('zenith_gold') || logo.includes('mas') || logo.endsWith('.jpg')) return '/fanous_logo.png';
     return logo;
   };
   const sanitizeTitle = (title?: string) => {
