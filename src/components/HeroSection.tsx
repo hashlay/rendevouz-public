@@ -63,7 +63,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
   };
 
   return (
-    <section id="hero" className="relative min-h-[100dvh] flex flex-col justify-center items-center overflow-hidden bg-[#012002] pt-24 pb-8 sm:py-24">
+    <section id="hero" className="relative min-h-0 sm:min-h-screen flex flex-col justify-start sm:justify-center items-center overflow-hidden bg-[#012002] pt-20 pb-2 sm:py-24">
       {/* Background Media */}
       <div className="absolute inset-0 z-0 overflow-hidden select-none pointer-events-none">
         {/* Mobile View */}
@@ -73,7 +73,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
               key={`mob-${idx}-${src}`}
               src={src}
               alt="FANOUS 2K26 Background"
-              className={`absolute inset-0 w-full h-full object-cover object-center filter brightness-[0.70] contrast-[1.05] transition-opacity duration-1000 ${
+              className={`absolute inset-0 w-full h-full object-cover object-top filter brightness-[0.75] contrast-[1.05] transition-opacity duration-1000 ${
                 idx === mobileIndex ? 'opacity-100' : 'opacity-0'
               }`}
             />
@@ -94,8 +94,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
           ))}
         </div>
 
-        {/* Subtle atmospheric blending */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#012002]/80 via-[#012002]/20 to-transparent pointer-events-none" />
+        {/* Subtle atmospheric blending (only on desktop so mobile background is not blacked out) */}
+        <div className="hidden sm:block absolute inset-0 bg-gradient-to-t from-[#012002]/80 via-[#012002]/20 to-transparent pointer-events-none" />
       </div>
 
       {/* Admin Quick Action Button */}
@@ -110,28 +110,28 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
         </div>
       )}
 
-      <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 w-full z-20 text-center flex-1 flex flex-col justify-center items-center py-6 sm:py-8">
+      <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 w-full z-20 text-center flex-1 flex flex-col justify-start sm:justify-center items-center pt-1 pb-1 sm:py-8">
         <div className="flex flex-col items-center select-none w-full my-auto">
           {/* 1. Main Festival Brand Title: Clean Sora Font */}
-          <h1 className="font-sora font-extrabold text-[#F4F8F4] text-5xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight uppercase select-none my-1.5 drop-shadow-md leading-none sm:leading-tight">
+          <h1 className="font-sora font-extrabold text-[#F4F8F4] text-5xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight uppercase select-none my-1 drop-shadow-md leading-none sm:leading-tight">
             {cmsSettings?.heroTitle || 'FANOUS 2K26'}
           </h1>
 
           {/* 2. Theme Subtitle: Meelad Fest (Semi-bold, 5% smaller than Fanous 2K26) */}
           <h2
-            className="font-sora font-semibold text-[2.4rem] sm:text-[3.4rem] md:text-[4.2rem] lg:text-[5.6rem] tracking-tight select-none my-1.5 leading-none sm:leading-tight drop-shadow-sm"
+            className="font-sora font-semibold text-[2.4rem] sm:text-[3.4rem] md:text-[4.2rem] lg:text-[5.6rem] tracking-tight select-none my-1 leading-none sm:leading-tight drop-shadow-sm"
             style={{ color: 'var(--color-primary-accent, #18BA46)' }}
           >
             {(cmsSettings?.heroSubtitle || 'Meelad Fest').replace(/^["“']+|["”']+$/g, '')}
           </h2>
 
           {/* 3. Campus Name Badge */}
-          <p className="font-sora text-xs sm:text-sm md:text-base font-bold text-[#A2D5A4] tracking-[0.25em] sm:tracking-[0.35em] uppercase mt-2 sm:mt-3 mb-6 sm:mb-8 select-none">
+          <p className="font-sora text-xs sm:text-sm md:text-base font-bold text-[#A2D5A4] tracking-[0.25em] sm:tracking-[0.35em] uppercase mt-1.5 sm:mt-3 mb-5 sm:mb-8 select-none">
             {cmsSettings?.heroLogoBadge || cmsSettings?.campusName || 'SWALAHUL HUDA ACADEMY'}
           </p>
 
           {/* 5. Date & Venue Details Bar */}
-          <div className="flex justify-center mb-6 sm:mb-10 w-full max-w-md mx-auto">
+          <div className="flex justify-center mb-5 sm:mb-10 w-full max-w-md mx-auto">
             <div
               className="inline-flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6 bg-black/40 backdrop-blur-xl border px-6 sm:px-8 py-3 rounded-full shadow-lg w-full sm:w-auto"
               style={{ borderColor: 'var(--color-border-subtle, #176523)' }}
@@ -149,7 +149,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
           </div>
 
           {/* Dual Action Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-2 sm:mb-8 w-full max-w-md mx-auto sm:max-w-none">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-1 sm:mb-8 w-full max-w-md mx-auto sm:max-w-none">
             <button
               onClick={() => onNavigate('results')}
               style={{ backgroundColor: 'var(--color-primary-accent, #18BA46)' }}

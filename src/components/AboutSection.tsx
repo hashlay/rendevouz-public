@@ -9,7 +9,7 @@ interface AboutSectionProps {
 
 export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenConceptModal, cmsSettings }) => {
   return (
-    <section id="about" className="py-12 sm:py-16 bg-[#121212] relative overflow-hidden border-t border-b border-white/5 font-sans">
+    <section id="about" className="pt-2 pb-12 sm:py-16 bg-[#121212] relative overflow-hidden border-t border-b border-white/5 font-sans">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Section Header */}
         <div className="flex flex-col items-start mb-8 sm:mb-10">
