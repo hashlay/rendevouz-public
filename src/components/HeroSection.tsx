@@ -110,30 +110,31 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
         </div>
       )}
 
-      <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 w-full z-20 text-center flex-1 flex flex-col justify-center items-center py-6 sm:py-8">
-        <div className="flex flex-col items-center select-none w-full my-auto">
+      <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 w-full z-20 text-center flex-1 flex flex-col justify-between sm:justify-center items-center pt-2 sm:pt-4 pb-3 sm:pb-8">
+        {/* Upper Brand & Details Group: Centered in available upper area */}
+        <div className="flex flex-col items-center select-none w-full my-auto sm:my-0">
           {/* 1. Main Festival Brand Title: Clean Sora Font */}
-          <h1 className="font-sora font-extrabold text-[#F4F8F4] text-5xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight uppercase select-none my-1.5 drop-shadow-md leading-none sm:leading-tight">
+          <h1 className="font-sora font-extrabold text-[#F4F8F4] text-5xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight uppercase select-none my-1 sm:my-1.5 drop-shadow-md leading-none sm:leading-tight">
             {cmsSettings?.heroTitle || 'FANOUS 2K26'}
           </h1>
 
           {/* 2. Theme Subtitle: Meelad Fest (Semi-bold, 5% smaller than Fanous 2K26) */}
           <h2
-            className="font-sora font-semibold text-[2.4rem] sm:text-[3.4rem] md:text-[4.2rem] lg:text-[5.6rem] tracking-tight select-none my-1.5 leading-none sm:leading-tight drop-shadow-sm"
+            className="font-sora font-semibold text-[2.4rem] sm:text-[3.4rem] md:text-[4.2rem] lg:text-[5.6rem] tracking-tight select-none my-1 sm:my-1.5 leading-none sm:leading-tight drop-shadow-sm"
             style={{ color: 'var(--color-primary-accent, #18BA46)' }}
           >
             {(cmsSettings?.heroSubtitle || 'Meelad Fest').replace(/^["“']+|["”']+$/g, '')}
           </h2>
 
           {/* 3. Campus Name Badge */}
-          <p className="font-sora text-xs sm:text-sm md:text-base font-bold text-[#A2D5A4] tracking-[0.25em] sm:tracking-[0.35em] uppercase mt-2 sm:mt-3 mb-6 sm:mb-8 select-none">
+          <p className="font-sora text-xs sm:text-sm md:text-base font-bold text-[#A2D5A4] tracking-[0.25em] sm:tracking-[0.35em] uppercase mt-2 sm:mt-3 mb-5 sm:mb-8 select-none">
             {cmsSettings?.heroLogoBadge || cmsSettings?.campusName || 'SWALAHUL HUDA ACADEMY'}
           </p>
 
-          {/* 5. Date & Venue Details Bar */}
-          <div className="flex justify-center mb-6 sm:mb-10 w-full max-w-md mx-auto">
+          {/* 4. Date & Venue Details Bar */}
+          <div className="flex justify-center mb-4 sm:mb-10 w-full max-w-md mx-auto">
             <div
-              className="inline-flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6 bg-black/40 backdrop-blur-xl border px-6 sm:px-8 py-3 rounded-full shadow-lg w-full sm:w-auto"
+              className="inline-flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6 bg-black/40 backdrop-blur-xl border px-6 sm:px-8 py-2.5 sm:py-3 rounded-full shadow-lg w-full sm:w-auto"
               style={{ borderColor: 'var(--color-border-subtle, #176523)' }}
             >
               <div className="flex items-center gap-2 text-[#F4F8F4] font-mono text-xs sm:text-sm font-medium">
@@ -147,39 +148,39 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Dual Action Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-2 sm:mb-8 w-full max-w-md mx-auto sm:max-w-none">
+        {/* Dual Action Buttons: Anchored near bottom with consistent modest gap on all mobile screens */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 w-full max-w-md mx-auto sm:max-w-none mt-auto sm:mt-6 pb-2 sm:pb-0">
+          <button
+            onClick={() => onNavigate('results')}
+            style={{ backgroundColor: 'var(--color-primary-accent, #18BA46)' }}
+            className="w-full sm:w-auto px-7 py-3.5 hover:brightness-110 text-white text-xs sm:text-sm font-extrabold uppercase tracking-wider rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+          >
+            <Trophy className="w-4 h-4 text-white" />
+            <span>Check Live Results</span>
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
+
+          {isLiveStreamEnabled() ? (
             <button
-              onClick={() => onNavigate('results')}
-              style={{ backgroundColor: 'var(--color-primary-accent, #18BA46)' }}
-              className="w-full sm:w-auto px-7 py-3.5 hover:brightness-110 text-white text-xs sm:text-sm font-extrabold uppercase tracking-wider rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+              onClick={() => onNavigate('live')}
+              className="w-full sm:w-auto px-7 py-3.5 bg-black/40 hover:bg-black/70 border text-[#F4F8F4] text-xs sm:text-sm font-extrabold uppercase tracking-wider rounded-xl backdrop-blur-lg transition-all duration-300 flex items-center justify-center gap-2 transform hover:-translate-y-0.5 cursor-pointer shadow-md hover:border-emerald-400/60"
+              style={{ borderColor: 'var(--color-border-subtle, #176523)' }}
             >
-              <Trophy className="w-4 h-4 text-white" />
-              <span>Check Live Results</span>
-              <ChevronRight className="w-3.5 h-3.5" />
+              <Radio className="w-4 h-4 animate-pulse" style={{ color: 'var(--color-primary-accent, #18BA46)' }} />
+              <span>Watch Live Stream</span>
             </button>
-
-            {isLiveStreamEnabled() ? (
-              <button
-                onClick={() => onNavigate('live')}
-                className="w-full sm:w-auto px-7 py-3.5 bg-black/40 hover:bg-black/70 border text-[#F4F8F4] text-xs sm:text-sm font-extrabold uppercase tracking-wider rounded-xl backdrop-blur-lg transition-all duration-300 flex items-center justify-center gap-2 transform hover:-translate-y-0.5 cursor-pointer shadow-md hover:border-emerald-400/60"
-                style={{ borderColor: 'var(--color-border-subtle, #176523)' }}
-              >
-                <Radio className="w-4 h-4 animate-pulse" style={{ color: 'var(--color-primary-accent, #18BA46)' }} />
-                <span>Watch Live Stream</span>
-              </button>
-            ) : (
-              <button
-                onClick={() => onNavigate('team-points')}
-                className="w-full sm:w-auto px-7 py-3.5 bg-black/40 hover:bg-black/70 border text-[#F4F8F4] text-xs sm:text-sm font-extrabold uppercase tracking-wider rounded-xl backdrop-blur-lg transition-all duration-300 flex items-center justify-center gap-2 transform hover:-translate-y-0.5 cursor-pointer shadow-md hover:border-emerald-400/60"
-                style={{ borderColor: 'var(--color-border-subtle, #176523)' }}
-              >
-                <Trophy className="w-4 h-4" style={{ color: 'var(--color-primary-accent, #18BA46)' }} />
-                <span>View Team Standings</span>
-              </button>
-            )}
-          </div>
+          ) : (
+            <button
+              onClick={() => onNavigate('team-points')}
+              className="w-full sm:w-auto px-7 py-3.5 bg-black/40 hover:bg-black/70 border text-[#F4F8F4] text-xs sm:text-sm font-extrabold uppercase tracking-wider rounded-xl backdrop-blur-lg transition-all duration-300 flex items-center justify-center gap-2 transform hover:-translate-y-0.5 cursor-pointer shadow-md hover:border-emerald-400/60"
+              style={{ borderColor: 'var(--color-border-subtle, #176523)' }}
+            >
+              <Trophy className="w-4 h-4" style={{ color: 'var(--color-primary-accent, #18BA46)' }} />
+              <span>View Team Standings</span>
+            </button>
+          )}
         </div>
       </div>
     </section>
