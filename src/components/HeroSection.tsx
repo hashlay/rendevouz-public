@@ -111,35 +111,22 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
       )}
 
       <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 w-full z-20 text-center">
-        <div className="flex flex-col items-center select-none">
-          {/* 1. Official Fanous Emblem */}
-          <div className="flex justify-center items-center mb-3 sm:mb-4">
-            <div className="relative p-1.5 rounded-2xl bg-black/50 border border-emerald-500/30 backdrop-blur-md shadow-xl">
-              <img
-                src={cmsSettings?.heroLogo || '/fanous_logo.jpg'}
-                alt="FANOUS 2K26 Emblem"
-                className="object-contain rounded-xl select-none pointer-events-none drop-shadow-md"
-                style={{
-                  height: 'clamp(58px, 7.5vw, 86px)',
-                  width: 'auto'
-                }}
-              />
-              <div className="absolute inset-0 rounded-2xl blur-xl opacity-20 pointer-events-none" style={{ backgroundColor: 'var(--color-primary-accent, #18BA46)' }} />
-            </div>
-          </div>
-
-          {/* 2. Main Festival Brand Title: Clean Sora Font */}
-          <h1 className="font-sora font-extrabold text-[#F4F8F4] text-4xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight uppercase select-none my-1 sm:my-2 drop-shadow-sm">
+        <div className="flex flex-col items-center select-none pt-2 sm:pt-4">
+          {/* 1. Main Festival Brand Title: Clean Sora Font */}
+          <h1 className="font-sora font-extrabold text-[#F4F8F4] text-4xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight uppercase select-none my-1 drop-shadow-md leading-none sm:leading-tight">
             {cmsSettings?.heroTitle || 'FANOUS 2K26'}
           </h1>
 
-          {/* 3. Theme Subtitle: Meelad Fest */}
-          <p className="font-sora text-sm sm:text-base md:text-xl font-bold tracking-wider mb-1.5 sm:mb-2 select-none" style={{ color: 'var(--color-primary-accent, #18BA46)' }}>
-            “{(cmsSettings?.heroSubtitle || 'Meelad Fest').replace(/^["“']+|["”']+$/g, '')}”
-          </p>
+          {/* 2. Theme Subtitle: Meelad Fest (Semi-bold, 5% smaller than Fanous 2K26) */}
+          <h2
+            className="font-sora font-semibold text-[2rem] sm:text-[3.4rem] md:text-[4.2rem] lg:text-[5.6rem] tracking-tight select-none my-1 leading-none sm:leading-tight drop-shadow-sm"
+            style={{ color: 'var(--color-primary-accent, #18BA46)' }}
+          >
+            {(cmsSettings?.heroSubtitle || 'Meelad Fest').replace(/^["“']+|["”']+$/g, '')}
+          </h2>
 
-          {/* 4. Campus Name Badge */}
-          <p className="font-sora text-[10.5px] min-[380px]:text-xs sm:text-sm font-bold text-[#A2D5A4] tracking-[0.22em] sm:tracking-[0.32em] uppercase mt-1 mb-6 sm:mb-8 select-none">
+          {/* 3. Campus Name Badge */}
+          <p className="font-sora text-xs sm:text-sm md:text-base font-bold text-[#A2D5A4] tracking-[0.25em] sm:tracking-[0.35em] uppercase mt-2 sm:mt-3 mb-6 sm:mb-8 select-none">
             {cmsSettings?.heroLogoBadge || cmsSettings?.campusName || 'SWALAHUL HUDA ACADEMY'}
           </p>
 
