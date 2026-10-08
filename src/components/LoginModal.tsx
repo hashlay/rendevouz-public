@@ -110,19 +110,16 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
         </div>
 
         {/* Participant Portal Section Heading */}
-        <div className="flex items-start justify-between">
-          <div>
-            <span className="text-[#D4AF37] text-[10px] font-bold tracking-[0.2em] uppercase font-mono block">
-              PARTICIPANT PORTAL
-            </span>
-            <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight mt-0.5 mb-1 font-sans">
-              Sign in
-            </h2>
-            <p className="text-zinc-400 text-xs leading-relaxed font-sans">
-              Use the chest number on your badge and your {criteriaMode === 'class' ? 'class / grade' : 'date of birth'}.
-            </p>
-          </div>
-          <img src="/fanous_logo.png" alt="FANOUS 2K26" className="h-12 w-auto object-contain shrink-0 drop-shadow-md ml-3" />
+        <div>
+          <span className="text-[#D4AF37] text-[10px] font-bold tracking-[0.2em] uppercase font-mono block">
+            PARTICIPANT PORTAL
+          </span>
+          <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight mt-0.5 mb-1 font-sans">
+            Sign in
+          </h2>
+          <p className="text-zinc-400 text-xs leading-relaxed font-sans">
+            Use the chest number on your badge and your {criteriaMode === 'class' ? 'class / grade' : 'date of birth'}.
+          </p>
         </div>
 
         {/* Login Form */}
