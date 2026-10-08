@@ -517,10 +517,10 @@ function calculatePoints(r, comp, eventSettings) {
   }
 
   // Normal rank-based points if grade pointing system is disabled:
-  if (r.points !== undefined && r.points !== null && r.points > 0) return Number(r.points);
   if (r.rank === 1) return Number(eventSettings?.globalPointsRank1 ?? 20);
   if (r.rank === 2) return Number(eventSettings?.globalPointsRank2 ?? 14);
   if (r.rank === 3) return Number(eventSettings?.globalPointsRank3 ?? 7);
+  if (r.points !== undefined && r.points !== null && !r.rank) return Number(r.points);
   return 0;
 }
 

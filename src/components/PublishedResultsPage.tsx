@@ -406,7 +406,14 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
                                           else g = '';
                                         }
                                       }
-                                                                              const pts = res.points !== undefined && res.points !== null ? Number(res.points) : (() => {
+                                                                              const isGradeSystem = eventSettings?.gradeSystemEnabled !== false;
+                                        const pts = res.points !== undefined && res.points !== null ? Number(res.points) : (() => {
+                                          if (!isGradeSystem) {
+                                            if (res.rank === 1) return Number(eventSettings?.globalPointsRank1) || 20;
+                                            if (res.rank === 2) return Number(eventSettings?.globalPointsRank2) || 14;
+                                            if (res.rank === 3) return Number(eventSettings?.globalPointsRank3) || 7;
+                                            return 0;
+                                          }
                                           if (m <= 0) return 0;
                                           if (isGroup) {
                                             if (m >= 95) return 20;
