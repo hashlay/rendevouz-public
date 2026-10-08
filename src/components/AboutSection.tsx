@@ -50,17 +50,16 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenConceptModal, 
               </div>
 
               <h3 className="text-lg sm:text-xl font-bold text-white mb-1.5 pt-1">
-                {cmsSettings?.aboutTitle || 'Kulliyathu Imam Rabbani'}
+                {cmsSettings?.aboutTitle || 'Swalahul Huda Academy'}
               </h3>
               <p style={{ color: 'var(--color-primary-accent)' }} className="text-xs font-semibold uppercase tracking-wider mb-3 font-mono">
-                {cmsSettings?.aboutSubtitle || 'Off-Campus of Markaz Garden, Poonoor'}
+                {cmsSettings?.aboutSubtitle || 'Meelad Fest 2K26'}
               </p>
 
               <div className="text-zinc-300 text-xs sm:text-sm leading-relaxed mb-5 whitespace-pre-line">
                 {cmsSettings?.aboutDescription || (
                   <>
-                    <strong>Kulliyathu Imam Rabbani</strong> stands as a premier center of higher Islamic learning and academic excellence, functioning as a key off-campus institute under the revered banner of <strong>Markaz Garden, Poonoor</strong>.<br/><br/>
-                    The <strong>Imam Rabbani LIFE Festival (Rendezvous Silver Edition)</strong> is an annual flagship celebration of intellectual, creative, and moral excellence. It brings together over 1200 students across 40+ disciplines.
+                    <strong>Swalahul Huda Academy</strong> presents <strong>FANOUS 2K26 (Meelad Fest)</strong>, an annual celebration of intellectual, creative, and moral excellence.
                   </>
                 )}
               </div>
@@ -69,7 +68,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenConceptModal, 
               <div className="bg-zinc-900/60 border rounded-xl p-4 mb-5" style={{ borderColor: 'var(--color-primary-accent)' }}>
                 <div className="flex items-center gap-2 text-white font-bold text-xs mb-1.5">
 
-                  <span>Theme: "{cmsSettings?.themeTitle || 'Decoding Phytolore'}"</span>
+                  <span>Theme: "{cmsSettings?.themeTitle || 'Meelad Fest'}"</span>
                 </div>
                 <p className="text-xs text-zinc-300 leading-relaxed italic whitespace-pre-line">
                   "{cmsSettings?.themeDescription || 'In an interconnected world, \'Decoding Phytolore\' calls upon the youth to explore the deeper symbiosis between nature, wisdom, spiritual clarity, and moral fortitude.'}"
@@ -96,7 +95,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenConceptModal, 
               <div className="relative aspect-[4/3] sm:aspect-[16/11] overflow-hidden">
                 <img
                   src={cmsSettings?.aboutImage || "/main_stage.jpeg"}
-                  alt="Students at Imam Rabbani on Stage"
+                  alt="Swalahul Huda Academy Meelad Fest"
                   className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 filter brightness-95 contrast-105"
                   referrerPolicy="no-referrer"
                 />
@@ -115,13 +114,13 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenConceptModal, 
                 {/* Bottom Overlay Label */}
                 <div className="absolute bottom-3 left-3 right-3 text-left">
                   <span className="text-[10px] font-bold uppercase tracking-widest block font-mono" style={{ color: 'var(--color-primary-accent)' }}>
-                    {cmsSettings?.aboutImageTitle || 'Kulliyathu Imam Rabbani'}
+                    {cmsSettings?.aboutImageTitle || 'Swalahul Huda Academy'}
                   </span>
                   <h4 className="text-base font-extrabold text-white leading-tight">
                     {cmsSettings?.aboutImageSubtitle || 'Grand Assembly & Festival Inauguration'}
                   </h4>
                   <p className="text-[11px] text-zinc-300 mt-0.5">
-                    {cmsSettings?.aboutImageLocation || 'Main Stage Auditorium • Imam Rabbani Campus'}
+                    {cmsSettings?.aboutImageLocation || 'Swalahul Huda Academy • Rifayiya Juma Masjid Muchila'}
                   </p>
                 </div>
               </div>
@@ -130,7 +129,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenConceptModal, 
               <div className="p-3 bg-[#141414] border-t border-white/10 flex items-center justify-between text-[11px] text-zinc-400">
                 <div className="flex items-center gap-1.5">
                   <Award className="w-3.5 h-3.5" style={{ color: 'var(--color-primary-accent)' }} />
-                  <span>{cmsSettings?.aboutImageFooter || 'Imam Rabbani Life Festival'}</span>
+                  <span>{cmsSettings?.aboutImageFooter || 'Swalahul Huda Academy'}</span>
                 </div>
               </div>
             </div>

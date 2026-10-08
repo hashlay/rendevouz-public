@@ -703,11 +703,10 @@ export const renderPosterToCanvas = async (
 
   const rawTemplateConfig = eventSettings?.posterTemplateConfig || {};
   const defaultThemes = [
-    '/themes/theme_phytolore_green.jpg',
-    '/themes/theme_phytolore_dark_green.jpg',
-    '/themes/theme_white_brown.jpg',
-    '/themes/theme_yellow_scroll.jpg',
-    '/themes/theme_phytolore_green_theme5.jpg'
+    '/themes/theme_brown.jpg',
+    '/themes/theme_blue.jpg',
+    '/themes/theme_yellow.jpg',
+    '/themes/theme_purple.jpg'
   ];
   let inputThemes = rawTemplateConfig.customThemes;
   if (Array.isArray(inputThemes) && inputThemes.length > 0) {
@@ -756,7 +755,7 @@ export const renderPosterToCanvas = async (
   
   // Theme 0 default color fallback
   if (themeIdx === 0) {
-    if (userConf.compNameColor === '#18BA46') {
+    if (userConf.compNameColor === '#48205D') {
       userConf.compNameColor = defaultConf.compNameColor;
       userConf.resultNumColor = defaultConf.resultNumColor;
       userConf.unitColor = defaultConf.unitColor;
@@ -1248,9 +1247,9 @@ export const generatePosterShareCaption = (
 ): string => {
   const festivalTitle = (eventSettings?.festivalName || 'RENDEZVOUS 26').toUpperCase();
   const formattedNum = String(compIndex || 1).padStart(2, '0');
-  const slogan = eventSettings?.festivalTagline || eventSettings?.slogan || 'Decoding Phytolore';
-  const campus = eventSettings?.campusName || eventSettings?.sectorName || 'Imam Rabbani Life Festival';
-  const hashtags = eventSettings?.shareHashtags || '#Rendezvous26 #ImamRabbani #LifeFestival #DecodingPhytolore #Results #Congratulations';
+  const slogan = eventSettings?.festivalTagline || eventSettings?.slogan || 'Meelad Fest';
+  const campus = eventSettings?.campusName || eventSettings?.sectorName || 'Swalahul Huda Academy';
+  const hashtags = eventSettings?.shareHashtags || '#Fanous2K26 #SwalahulHudaAcademy #MeeladFest #Results #Muchila';
 
   const rank1List = (results || []).filter((r: any) => r.rank === 1);
   const rank2List = (results || []).filter((r: any) => r.rank === 2);

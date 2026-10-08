@@ -78,38 +78,40 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings, dragBlo
 
   // Sanitization helpers to guarantee clean Rendezvous 26 presentation
   const sanitizeLogo = (logo?: string) => {
-    if (!logo || logo.includes('tabassum') || logo.includes('zenith_gold') || logo.includes('mas')) return '/rendezvous_icon.png';
+    if (!logo || logo.includes('tabassum') || logo.includes('zenith_gold') || logo.includes('mas')) return '/fanous_logo.jpg';
     return logo;
   };
   const sanitizeTitle = (title?: string) => {
-    if (!title || title.toUpperCase().includes('TABASSUM')) return 'RENDEZVOUS';
+    if (!title || title.toUpperCase().includes('TABASSUM')) return 'FANOUS';
     return title;
   };
   const sanitizeSubtitle = (sub?: string) => {
-    if (!sub || sub.toUpperCase().includes('MEELAD') || sub.toUpperCase().includes('FEST')) return '26';
+    if (!sub || sub.toUpperCase().includes('MEELAD') || sub.toUpperCase().includes('FEST')) return '2K26';
     return sub;
   };
   const sanitizeBadge = (badge?: string) => {
-    if (!badge || badge.toUpperCase().includes('NOORUL')) return 'IMAM RABBANI LIFE FESTIVAL';
+    if (!badge || badge.toUpperCase().includes('NOORUL')) return 'SWALAHUL HUDA ACADEMY';
     return badge;
   };
   const sanitizeDesc = (desc?: string) => {
     if (!desc || desc.toUpperCase().includes('TABASSUM') || desc.toUpperCase().includes('NOORUL')) {
-      return 'Rendezvous 26 is a vibrant celebration of talent, creativity, knowledge, and togetherness, proudly organized by Imam Rabbani Life Festival, bringing students together through meaningful learning, healthy competition, and shared values.';
+      return 'FANOUS 2K26 is a vibrant celebration of talent, creativity, knowledge, and togetherness, proudly organized by Swalahul Huda Academy for Meelad Fest.';
     }
     return desc;
   };
   const sanitizeLocation = (loc?: string) => {
-    if (!loc || loc.toUpperCase().includes('JEPPU') || loc.toUpperCase().includes('MAS GARDEN')) return 'Imam Rabbani Campus';
+    if (!loc || loc.toUpperCase().includes('JEPPU') || loc.toUpperCase().includes('MAS GARDEN')) return 'Rifayiya Juma Masjid Muchila';
     return loc;
   };
   const sanitizeEmail = (email?: string) => {
-    if (!email || email.includes('zenith.theorganizer')) return 'zenith.theorganizer@gmail.com';
-    return email;
+    return 'zenith.theorganizer@gmail.com';
+  };
+  const sanitizePhone = (phone?: string) => {
+    return '+91 7483138340';
   };
   const sanitizeCopyright = (cr?: string) => {
-    if (!cr || cr.toUpperCase().includes('NOORUL') || cr.toUpperCase().includes('TABASSUM')) {
-      return '© 2026 Imam Rabbani Life Festival. All rights reserved. Developed by Zenith.';
+    if (!cr || cr.toUpperCase().includes('NOORUL') || cr.toUpperCase().includes('TABASSUM') || cr.toUpperCase().includes('RABBANI')) {
+      return '© 2026 FANOUS 2K26 – Meelad Fest. Swalahul Huda Academy. All rights reserved. Developed by Zenith.';
     }
     return cr;
   };
@@ -157,7 +159,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings, dragBlo
               className="flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer group"
             >
               <Phone className="w-3 h-3 transition-transform group-hover:scale-110 opacity-70" style={{ color: 'var(--color-primary-accent)' }} />
-              +91 74831 38340
+              +91 7483138340
             </a>
             <a href="mailto:zenith.theorganizer@gmail.com" className="flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer group">
               <Mail className="w-3 h-3 transition-transform group-hover:scale-110 opacity-70" style={{ color: 'var(--color-primary-accent)' }} />
@@ -229,7 +231,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings, dragBlo
                 </div>
                 <div className="flex items-center gap-2.5">
                   <Phone className="w-4 h-4 shrink-0" style={{ color: 'var(--color-primary-accent)' }} />
-                  <span>{cmsSettings?.footerPhone || INSTITUTION.phone}</span>
+                  <span>{sanitizePhone(cmsSettings?.footerPhone || INSTITUTION.phone)}</span>
                 </div>
               </div>
 

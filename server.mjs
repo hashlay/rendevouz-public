@@ -132,7 +132,7 @@ async function getMongoDb() {
       await cachedClient.connect();
     }
     const dbPath = mongoUri.includes('/') ? mongoUri.split('/').pop()?.split('?')[0] : null;
-    const dbName = (dbPath && dbPath.length > 0) ? dbPath : 'sahityotsav';
+    const dbName = (dbPath && dbPath.length > 0) ? dbPath : 'rendezvous_2026';
     cachedDb = cachedClient.db(dbName);
     return cachedDb;
   } catch (err) {
@@ -415,7 +415,7 @@ app.put('/api/settings', async (req, res) => {
     await Promise.all(tasks);
     invalidateDbCache();
 
-    console.log('✅ [Settings] Successfully updated settings in MongoDB sahityotsav.');
+    console.log('✅ [Settings] Successfully updated settings in MongoDB rendezvous_2026.');
     res.json({ message: 'Settings updated successfully', success: true });
   } catch (err) {
     console.error('❌ Failed to save settings in server.mjs:', err);
