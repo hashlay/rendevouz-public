@@ -63,7 +63,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
   };
 
   return (
-    <section id="hero" className="relative min-h-[90vh] sm:min-h-screen flex items-center justify-center overflow-hidden bg-[#012002] pt-24 pb-16">
+    <section id="hero" className="relative min-h-0 sm:min-h-screen flex items-center justify-center overflow-hidden bg-[#012002] pt-20 pb-4 sm:py-24">
       {/* Background Media */}
       <div className="absolute inset-0 z-0 overflow-hidden select-none pointer-events-none">
         {/* Mobile View */}
@@ -149,7 +149,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
           </div>
 
           {/* Dual Action Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-6 sm:mb-10 max-w-md mx-auto sm:max-w-none">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-2 sm:mb-8 max-w-md mx-auto sm:max-w-none">
             <button
               onClick={() => onNavigate('results')}
               style={{ backgroundColor: 'var(--color-primary-accent, #18BA46)' }}
