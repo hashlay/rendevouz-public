@@ -57,7 +57,7 @@ export const Logo: React.FC<LogoProps> = ({
           {/* Subtle purple ambient glow */}
           <div
             className="absolute inset-0 blur-lg rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-            style={{ backgroundColor: 'var(--color-primary-accent, #48205D)', opacity: 0.3 }}
+            style={{ backgroundColor: 'var(--color-primary-accent, #18BA46)', opacity: 0.3 }}
           />
         </div>
       )}

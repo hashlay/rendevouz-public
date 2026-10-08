@@ -63,7 +63,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
   };
 
   return (
-    <section id="hero" className="relative min-h-[90vh] sm:min-h-screen flex items-center justify-center overflow-hidden bg-[#F7F6F8] pt-24 pb-16">
+    <section id="hero" className="relative min-h-[90vh] sm:min-h-screen flex items-center justify-center overflow-hidden bg-[#012002] pt-24 pb-16">
       {/* Background Media */}
       <div className="absolute inset-0 z-0 overflow-hidden select-none pointer-events-none">
         {/* Mobile View */}
@@ -73,7 +73,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
               key={`mob-${idx}-${src}`}
               src={src}
               alt="FANOUS 2K26 Background"
-              className={`absolute inset-0 w-full h-full object-cover filter brightness-[0.98] contrast-[1.05] transition-opacity duration-1000 ${
+              className={`absolute inset-0 w-full h-full object-cover filter brightness-[0.65] contrast-[1.05] transition-opacity duration-1000 ${
                 idx === mobileIndex ? 'opacity-100' : 'opacity-0'
               }`}
             />
@@ -87,7 +87,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
               key={`desk-${idx}-${src}`}
               src={src}
               alt="FANOUS 2K26 Background"
-              className={`absolute inset-0 w-full h-full object-cover filter brightness-[0.98] contrast-[1.05] transition-opacity duration-1000 ${
+              className={`absolute inset-0 w-full h-full object-cover filter brightness-[0.65] contrast-[1.05] transition-opacity duration-1000 ${
                 idx === desktopIndex ? 'opacity-100' : 'opacity-0'
               }`}
             />
@@ -95,15 +95,15 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
         </div>
 
         {/* Subtle atmospheric blending */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#F7F6F8]/80 via-transparent to-[#F7F6F8]/40 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#012002]/90 via-[#012002]/30 to-transparent pointer-events-none" />
       </div>
 
       {/* Admin Quick Action Button */}
       {authUser && (authUser.role === 'admin' || authUser.role === 'superadmin') && (
-        <div className="absolute top-24 right-4 sm:right-8 z-30 bg-white/80 border border-purple-200 backdrop-blur-md rounded-full px-3 py-1.5 shadow-lg">
+        <div className="absolute top-24 right-4 sm:right-8 z-30 bg-black/50 border border-emerald-500/30 backdrop-blur-md rounded-full px-3 py-1.5 shadow-lg">
           <button
             onClick={() => setActiveModalView('admin-dashboard')}
-            className="text-[10px] text-purple-900 font-mono hover:underline flex items-center gap-1.5"
+            className="text-[10px] text-emerald-400 font-mono hover:underline flex items-center gap-1.5"
           >
             <Settings className="w-3.5 h-3.5" /> Manage Hero Media
           </button>
@@ -114,7 +114,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
         <div className="flex flex-col items-center select-none">
           {/* 1. Official Fanous Emblem */}
           <div className="flex justify-center items-center mb-3 sm:mb-4">
-            <div className="relative p-1.5 rounded-2xl bg-white/70 border border-purple-300/40 backdrop-blur-md shadow-xl">
+            <div className="relative p-1.5 rounded-2xl bg-black/50 border border-emerald-500/30 backdrop-blur-md shadow-xl">
               <img
                 src={cmsSettings?.heroLogo || '/fanous_logo.jpg'}
                 alt="FANOUS 2K26 Emblem"
@@ -124,38 +124,38 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
                   width: 'auto'
                 }}
               />
-              <div className="absolute inset-0 rounded-2xl blur-xl opacity-20 pointer-events-none" style={{ backgroundColor: 'var(--color-primary-accent, #48205D)' }} />
+              <div className="absolute inset-0 rounded-2xl blur-xl opacity-20 pointer-events-none" style={{ backgroundColor: 'var(--color-primary-accent, #18BA46)' }} />
             </div>
           </div>
 
           {/* 2. Main Festival Brand Title: Clean Sora Font */}
-          <h1 className="font-sora font-extrabold text-[#351747] text-4xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight uppercase select-none my-1 sm:my-2 drop-shadow-sm">
+          <h1 className="font-sora font-extrabold text-[#F4F8F4] text-4xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight uppercase select-none my-1 sm:my-2 drop-shadow-sm">
             {cmsSettings?.heroTitle || 'FANOUS 2K26'}
           </h1>
 
           {/* 3. Theme Subtitle: Meelad Fest */}
-          <p className="font-sora text-sm sm:text-base md:text-xl font-bold tracking-wider mb-1.5 sm:mb-2 select-none" style={{ color: 'var(--color-primary-accent, #48205D)' }}>
+          <p className="font-sora text-sm sm:text-base md:text-xl font-bold tracking-wider mb-1.5 sm:mb-2 select-none" style={{ color: 'var(--color-primary-accent, #18BA46)' }}>
             “{(cmsSettings?.heroSubtitle || 'Meelad Fest').replace(/^["“']+|["”']+$/g, '')}”
           </p>
 
           {/* 4. Campus Name Badge */}
-          <p className="font-sora text-[10.5px] min-[380px]:text-xs sm:text-sm font-bold text-[#684477] tracking-[0.22em] sm:tracking-[0.32em] uppercase mt-1 mb-6 sm:mb-8 select-none">
+          <p className="font-sora text-[10.5px] min-[380px]:text-xs sm:text-sm font-bold text-[#A2D5A4] tracking-[0.22em] sm:tracking-[0.32em] uppercase mt-1 mb-6 sm:mb-8 select-none">
             {cmsSettings?.heroLogoBadge || cmsSettings?.campusName || 'SWALAHUL HUDA ACADEMY'}
           </p>
 
           {/* 5. Date & Venue Details Bar */}
           <div className="flex justify-center mb-8 sm:mb-10">
             <div
-              className="inline-flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-6 bg-white/90 backdrop-blur-xl border px-6 sm:px-8 py-3 rounded-full shadow-lg"
-              style={{ borderColor: 'var(--color-border-subtle, #DED2E5)' }}
+              className="inline-flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-6 bg-black/40 backdrop-blur-xl border px-6 sm:px-8 py-3 rounded-full shadow-lg"
+              style={{ borderColor: 'var(--color-border-subtle, #176523)' }}
             >
-              <div className="flex items-center gap-2 text-[#351747] font-mono text-xs sm:text-sm font-medium">
-                <Calendar className="w-4 h-4 shrink-0" style={{ color: 'var(--color-primary-accent, #48205D)' }} />
+              <div className="flex items-center gap-2 text-[#F4F8F4] font-mono text-xs sm:text-sm font-medium">
+                <Calendar className="w-4 h-4 shrink-0" style={{ color: 'var(--color-primary-accent, #18BA46)' }} />
                 <span>{cmsSettings?.heroDate || 'October 9, 2026'}</span>
               </div>
-              <div className="hidden sm:block w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: 'var(--color-primary-accent, #48205D)' }} />
-              <div className="flex items-center gap-2 text-[#351747] font-mono text-xs sm:text-sm font-medium">
-                <MapPin className="w-4 h-4 shrink-0" style={{ color: 'var(--color-primary-accent, #48205D)' }} />
+              <div className="hidden sm:block w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: 'var(--color-primary-accent, #18BA46)' }} />
+              <div className="flex items-center gap-2 text-[#F4F8F4] font-mono text-xs sm:text-sm font-medium">
+                <MapPin className="w-4 h-4 shrink-0" style={{ color: 'var(--color-primary-accent, #18BA46)' }} />
                 <span>{cmsSettings?.heroLocation || 'Rifayiya Juma Masjid Muchila'}</span>
               </div>
             </div>
@@ -165,7 +165,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-6 sm:mb-10 max-w-md mx-auto sm:max-w-none">
             <button
               onClick={() => onNavigate('results')}
-              style={{ backgroundColor: 'var(--color-primary-accent, #48205D)' }}
+              style={{ backgroundColor: 'var(--color-primary-accent, #18BA46)' }}
               className="w-full sm:w-auto px-7 py-3.5 hover:brightness-110 text-white text-xs sm:text-sm font-extrabold uppercase tracking-wider rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2 transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
             >
               <Trophy className="w-4 h-4 text-white" />
@@ -176,19 +176,19 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
             {isLiveStreamEnabled() ? (
               <button
                 onClick={() => onNavigate('live')}
-                className="w-full sm:w-auto px-7 py-3.5 bg-white/90 hover:bg-white border text-[#351747] text-xs sm:text-sm font-extrabold uppercase tracking-wider rounded-xl backdrop-blur-lg transition-all duration-300 flex items-center justify-center gap-2 transform hover:-translate-y-0.5 cursor-pointer shadow-md"
-                style={{ borderColor: 'var(--color-border-subtle, #DED2E5)' }}
+                className="w-full sm:w-auto px-7 py-3.5 bg-black/40 hover:bg-black/70 border text-[#F4F8F4] text-xs sm:text-sm font-extrabold uppercase tracking-wider rounded-xl backdrop-blur-lg transition-all duration-300 flex items-center justify-center gap-2 transform hover:-translate-y-0.5 cursor-pointer shadow-md hover:border-emerald-400/60"
+                style={{ borderColor: 'var(--color-border-subtle, #176523)' }}
               >
-                <Radio className="w-4 h-4 animate-pulse" style={{ color: 'var(--color-primary-accent, #48205D)' }} />
+                <Radio className="w-4 h-4 animate-pulse" style={{ color: 'var(--color-primary-accent, #18BA46)' }} />
                 <span>Watch Live Stream</span>
               </button>
             ) : (
               <button
                 onClick={() => onNavigate('team-points')}
-                className="w-full sm:w-auto px-7 py-3.5 bg-white/90 hover:bg-white border text-[#351747] text-xs sm:text-sm font-extrabold uppercase tracking-wider rounded-xl backdrop-blur-lg transition-all duration-300 flex items-center justify-center gap-2 transform hover:-translate-y-0.5 cursor-pointer shadow-md"
-                style={{ borderColor: 'var(--color-border-subtle, #DED2E5)' }}
+                className="w-full sm:w-auto px-7 py-3.5 bg-black/40 hover:bg-black/70 border text-[#F4F8F4] text-xs sm:text-sm font-extrabold uppercase tracking-wider rounded-xl backdrop-blur-lg transition-all duration-300 flex items-center justify-center gap-2 transform hover:-translate-y-0.5 cursor-pointer shadow-md hover:border-emerald-400/60"
+                style={{ borderColor: 'var(--color-border-subtle, #176523)' }}
               >
-                <Trophy className="w-4 h-4" style={{ color: 'var(--color-primary-accent, #48205D)' }} />
+                <Trophy className="w-4 h-4" style={{ color: 'var(--color-primary-accent, #18BA46)' }} />
                 <span>View Team Standings</span>
               </button>
             )}

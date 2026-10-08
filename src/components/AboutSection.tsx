@@ -11,7 +11,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenConceptModal, 
   return (
     <section id="about" className="py-10 sm:py-14 bg-[#121212] relative overflow-hidden border-t border-b border-white/5 font-sans">
       {/* Background ambient accents */}
-      <div className="absolute top-0 right-0 w-80 h-80 bg-[#FF2B2B]/5 blur-[120px] pointer-events-none" />
+      <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/10 blur-[120px] pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-80 h-80 bg-zinc-400/5 blur-[120px] pointer-events-none" />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
