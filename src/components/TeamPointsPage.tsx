@@ -36,7 +36,7 @@ export const TeamPointsPage: React.FC = () => {
           <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight font-sans">
             Team Points <span style={{ color: 'var(--color-primary-accent)' }}>Standings</span>
           </h1>
-          {standingsMeta?.resultsCount !== undefined && standingsMeta.resultsCount > 0 && (
+          {Boolean(standingsMeta?.isSnapshot && standingsMeta?.resultsCount && standingsMeta.resultsCount > 0) && (
             <div className="mt-2.5 flex items-center justify-center sm:justify-start gap-2">
               <span 
                 className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold tracking-wider uppercase border"
@@ -56,11 +56,11 @@ export const TeamPointsPage: React.FC = () => {
         {sortedHouses.length === 0 ? (
           <div className="flex flex-col items-center justify-center text-center h-[40vh] bg-[#161619] border border-[#2A2A32] rounded-2xl p-6">
             <div className="w-16 h-16 bg-[#1C1C20] rounded-full flex items-center justify-center mb-4">
-              <span className="text-2xl text-zinc-600 font-mono">0</span>
+              <span className="text-2xl text-zinc-600 font-mono">🏆</span>
             </div>
-            <h2 className="text-lg font-bold text-white mb-2 font-mono uppercase tracking-widest">No Houses Registered</h2>
+            <h2 className="text-lg font-bold text-white mb-2 font-mono uppercase tracking-widest">Standings Not Yet Published</h2>
             <p className="text-zinc-500 text-sm max-w-sm">
-              Team standings will appear here once houses are added and results are published.
+              Official team points have not been published yet. They will appear here once announced by the festival committee.
             </p>
           </div>
         ) : (

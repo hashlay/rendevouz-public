@@ -280,35 +280,8 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             bronzeCount: s.thirdPlaceCount || 0
           }));
           setHouseScores(scores);
-        } else if (units.length > 0) {
-          const scoreMap: Record<string, HouseScore> = {};
-          units.forEach((u: any, i: number) => {
-            scoreMap[u.name] = { 
-              id: u.id, 
-              name: u.name, 
-              code: u.code || u.name.substring(0, 3).toUpperCase(), 
-              color: colors[i % colors.length], 
-              accentColor: accents[i % accents.length], 
-              totalPoints: 0, 
-              goldCount: 0, 
-              silverCount: 0, 
-              bronzeCount: 0 
-            };
-          });
-
-          rawResults.forEach(r => {
-            if (r.deletedAt || !r.publishedStatus) return;
-            const h = scoreMap[r.department];
-            if (h) {
-              const rankPts = r.rank === 1 ? 20 : r.rank === 2 ? 14 : r.rank === 3 ? 7 : 0;
-              h.totalPoints += rankPts;
-              if (r.rank === 1) h.goldCount++;
-              if (r.rank === 2) h.silverCount++;
-              if (r.rank === 3) h.bronzeCount++;
-            }
-          });
-
-          setHouseScores(Object.values(scoreMap).sort((a, b) => b.totalPoints - a.totalPoints));
+        } else {
+          setHouseScores([]);
         }
 
         // Revalidate stored participant on mount to ensure fresh live data

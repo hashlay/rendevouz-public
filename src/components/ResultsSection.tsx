@@ -44,7 +44,7 @@ export const ResultsSection: React.FC<ResultsSectionProps> = ({ onNavigate }) =>
               <span style={{ color: 'var(--color-primary-accent)' }} className="font-mono text-[10px] font-bold tracking-[0.25em] uppercase">
                 STANDINGS & RESULTS
               </span>
-              {standingsMeta?.resultsCount !== undefined && standingsMeta.resultsCount > 0 && (
+              {Boolean(standingsMeta?.isSnapshot && standingsMeta?.resultsCount && standingsMeta.resultsCount > 0) && (
                 <span 
                   className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold tracking-wider uppercase border"
                   style={{ 
@@ -112,7 +112,7 @@ export const ResultsSection: React.FC<ResultsSectionProps> = ({ onNavigate }) =>
                 })
               ) : (
                 <div className="flex items-center justify-center p-8 border border-white/5 bg-white/5 rounded-xl">
-                  <span className="text-zinc-500 font-mono text-sm uppercase tracking-widest">No scores available</span>
+                  <span className="text-zinc-500 font-mono text-sm uppercase tracking-widest">Team standings not yet published</span>
                 </div>
               )}
             </div>

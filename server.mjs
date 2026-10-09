@@ -703,28 +703,9 @@ app.get('/api/public/results', async (req, res) => {
   res.json(enrichedResults);
 });
 
-// Public Unit Standings / Team Points
-app.get('/api/public/standings', async (req, res) => {
-  const dbState = await getDbState();
+// Helper to calculate live standings for snapshot creation
+function computeLiveStandings(dbState) {
   const { units = [], participants = [], results = [], teams = [], competitions = [], eventSettings = {} } = dbState;
-
-  // Check if admin has published a frozen snapshot of team standings
-  let publishedSnapshot = dbState.settings?.publishedTeamStandings;
-  if (!publishedSnapshot && dbState.db) {
-    try {
-      const snapDoc = await dbState.db.collection('settings').findOne({ _id: 'publishedTeamStandings' });
-      if (snapDoc && Array.isArray(snapDoc.standings)) {
-        publishedSnapshot = snapDoc;
-      }
-    } catch (_) {}
-  }
-
-  if (publishedSnapshot && Array.isArray(publishedSnapshot.standings) && publishedSnapshot.standings.length > 0) {
-    res.setHeader('x-standings-results-count', String(publishedSnapshot.resultsCount || 0));
-    res.setHeader('x-standings-published-at', String(publishedSnapshot.publishedAt || ''));
-    return res.json(publishedSnapshot.standings);
-  }
-
   const validUnits = units.filter(u => u.active !== false);
 
   const publishedSheetCompIds = new Set(
@@ -818,7 +799,7 @@ app.get('/api/public/standings', async (req, res) => {
   });
 
   let currentRank = 1;
-  const finalStandings = standings.map((standing, index) => {
+  return standings.map((standing, index) => {
     const prev = standings[index - 1];
     if (index > 0 && (standing.overallPoints < prev.overallPoints || (standing.overallPoints === prev.overallPoints && standing.overallMarks < prev.overallMarks))) {
       currentRank++;
@@ -828,11 +809,84 @@ app.get('/api/public/standings', async (req, res) => {
       rank: currentRank
     };
   });
+}
 
-  res.json(finalStandings);
+// Public Unit Standings / Team Points
+app.get('/api/public/standings', async (req, res) => {
+  const dbState = await getDbState();
+
+  // Check if admin has published a frozen snapshot of team standings
+  let publishedSnapshot = dbState.settings?.publishedTeamStandings;
+  if (!publishedSnapshot && dbState.db) {
+    try {
+      const snapDoc = await dbState.db.collection('settings').findOne({ _id: 'publishedTeamStandings' });
+      if (snapDoc && Array.isArray(snapDoc.standings)) {
+        publishedSnapshot = snapDoc;
+      }
+    } catch (_) {}
+  }
+
+  // Strictly return published snapshot only. If not published yet, return empty list!
+  if (publishedSnapshot && Array.isArray(publishedSnapshot.standings) && publishedSnapshot.standings.length > 0) {
+    res.setHeader('x-standings-results-count', String(publishedSnapshot.resultsCount || 0));
+    res.setHeader('x-standings-published-at', String(publishedSnapshot.publishedAt || ''));
+    return res.json(publishedSnapshot.standings);
+  }
+
+  // Not yet published to public: Keep team points hidden until admin explicitly publishes
+  res.json([]);
 });
 
-// Standings metadata endpoint
+// Publish Standings snapshot (called from Admin panel)
+app.post('/api/standings/publish', async (req, res) => {
+  const dbState = await getDbState(true);
+  const liveStandings = computeLiveStandings(dbState);
+
+  const publishedSheetCompIds = new Set(
+    (dbState.judgmentSheets || [])
+      .filter(s => !s.deletedAt && (s.publishedToResults === true || s.status === 'published' || s.isPublished === true))
+      .map(s => s.competitionId)
+      .filter(Boolean)
+  );
+  const publishedResults = (dbState.results || []).filter(r => !r.deletedAt && (r.publishedStatus === true || r.isPublished === true || publishedSheetCompIds.has(r.competitionId)));
+  const publishedCompIds = new Set(publishedResults.map(r => r.competitionId).filter(Boolean));
+  const resultsCount = publishedCompIds.size;
+
+  const snapshot = {
+    publishedAt: new Date().toISOString(),
+    resultsCount,
+    standings: liveStandings
+  };
+
+  if (!dbState.settings) dbState.settings = {};
+  dbState.settings.publishedTeamStandings = snapshot;
+  if (dbState.eventSettings) dbState.eventSettings.publishedTeamStandings = snapshot;
+
+  const mongoDb = await getMongoDb();
+  if (mongoDb) {
+    try {
+      await mongoDb.collection('settings').updateOne(
+        { _id: 'publishedTeamStandings' },
+        { $set: snapshot },
+        { upsert: true }
+      );
+      await mongoDb.collection('settings').updateOne(
+        { _id: 'eventSettings' },
+        { $set: { publishedTeamStandings: snapshot, updatedAt: new Date().toISOString() } },
+        { upsert: true }
+      );
+    } catch (err) {
+      console.error('Failed to persist snapshot in mongo:', err);
+    }
+  }
+
+  invalidateDbCache();
+
+  res.json({
+    success: true,
+    publishedTeamStandings: snapshot
+  });
+});
 
 // Unpublish Standings snapshot
 app.post('/api/standings/unpublish', async (req, res) => {
@@ -840,10 +894,14 @@ app.post('/api/standings/unpublish', async (req, res) => {
   if (dbState.settings) {
     delete dbState.settings.publishedTeamStandings;
   }
-  if (dbState.db) {
+  if (dbState.eventSettings) {
+    delete dbState.eventSettings.publishedTeamStandings;
+  }
+  const mongoDb = await getMongoDb();
+  if (mongoDb) {
     try {
-      await dbState.db.collection('settings').deleteOne({ _id: 'publishedTeamStandings' });
-      await dbState.db.collection('settings').updateOne(
+      await mongoDb.collection('settings').deleteOne({ _id: 'publishedTeamStandings' });
+      await mongoDb.collection('settings').updateOne(
         { $or: [{ id: 'app_settings' }, { _id: 'cmsSettings' }, { _id: 'eventSettings' }] },
         { $unset: { publishedTeamStandings: "" }, $set: { updatedAt: new Date().toISOString() } }
       );
@@ -851,7 +909,8 @@ app.post('/api/standings/unpublish', async (req, res) => {
       console.error('Failed to unpublish standings in mongo:', e);
     }
   }
-  res.json({ success: true, message: 'Team standings snapshot removed. Public site will now reflect live published results.' });
+  invalidateDbCache();
+  res.json({ success: true, message: 'Team standings snapshot removed. Public site will now hide team standings until published.' });
 });
 
 app.get('/api/public/standings/meta', async (req, res) => {
@@ -874,7 +933,7 @@ app.get('/api/public/standings/meta', async (req, res) => {
   const publishedResults = (dbState.results || []).filter(r => !r.deletedAt && (r.publishedStatus === true || r.isPublished === true || publishedSheetCompIds.has(r.competitionId)));
   const publishedCompIds = new Set(publishedResults.map(r => r.competitionId).filter(Boolean));
   res.json({
-    resultsCount: publishedSnapshot?.resultsCount ?? publishedCompIds.size,
+    resultsCount: publishedSnapshot ? (publishedSnapshot.resultsCount || 0) : 0,
     publishedAt: publishedSnapshot?.publishedAt || null,
     isSnapshot: !!publishedSnapshot,
     liveResultsCount: publishedCompIds.size
