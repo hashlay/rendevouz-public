@@ -119,8 +119,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
 
           {/* 2. Theme Subtitle: Meelad Fest (Semi-bold, 5% smaller than Fanous 2K26) */}
           <h2
-            className="font-sora font-semibold text-[2rem] sm:text-[3.4rem] md:text-[4.2rem] lg:text-[5.6rem] tracking-tight select-none my-1 leading-none sm:leading-tight drop-shadow-sm"
-            style={{ color: 'var(--color-primary-accent, #18BA46)' }}
+            className="font-sora font-semibold text-[2rem] sm:text-[3.4rem] md:text-[4.2rem] lg:text-[5.6rem] tracking-tight select-none my-1 leading-none sm:leading-tight drop-shadow-md"
+            style={{
+              color: cmsSettings?.heroSubtitleColor || '#F5C451',
+              textShadow: '0 2px 14px rgba(0, 0, 0, 0.95), 0 0 2px rgba(0, 0, 0, 0.9)',
+              WebkitTextStroke: '0.4px rgba(0, 0, 0, 0.6)'
+            }}
           >
             {(cmsSettings?.heroSubtitle || 'Meelad Fest').replace(/^["“']+|["”']+$/g, '')}
           </h2>
