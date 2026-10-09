@@ -247,6 +247,7 @@ function PublicWebsiteContent({ onSwitchToApp }: { onSwitchToApp: (mode: 'worksp
                       return <ResultsSection key="results" onNavigate={handleNavigate} />;
                     case 'smile':
                     case 'photohub':
+                      if (cmsData?.cmsSettings?.showPhotoHub === false || cmsData?.cmsSettings?.showSmile === false) return null;
                       return <SmilePhotoPortal key="smile" cmsSettings={cmsData?.cmsSettings} />;
                     case 'gallery':
                       return <GallerySection key="gallery" onNavigate={handleNavigate} />;
@@ -264,7 +265,6 @@ function PublicWebsiteContent({ onSwitchToApp }: { onSwitchToApp: (mode: 'worksp
                 <HeroSection onNavigate={handleNavigate} cmsSettings={cmsData?.cmsSettings} heroMedia={cmsData?.heroMedia} dragBlocks={cmsData?.dragBlocks} />
                 <AboutSection onOpenConceptModal={() => setIsConceptModalOpen(true)} cmsSettings={cmsData?.cmsSettings} />
                 <ResultsSection onNavigate={handleNavigate} />
-                <SmilePhotoPortal cmsSettings={cmsData?.cmsSettings} />
               </>
             )}
           </>

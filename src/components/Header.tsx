@@ -29,7 +29,6 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, onNavigate, cmsSe
       { id: 'about', label: 'About' },
       { id: 'results', label: 'Results' },
       { id: 'team-points', label: 'Team Points' },
-      { id: 'smile', label: 'Photo Hub' },
     ];
 
     const blocks = dragBlocks || cmsSettings?.dragBlocks || cmsSettings?.layoutSections;
@@ -51,7 +50,9 @@ export const Header: React.FC<HeaderProps> = ({ activeSection, onNavigate, cmsSe
       } else if (type === 'results' || type === 'standings') {
         links.push({ id: 'team-points', label: 'Team Points' });
       } else if (type === 'smile' || type === 'photohub') {
-        links.push({ id: 'smile', label: 'Photo Hub' });
+        if (cmsSettings?.showPhotoHub !== false && cmsSettings?.showSmile !== false) {
+          links.push({ id: 'smile', label: 'Photo Hub' });
+        }
       } else if (type === 'gallery') {
         links.push({ id: 'gallery', label: 'Gallery' });
       } else if (type === 'live_stream' || type === 'live_stages') {
