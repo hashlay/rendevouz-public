@@ -89,7 +89,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenConceptModal, 
               {/* Photo Frame */}
               <div className="relative aspect-[4/3] sm:aspect-[16/11] overflow-hidden">
                 <img
-                  src={cmsSettings?.aboutImage || "/main_stage.jpeg"}
+                  src={cmsSettings?.aboutImage || "/main_stage.jpeg?v=2"}
                   alt="Swalahul Huda Academy Meelad Fest"
                   className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 filter brightness-95 contrast-105"
                   referrerPolicy="no-referrer"
