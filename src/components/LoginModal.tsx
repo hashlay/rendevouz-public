@@ -21,9 +21,16 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   const criteriaMode = eventSettings?.participantLoginCriteria || 'class';
   const rawClasses: string[] = (Array.isArray(eventSettings?.availableClasses) && eventSettings.availableClasses.length > 0)
     ? eventSettings.availableClasses
-    : ['+1', '+2', 'BS1', 'BS2', 'BS3'];
+    : ['+1', '+2'];
   const availableClasses: string[] = Array.from(new Set(rawClasses.map(c => c.replace(/^Class\s*/i, '').trim()))).filter(Boolean);
-  if (availableClasses.length === 0) availableClasses.push('+1', '+2', 'BS1', 'BS2', 'BS3');
+  if (availableClasses.length === 0) availableClasses.push('+1', '+2');
+
+  const getClassLabel = (cls: string) => {
+    const clean = cls.replace(/^Class\s*/i, '').trim();
+    if (clean === '+1' || clean.toLowerCase() === 'junior') return '+1 (Junior)';
+    if (clean === '+2' || clean.toLowerCase() === 'senior') return '+2 (Senior)';
+    return cls;
+  };
 
   React.useEffect(() => {
     if (isOpen) {
@@ -130,7 +137,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
             </label>
             <input
               type="text"
-              placeholder="e.g. 2023JMF268"
+              placeholder="e.g. 201"
               value={chestNumber}
               disabled={isSigningIn}
               onChange={(e) => setChestNumber(e.target.value)}
@@ -152,7 +159,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                 <option value="">Select Class</option>
                 {availableClasses.map((cls, idx) => (
                   <option key={idx} value={cls}>
-                    {cls}
+                    {getClassLabel(cls)}
                   </option>
                 ))}
               </select>
