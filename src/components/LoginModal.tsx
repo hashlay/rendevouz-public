@@ -18,7 +18,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   const [isSigningIn, setIsSigningIn] = useState(false);
   const dateInputRef = React.useRef<HTMLInputElement>(null);
 
-  const criteriaMode = eventSettings?.participantLoginCriteria || 'class';
+  // Participant verification criteria mode is Class / Grade (+1 Junior, +2 Senior)
+  const criteriaMode = 'class';
   const rawClasses: string[] = (Array.isArray(eventSettings?.availableClasses) && eventSettings.availableClasses.length > 0)
     ? eventSettings.availableClasses
     : ['+1', '+2'];

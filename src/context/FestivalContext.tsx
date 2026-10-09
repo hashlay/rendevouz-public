@@ -240,6 +240,12 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             if (!resSettings.posterTemplateConfig && prev?.posterTemplateConfig) {
               merged.posterTemplateConfig = prev.posterTemplateConfig;
             }
+            if (!merged.participantLoginCriteria || merged.participantLoginCriteria === 'dob') {
+              merged.participantLoginCriteria = 'class';
+            }
+            if (!merged.availableClasses || merged.availableClasses.length === 0) {
+              merged.availableClasses = ['+1', '+2'];
+            }
             return merged;
           });
         }

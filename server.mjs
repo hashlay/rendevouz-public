@@ -358,6 +358,12 @@ app.get(['/api/settings', '/api/public/settings'], async (req, res) => {
     certificateTemplateConfig: dbState.certificateTemplateConfig || raw.certificateTemplateConfig,
     posterOverrides: raw.posterOverrides || dbState.posterOverrides || {}
   };
+  if (!settings.participantLoginCriteria || settings.participantLoginCriteria === 'dob') {
+    settings.participantLoginCriteria = 'class';
+  }
+  if (!settings.availableClasses || settings.availableClasses.length === 0) {
+    settings.availableClasses = ['+1', '+2'];
+  }
   res.json(settings);
 });
 
