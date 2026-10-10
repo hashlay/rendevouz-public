@@ -827,18 +827,19 @@ export const renderPosterToCanvas = async (
   let compOverride = null;
   if (compId && overrides[compId]) {
     compOverride = overrides[compId];
-  } else if (compName && overrides[compName]) {
-    compOverride = overrides[compName];
-  } else if (compName && overrides[compName.trim()]) {
-    compOverride = overrides[compName.trim()];
-  } else if (compName) {
-    const target = compName.trim().toLowerCase();
-    for (const [k, v] of Object.entries(overrides)) {
-      if (k.trim().toLowerCase() === target) {
-        compOverride = v;
-        break;
+  } else if (categoryName && compName && overrides[`${categoryName}_${compName}`]) {
+    compOverride = overrides[`${categoryName}_${compName}`];
+  }
+
+  // Cross-theme protection: If override was saved for a DIFFERENT theme, do NOT apply its colors/coordinates!
+  if (compOverride && compOverride._savedThemeIndex !== undefined && compOverride._savedThemeIndex !== themeIdx) {
+    const textOnly: any = {};
+    Object.keys(compOverride).forEach(k => {
+      if (k.includes('Override') || k.includes('Tie') || k.includes('customText')) {
+        textOnly[k] = compOverride[k];
       }
-    }
+    });
+    compOverride = Object.keys(textOnly).length > 0 ? textOnly : null;
   }
   
   const isOverrideValid = !!compOverride;
