@@ -173,7 +173,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings, dragBlo
       <footer className="bg-[#080808] text-white pt-20 pb-12 relative overflow-hidden border-t border-white/10">
         {/* Background Watermark Wave Logo */}
         <div className="absolute -bottom-10 right-0 opacity-5 pointer-events-none select-none">
-          <Logo size="xl" variant="icon" />
+          <Logo size="xl" variant="icon" customIconUrl={sanitizeLogo(cmsSettings?.footerLogo) || cmsSettings?.headerLogo || cmsSettings?.heroLogo} />
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -188,7 +188,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings, dragBlo
                     title={sanitizeTitle(cmsSettings?.footerLogoTitle)}
                     subtitle={sanitizeSubtitle(cmsSettings?.footerLogoSubtitle)}
                     badge={sanitizeBadge(cmsSettings?.footerLogoBadge)}
-                    customIconUrl={sanitizeLogo(cmsSettings?.footerLogo)}
+                    customIconUrl={sanitizeLogo(cmsSettings?.footerLogo) || cmsSettings?.headerLogo || cmsSettings?.heroLogo}
                   />
                 </div>
               </div>
