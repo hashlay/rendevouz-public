@@ -13,7 +13,6 @@ import { ResultsSection } from './components/ResultsSection';
 import { FullConceptModal } from './components/FullConceptModal';
 import { LoginModal } from './components/LoginModal';
 import { ParticipantProfileModal } from './components/ParticipantProfileModal';
-import { FaceScannerModal } from './components/FaceScannerModal';
 import { PublishedResultsPage } from './components/PublishedResultsPage';
 import { TeamPointsPage } from './components/TeamPointsPage';
 import { PublicGalleryPage } from './components/PublicGalleryPage';
@@ -289,11 +288,6 @@ function PublicWebsiteContent({ onSwitchToApp }: { onSwitchToApp: (mode: 'worksp
         isOpen={activeModalView === 'participant-profile'}
         onClose={() => setActiveModalView('none')}
         onNavigate={handleNavigate}
-      />
-
-      <FaceScannerModal
-        isOpen={activeModalView === 'face-scanner'}
-        onClose={() => setActiveModalView('none')}
       />
     </div>
   );

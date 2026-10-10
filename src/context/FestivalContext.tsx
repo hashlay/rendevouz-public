@@ -9,7 +9,6 @@ import {
   SmilePhoto,
   Stage,
   VideoHighlight,
-  FaceMatchResult,
   Program,
   JudgeProfile,
   MarkEntry,
@@ -62,10 +61,6 @@ interface FestivalContextType {
 
   videoHighlights: VideoHighlight[];
   addVideoHighlight: (video: Omit<VideoHighlight, 'id'>) => void;
-
-  // AI Face Matcher Engine
-  runFaceRecognition: (faceImageDataUrl: string) => FaceMatchResult;
-  isFaceScanning: boolean;
   
   // CMS State
   participants: ParticipantProfile[];
@@ -89,8 +84,8 @@ interface FestivalContextType {
   deleteMark: (id: string) => void;
 
   // UI Portals State
-  activeModalView: 'none' | 'login' | 'participant-profile' | 'admin-dashboard' | 'face-scanner' | 'judge-dashboard' | 'results-board';
-  setActiveModalView: (view: 'none' | 'login' | 'participant-profile' | 'admin-dashboard' | 'face-scanner' | 'judge-dashboard' | 'results-board') => void;
+  activeModalView: 'none' | 'login' | 'participant-profile' | 'admin-dashboard' | 'judge-dashboard' | 'results-board';
+  setActiveModalView: (view: 'none' | 'login' | 'participant-profile' | 'admin-dashboard' | 'judge-dashboard' | 'results-board') => void;
   
   // Dynamic Standings
   houseScores: HouseScore[];
@@ -124,7 +119,7 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [loginInitialTab, setLoginInitialTab] = useState<'participant' | 'committee' | 'developer'>('participant');
-  const [activeModalView, setActiveModalView] = useState<'none' | 'login' | 'participant-profile' | 'admin-dashboard' | 'face-scanner' | 'judge-dashboard' | 'results-board'>('none');
+  const [activeModalView, setActiveModalView] = useState<'none' | 'login' | 'participant-profile' | 'admin-dashboard' | 'judge-dashboard' | 'results-board'>('none');
 
   useEffect(() => {
     try {
@@ -204,7 +199,6 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [videoHighlights, setVideoHighlights] = useState<any[]>([]);
   const [eventSettings, setEventSettings] = useState<any>({});
   const [categories, setCategories] = useState<any[]>([]);
-  const [isFaceScanning, setIsFaceScanning] = useState(false);
   const [houseScores, setHouseScores] = useState<HouseScore[]>([]);
   const [standingsMeta, setStandingsMeta] = useState<{ resultsCount?: number; publishedAt?: string | null; isSnapshot?: boolean; liveResultsCount?: number } | null>(null);
 
@@ -708,41 +702,6 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const updateMark = (m: MarkEntry) => setMarks(prev => prev.map(x => x.id === m.id ? m : x));
   const deleteMark = (id: string) => setMarks(prev => prev.filter(x => x.id !== id));
 
-  // Simulated AI Face Recognition Matcher
-  const runFaceRecognition = (faceImageDataUrl: string): FaceMatchResult => {
-    setIsFaceScanning(true);
-    
-    // Scan all photos in SMILE and Gallery
-    const allSearchablePhotos = [...smilePhotos, ...gallery.map(g => ({
-      id: g.id,
-      title: g.title,
-      regCode: 'FESTIVAL-HD',
-      participantName: 'Festival Participant',
-      stage: g.category,
-      imageUrl: g.imageUrl,
-      timestamp: g.date,
-      resolution: '4K Ultra HD',
-      fileSize: '8.5 MB'
-    }))];
-
-    // Select matched photos probabilistically/deterministically based on hash or random set
-    // Always returns 2-4 matched high quality photos
-    const shuffled = [...allSearchablePhotos].sort(() => 0.5 - Math.random());
-    const matched = shuffled.slice(0, Math.min( shuf(3, 4), shuffled.length ));
-
-    setIsFaceScanning(false);
-
-    return {
-      matchedPhotos: matched,
-      similarityScore: 98.4,
-      matchCount: matched.length,
-      faceFeaturesDetected: 68
-    };
-  };
-
-  function shuf(min: number, max: number) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
 
   return (
     <FestivalContext.Provider
@@ -778,9 +737,6 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
         videoHighlights,
         addVideoHighlight,
-
-        runFaceRecognition,
-        isFaceScanning,
 
         activeModalView,
         setActiveModalView,
