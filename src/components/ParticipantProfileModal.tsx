@@ -293,7 +293,7 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
   // Dynamically compute published certificates directly from candidate's declared results (Rank 1, 2, 3)
   const participantCertificates = useMemo(() => {
     if (!p) return [];
-    return participantDeclaredResults.filter(r => r.rank >= 1 && r.rank <= 3 && r.certificatePublished === true);
+    return participantDeclaredResults.filter(r => r.rank >= 1 && r.rank <= 3 && r.certificatePublished !== false);
   }, [participantDeclaredResults, p]);
 
   // Dynamically compute winner posters directly from candidate's declared results (Rank 1, 2, 3)
