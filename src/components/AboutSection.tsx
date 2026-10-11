@@ -88,8 +88,8 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenConceptModal, 
               {/* Photo Frame */}
               <div className="relative aspect-[4/3] sm:aspect-[16/11] overflow-hidden">
                 <img
-                  src={cmsSettings?.aboutImage || "/main_stage.jpeg?v=2"}
-                  alt="Swalahul Huda Academy Meelad Fest"
+                  src={cmsSettings?.aboutImage || "https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3?auto=format&fit=crop&w=1200&q=80"}
+                  alt={cmsSettings?.aboutImageTitle || "FANOUS 2K26"}
                   className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 filter brightness-95 contrast-105"
                   referrerPolicy="no-referrer"
                 />
@@ -101,20 +101,20 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenConceptModal, 
                 <div className="absolute top-3 left-3 bg-black/70 backdrop-blur-md border border-white/20 px-2.5 py-1 rounded-full flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full animate-ping" style={{ backgroundColor: 'var(--color-primary-accent)' }} />
                   <span className="text-[9px] font-mono font-bold text-white uppercase tracking-wider">
-                    {cmsSettings?.aboutImageBadge || 'Main Stage'}
+                    {cmsSettings?.aboutImageBadge || 'MAIN STAGE'}
                   </span>
                 </div>
 
                 {/* Bottom Overlay Label */}
                 <div className="absolute bottom-3 left-3 right-3 text-left">
                   <span className="text-[10px] font-bold uppercase tracking-widest block font-mono" style={{ color: 'var(--color-primary-accent)' }}>
-                    {cmsSettings?.aboutImageTitle || 'Swalahul Huda Academy'}
+                    {cmsSettings?.aboutImageTitle || 'FANOUS 2K26'}
                   </span>
                   <h4 className="text-base font-extrabold text-white leading-tight">
-                    {cmsSettings?.aboutImageSubtitle || 'Grand Assembly & Festival Inauguration'}
+                    {cmsSettings?.aboutImageSubtitle || 'Grand Cultural & Literary Fest'}
                   </h4>
                   <p className="text-[11px] text-zinc-300 mt-0.5">
-                    {cmsSettings?.aboutImageLocation || 'Swalahul Huda Academy • Rifayiya Juma Masjid Muchila'}
+                    {cmsSettings?.aboutImageLocation || 'Rifayiya Juma Masjid Muchila'}
                   </p>
                 </div>
               </div>

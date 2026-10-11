@@ -3,8 +3,7 @@ import { X, User, Calendar, Award, Sparkles, Download, CheckCircle, ExternalLink
 import { useFestival } from '../context/FestivalContext';
 import { CertificateImage } from './CertificateImage';
 
-// Toggle to false in future to re-enable certificates in participant modal
-const CERTIFICATES_DISABLED = true;
+// Certificates visibility dynamically driven by eventSettings.enableCertificates
 import { PosterImage } from './PosterImage';
 import { generateCertificateShareCaption, generateParticipantPosterShareCaption } from '../utils/posterRenderer';
 
@@ -117,6 +116,12 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
   const dobFormatted = formatDobDisplay(p.dob);
   const criteriaMode = eventSettings?.participantLoginCriteria || (p.candidateClass ? 'class' : 'dob');
   const classDisplay = p.candidateClass ? p.candidateClass.replace(/^class\s*[:\-]?\s*/i, '').trim() : '';
+  const isCertificatesEnabled = Boolean(
+    eventSettings?.enableCertificates ??
+    eventSettings?.enablePublicCertificates ??
+    (eventSettings as any)?.showCertificates ??
+    false
+  );
 
   // Build exact competition posters list as in PublicPostersPage.tsx
   const competitionPosters = useMemo(() => {
@@ -675,7 +680,7 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
         </div>
 
         {/* Section C: Official Certificates - completely invisible when disabled */}
-        {!CERTIFICATES_DISABLED && (
+        {isCertificatesEnabled && (
           <div className="space-y-4">
             <h4 className="text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
               <Award className="w-5 h-5 text-emerald-400" />
