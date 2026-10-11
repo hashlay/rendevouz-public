@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { GalleryItem } from '../types';
-import { ZoomIn, ArrowRight, X, ChevronLeft, ChevronRight, Download, Share2, Check, Send, Copy, Image as ImageIcon } from 'lucide-react';
+import { ZoomIn, ArrowRight, X, ChevronLeft, ChevronRight, Download, Share2, Check, Image as ImageIcon } from 'lucide-react';
 import { getMediaUrl } from '../utils/mediaUrl';
+import { shareMediaFile } from '../utils/shareUtils';
 import { useFestival } from '../context/FestivalContext';
 
 interface GallerySectionProps {
@@ -13,7 +14,7 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ onNavigate }) =>
   const { eventSettings } = useFestival();
   const [activeItem, setActiveItem] = useState<GalleryItem | null>(null);
   const [copied, setCopied] = useState<boolean>(false);
-  const [showShareMenu, setShowShareMenu] = useState<boolean>(false);
+  const [sharing, setSharing] = useState<boolean>(false);
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -49,19 +50,19 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ onNavigate }) =>
   const handleNext = () => {
     if (!activeItem) return;
     const currentIndex = displayItems.findIndex(i => i.id === activeItem.id);
+    if (currentIndex === -1) return;
     const nextIndex = (currentIndex + 1) % displayItems.length;
     setActiveItem(displayItems[nextIndex]);
     setCopied(false);
-    setShowShareMenu(false);
   };
 
   const handlePrev = () => {
     if (!activeItem) return;
     const currentIndex = displayItems.findIndex(i => i.id === activeItem.id);
+    if (currentIndex === -1) return;
     const prevIndex = (currentIndex - 1 + displayItems.length) % displayItems.length;
     setActiveItem(displayItems[prevIndex]);
     setCopied(false);
-    setShowShareMenu(false);
   };
 
   const handleDownload = async (imageUrl: string, title: string) => {
@@ -87,23 +88,35 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ onNavigate }) =>
     }
   };
 
-  const handleShare = (item: GalleryItem) => {
-    if (navigator.share) {
-      navigator.share({
-        title: item.title,
-        text: `Check out this photo from ${eventSettings?.festivalName || 'the festival'}: ${item.title}`,
-        url: window.location.origin + item.imageUrl,
-      }).catch(() => setShowShareMenu(!showShareMenu));
-    } else {
-      setShowShareMenu(!showShareMenu);
+  const handleShare = async (item: GalleryItem) => {
+    if (sharing) return;
+    setSharing(true);
+    const festName = eventSettings?.festivalName || 'Imam Rabbani Life Festival';
+    const lines: string[] = [];
+    lines.push(`📸 *${item.title}*`);
+    if (item.caption) {
+      lines.push(`"${item.caption}"`);
     }
-  };
+    const meta: string[] = [];
+    if (item.category) meta.push(`🏷️ Category: ${item.category}`);
+    if (item.photographer) meta.push(`📷 Photo: ${item.photographer}`);
+    if (item.date) meta.push(`📅 ${item.date}`);
+    if (meta.length > 0) lines.push(meta.join(' | '));
+    lines.push(`\n✨ *${festName}*`);
 
-  const handleCopyLink = (imageUrl: string) => {
-    const fullUrl = window.location.origin + imageUrl;
-    navigator.clipboard.writeText(fullUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    const result = await shareMediaFile({
+      title: item.title,
+      caption: lines.join('\n'),
+      mediaUrl: item.imageUrl,
+      fileName: item.title,
+      fallbackUrl: item.imageUrl
+    });
+
+    setSharing(false);
+    if (result === 'copied') {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    }
   };
 
   return (
@@ -278,39 +291,24 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ onNavigate }) =>
 
                   <button
                     type="button"
+                    disabled={sharing}
                     onClick={() => handleShare(activeItem)}
-                    className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-mono font-bold uppercase tracking-wider rounded-xl transition-colors duration-200 flex items-center gap-1.5 shadow-md cursor-pointer min-h-[38px]"
+                    className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-mono font-bold uppercase tracking-wider rounded-xl transition-colors duration-200 flex items-center gap-1.5 shadow-md cursor-pointer min-h-[38px] disabled:opacity-50"
                   >
-                    {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Share2 className="w-3.5 h-3.5" />}
-                    <span>{copied ? 'COPIED!' : 'SHARE'}</span>
+                    {copied ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>COPIED!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Share2 className="w-3.5 h-3.5" />
+                        <span>{sharing ? 'OPENING...' : 'SHARE'}</span>
+                      </>
+                    )}
                   </button>
                 </div>
               </div>
-
-              {/* Share Options Drawer / Modal */}
-              {showShareMenu && (
-                <div className="mt-3 p-3 bg-[#18181C] border border-[#2D2D35] rounded-xl flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2">
-                  <a
-                    href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`Check out this photo from ${eventSettings?.festivalName || 'the festival'}: ${activeItem.title}\n${activeItem.imageUrl}\n\n© All rights reserved | Developed by Zenith Software`)}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="px-3 py-1.5 bg-[#25D366]/20 border border-[#25D366]/40 hover:bg-[#25D366] text-white text-xs font-mono font-bold uppercase rounded-lg transition-all flex items-center gap-1.5"
-                  >
-                    <Send className="w-3.5 h-3.5 text-[#25D366]" />
-                    <span>WhatsApp</span>
-                  </a>
-
-                  <button
-                    type="button"
-                    onClick={() => handleCopyLink(activeItem.imageUrl)}
-                    style={{ backgroundColor: 'var(--color-primary-accent)' }}
-                    className="px-3 py-1.5 border border-white/20 hover:opacity-90 text-white text-xs font-mono font-bold uppercase rounded-lg transition-all flex items-center gap-1.5 cursor-pointer"
-                  >
-                    <Copy className="w-3.5 h-3.5" />
-                    <span>{copied ? 'Copied!' : 'Copy Link'}</span>
-                  </button>
-                </div>
-              )}
             </div>
           </div>
         </div>,

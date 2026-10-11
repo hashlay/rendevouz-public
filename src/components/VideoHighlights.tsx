@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { VideoHighlight } from '../types';
-import { Play, X, Download, Share2, Video } from 'lucide-react';
+import { Play, X, Download, Share2, Video, Check } from 'lucide-react';
 import { getMediaUrl } from '../utils/mediaUrl';
+import { shareMediaFile } from '../utils/shareUtils';
 import { useFestival } from '../context/FestivalContext';
 
 // Lazy-rendered card that only mounts when visible in viewport
@@ -98,6 +99,8 @@ export const VideoHighlights: React.FC = React.memo(() => {
   const [activeVideo, setActiveVideo] = useState<VideoHighlight | null>(null);
   const [highlights, setHighlights] = useState<VideoHighlight[]>([]);
   const [loading, setLoading] = useState(true);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [sharingId, setSharingId] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -136,18 +139,32 @@ export const VideoHighlights: React.FC = React.memo(() => {
   }, [activeVideo]);
 
   const handleShare = useCallback(async (video: VideoHighlight) => {
-    const festTitle = eventSettings?.festivalName || 'the festival';
-    const text = `Check out this performance: ${video.title}${video.performer ? ` by ${video.performer}` : ''} at ${festTitle}!\n\n© All rights reserved | Developed by Zenith Software`;
-    const url = window.location.origin + video.videoUrl;
-    
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: video.title, text, url });
-      } catch (_) {}
-    } else {
-      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text + '\n' + url)}`, '_blank');
+    if (sharingId) return;
+    setSharingId(video.id);
+    const festTitle = eventSettings?.festivalName || 'Imam Rabbani Life Festival';
+    const lines: string[] = [];
+    lines.push(`🎬 *${video.title}*`);
+    const meta: string[] = [];
+    if (video.performer) meta.push(`🎤 Performer: ${video.performer}`);
+    if (video.stageName) meta.push(`📍 Stage: ${video.stageName}`);
+    if (video.event) meta.push(`🏆 Event: ${video.event}`);
+    if (meta.length > 0) lines.push(meta.join('\n'));
+    lines.push(`\n✨ *${festTitle}*`);
+
+    const result = await shareMediaFile({
+      title: video.title,
+      caption: lines.join('\n'),
+      mediaUrl: video.thumbnailUrl || undefined,
+      fileName: `${video.title}_highlight`,
+      fallbackUrl: video.videoUrl
+    });
+
+    setSharingId(null);
+    if (result === 'copied') {
+      setCopiedId(video.id);
+      setTimeout(() => setCopiedId(null), 2500);
     }
-  }, [eventSettings?.festivalName]);
+  }, [eventSettings?.festivalName, sharingId]);
 
   const handleDownload = useCallback((video: VideoHighlight) => {
     const a = document.createElement('a');
@@ -251,10 +268,20 @@ export const VideoHighlights: React.FC = React.memo(() => {
                 <div className="flex gap-2 flex-shrink-0">
                   <button
                     onClick={() => handleShare(activeVideo)}
-                    className="flex items-center gap-2 px-3.5 py-2 bg-white/5 hover:bg-white/10 text-white rounded-xl text-xs font-mono font-bold transition-colors cursor-pointer min-h-[40px]"
+                    disabled={sharingId === activeVideo.id}
+                    className="flex items-center gap-2 px-3.5 py-2 bg-white/5 hover:bg-white/10 text-white rounded-xl text-xs font-mono font-bold transition-colors cursor-pointer min-h-[40px] disabled:opacity-50"
                   >
-                    <Share2 className="w-4 h-4" />
-                    <span>Share</span>
+                    {copiedId === activeVideo.id ? (
+                      <>
+                        <Check className="w-4 h-4 text-emerald-400" />
+                        <span>Copied!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Share2 className="w-4 h-4" />
+                        <span>{sharingId === activeVideo.id ? 'Opening...' : 'Share'}</span>
+                      </>
+                    )}
                   </button>
                   <button
                     onClick={() => handleDownload(activeVideo)}
