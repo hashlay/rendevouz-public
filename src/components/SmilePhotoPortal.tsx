@@ -16,7 +16,10 @@ export const SmilePhotoPortal: React.FC<SmilePhotoPortalProps> = ({ cmsSettings 
   return (
     <section id="smile" className="py-10 sm:py-14 bg-[#0A0A0A] relative overflow-hidden border-b border-white/10 font-sans">
       {/* Background Glows */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[250px] bg-[#FF2B2B]/10 blur-[140px] rounded-full pointer-events-none" />
+      <div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[250px] blur-[140px] rounded-full pointer-events-none opacity-10"
+        style={{ backgroundColor: 'var(--color-primary-accent)' }}
+      />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
         {/* Header Title */}
@@ -35,7 +38,9 @@ export const SmilePhotoPortal: React.FC<SmilePhotoPortalProps> = ({ cmsSettings 
 
         {/* Centered Interactive QR Scanner Frame & Drive Action Button */}
         <div className="max-w-sm mx-auto bg-[#141416] border border-white/15 rounded-2xl p-6 sm:p-8 text-center relative overflow-hidden shadow-xl group">
-          <div className="absolute inset-0 bg-gradient-to-b from-[#FF2B2B]/5 via-transparent to-transparent opacity-50 pointer-events-none" />
+          <div
+            className="absolute inset-0 bg-gradient-to-b from-white/5 via-transparent to-transparent opacity-50 pointer-events-none"
+          />
 
           {/* QR Frame Container - Clickable to Drive */}
           <a
@@ -58,7 +63,7 @@ export const SmilePhotoPortal: React.FC<SmilePhotoPortalProps> = ({ cmsSettings 
             </div>
 
             <span className="text-[9px] font-mono text-zinc-400 mt-1 font-bold tracking-widest uppercase">
-              PHOTO HUB • 2026
+              {eventSettings?.festivalName || 'PHOTO HUB'} • {new Date().getFullYear()}
             </span>
           </a>
 

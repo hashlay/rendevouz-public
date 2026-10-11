@@ -75,7 +75,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
   }
 }
 
-function PublicWebsiteContent({ onSwitchToApp }: { onSwitchToApp: (mode: 'workspace' | 'participant') => void }) {
+function PublicWebsiteContent() {
   const [activeSection, setActiveSection] = useState<string>('hero');
   const [isConceptModalOpen, setIsConceptModalOpen] = useState<boolean>(false);
   const [cmsData, setCmsData] = useState<any>(null);
@@ -93,12 +93,26 @@ function PublicWebsiteContent({ onSwitchToApp }: { onSwitchToApp: (mode: 'worksp
   });
 
   const {
+    authUser,
     isLoginModalOpen,
     setIsLoginModalOpen,
     loginInitialTab,
     activeModalView,
     setActiveModalView
   } = useFestival();
+
+  React.useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const portalParam = (searchParams.get('portal') || searchParams.get('mode'))?.toLowerCase();
+    const path = window.location.pathname.toLowerCase();
+    if (portalParam === 'participant' || path.startsWith('/participant')) {
+      if (authUser?.role === 'participant') {
+        setActiveModalView('participant-profile');
+      } else {
+        setIsLoginModalOpen(true);
+      }
+    }
+  }, [authUser, setActiveModalView, setIsLoginModalOpen]);
 
   React.useEffect(() => {
     const applyCMSData = (data: any) => {
@@ -294,31 +308,10 @@ function PublicWebsiteContent({ onSwitchToApp }: { onSwitchToApp: (mode: 'worksp
 }
 
 export default function App() {
-  const [appMode, setAppModeState] = useState<'participant' | 'public'>(() => {
-    const path = window.location.pathname.toLowerCase();
-    const searchParams = new URLSearchParams(window.location.search);
-    const portalParam = (searchParams.get('portal') || searchParams.get('mode'))?.toLowerCase();
-    const port = window.location.port;
-
-    if (portalParam === 'participant' || path.startsWith('/participant') || port === '3002') {
-      return 'participant';
-    }
-
-    return 'public';
-  });
-
-  const setAppMode = (mode: 'participant' | 'public') => {
-    setAppModeState(mode);
-    const newPath = mode === 'participant' ? '/participant' : '/';
-    if (window.location.pathname !== newPath) {
-      window.history.pushState({}, '', newPath);
-    }
-  };
-
   return (
     <ErrorBoundary>
       <FestivalProvider>
-        <PublicWebsiteContent onSwitchToApp={(mode) => setAppMode(mode as any)} />
+        <PublicWebsiteContent />
       </FestivalProvider>
     </ErrorBoundary>
   );

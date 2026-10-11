@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { STAGES_DATA } from '../data/festivalData';
+import React from 'react';
 import { ArrowRight } from 'lucide-react';
 import { useFestival } from '../context/FestivalContext';
 
@@ -20,7 +19,10 @@ export const LiveStreamSection: React.FC = () => {
   return (
     <section id="live" className="py-10 sm:py-14 bg-[#0E0E10] relative overflow-hidden border-b border-white/10 font-sans">
       {/* Background Glow */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[400px] h-[200px] bg-[#FF2B2B]/5 blur-[140px] pointer-events-none" />
+      <div
+        style={{ backgroundColor: 'var(--color-primary-accent, #10b981)', opacity: 0.05 }}
+        className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[400px] h-[200px] blur-[140px] pointer-events-none"
+      />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Section Header */}

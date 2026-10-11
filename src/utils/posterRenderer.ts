@@ -1246,7 +1246,7 @@ export const generatePosterShareCaption = (
   results: any[],
   eventSettings?: any
 ): string => {
-  const festivalTitle = (eventSettings?.festivalName || 'RENDEZVOUS 26').toUpperCase();
+  const festivalTitle = (eventSettings?.festivalName || 'FANOUS 2K26').toUpperCase();
   const formattedNum = String(compIndex || 1).padStart(2, '0');
   const slogan = eventSettings?.festivalTagline || eventSettings?.slogan || 'Meelad Fest';
   const campus = eventSettings?.campusName || eventSettings?.sectorName || 'Swalahul Huda Academy';

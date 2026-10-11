@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { X, User, QrCode, Calendar, Award, Sparkles, Download, ScanFace, CheckCircle, ExternalLink, ShieldCheck, MapPin, Printer } from 'lucide-react';
+import { X, User, Calendar, Award, Sparkles, Download, CheckCircle, ExternalLink, Printer } from 'lucide-react';
 import { useFestival } from '../context/FestivalContext';
 import { CertificateImage } from './CertificateImage';
 

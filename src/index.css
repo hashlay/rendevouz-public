@@ -90,10 +90,6 @@
   font-family: 'Thunder ExtraLight LC', 'Thunder', sans-serif;
 }
 
-.hero-rendezvous-title {
-  font-family: 'Hochland', sans-serif;
-  color: #ffffff;
-}
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
