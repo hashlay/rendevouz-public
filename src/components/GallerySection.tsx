@@ -3,12 +3,14 @@ import { createPortal } from 'react-dom';
 import { GalleryItem } from '../types';
 import { ZoomIn, ArrowRight, X, ChevronLeft, ChevronRight, Download, Share2, Check, Send, Copy, Image as ImageIcon } from 'lucide-react';
 import { getMediaUrl } from '../utils/mediaUrl';
+import { useFestival } from '../context/FestivalContext';
 
 interface GallerySectionProps {
   onNavigate?: (sectionId: string) => void;
 }
 
 export const GallerySection: React.FC<GallerySectionProps> = ({ onNavigate }) => {
+  const { eventSettings } = useFestival();
   const [activeItem, setActiveItem] = useState<GalleryItem | null>(null);
   const [copied, setCopied] = useState<boolean>(false);
   const [showShareMenu, setShowShareMenu] = useState<boolean>(false);
@@ -89,7 +91,7 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ onNavigate }) =>
     if (navigator.share) {
       navigator.share({
         title: item.title,
-        text: `Check out this photo from Rendezvous Silver Edition: ${item.title}`,
+        text: `Check out this photo from ${eventSettings?.festivalName || 'the festival'}: ${item.title}`,
         url: window.location.origin + item.imageUrl,
       }).catch(() => setShowShareMenu(!showShareMenu));
     } else {
@@ -289,7 +291,7 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ onNavigate }) =>
               {showShareMenu && (
                 <div className="mt-3 p-3 bg-[#18181C] border border-[#2D2D35] rounded-xl flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2">
                   <a
-                    href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`Check out this photo from Rendezvous Silver Edition: ${activeItem.title}\n${activeItem.imageUrl}`)}`}
+                    href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`Check out this photo from ${eventSettings?.festivalName || 'the festival'}: ${activeItem.title}\n${activeItem.imageUrl}`)}`}
                     target="_blank"
                     rel="noreferrer"
                     className="px-3 py-1.5 bg-[#25D366]/20 border border-[#25D366]/40 hover:bg-[#25D366] text-white text-xs font-mono font-bold uppercase rounded-lg transition-all flex items-center gap-1.5"

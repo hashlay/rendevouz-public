@@ -1,29 +1,14 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import {
   AuthUser,
-  UserRole,
   ParticipantProfile,
-  HeroMedia,
   ResultItem,
   GalleryItem,
-  SmilePhoto,
-  Stage,
-  VideoHighlight,
-  Program,
-  JudgeProfile,
-  MarkEntry,
   HouseScore
 } from '../types';
 import {
-  DEFAULT_HERO_MEDIA,
-  RESULTS_DATA,
-  GALLERY_DATA,
-  STAGES_DATA,
-  VIDEO_HIGHLIGHTS,
   NO_DP_AVATAR
 } from '../data/festivalData';
-
-const STORAGE_KEY = 'festival_cms_data_v2';
 
 interface FestivalContextType {
   // Auth state
@@ -36,56 +21,17 @@ interface FestivalContextType {
   loginInitialTab: 'participant';
   openLoginModal: (tab?: 'participant') => void;
 
-  // Hero Media State (Cycling background)
-  heroMedia: HeroMedia[];
-  activeHeroIndex: number;
-  setActiveHeroIndex: (index: number) => void;
-  addHeroMedia: (media: Omit<HeroMedia, 'id'>) => { success: boolean; error?: string };
-  removeHeroMedia: (id: string) => void;
-
-  // Dynamic Content Data
+  // Dynamic Content Data (Live from Backend)
   results: ResultItem[];
-  addResult: (item: Omit<ResultItem, 'id'>) => void;
-  updateResult: (item: ResultItem) => void;
-  deleteResult: (id: string) => void;
-
   gallery: GalleryItem[];
-  addGalleryItem: (item: Omit<GalleryItem, 'id'>) => void;
 
-  smilePhotos: SmilePhoto[];
-  addSmilePhoto: (photo: Omit<SmilePhoto, 'id'>) => void;
-
-  stages: Stage[];
-  updateStage: (stage: Stage) => void;
-
-  videoHighlights: VideoHighlight[];
-  addVideoHighlight: (video: Omit<VideoHighlight, 'id'>) => void;
-  
-  // CMS State
-  participants: ParticipantProfile[];
-  addParticipant: (p: ParticipantProfile) => void;
+  // Participant State
   updateParticipant: (p: ParticipantProfile) => void;
-  deleteParticipant: (codeNumber: string) => void;
-
-  programs: Program[];
-  addProgram: (p: Program) => void;
-  updateProgram: (p: Program) => void;
-  deleteProgram: (id: string) => void;
-
-  judges: JudgeProfile[];
-  addJudge: (j: JudgeProfile) => void;
-  updateJudge: (j: JudgeProfile) => void;
-  deleteJudge: (id: string) => void;
-
-  marks: MarkEntry[];
-  addMark: (m: MarkEntry) => void;
-  updateMark: (m: MarkEntry) => void;
-  deleteMark: (id: string) => void;
 
   // UI Portals State
   activeModalView: 'none' | 'login' | 'participant-profile';
   setActiveModalView: (view: 'none' | 'login' | 'participant-profile') => void;
-  
+
   // Dynamic Standings
   houseScores: HouseScore[];
   standingsMeta: { resultsCount?: number; publishedAt?: string | null; isSnapshot?: boolean; liveResultsCount?: number } | null;
@@ -113,8 +59,10 @@ function safeStorageGet<T>(key: string, fallback: T): T {
 }
 
 export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // 1. Auth State
-  const [authUser, setAuthUser] = useState<AuthUser | null>(() => safeStorageGet<AuthUser | null>('rendezvous_auth_user', null));
+  // 1. Auth State (Multi-SaaS ready festival_auth_user key)
+  const [authUser, setAuthUser] = useState<AuthUser | null>(() => {
+    return safeStorageGet<AuthUser | null>('festival_auth_user', null) || safeStorageGet<AuthUser | null>('rendezvous_auth_user', null);
+  });
 
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [loginInitialTab, setLoginInitialTab] = useState<'participant'>('participant');
@@ -123,50 +71,22 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   useEffect(() => {
     try {
       if (authUser) {
-        localStorage.setItem('rendezvous_auth_user', JSON.stringify(authUser));
+        localStorage.setItem('festival_auth_user', JSON.stringify(authUser));
       } else {
-        localStorage.removeItem('rendezvous_auth_user');
+        localStorage.removeItem('festival_auth_user');
       }
+      localStorage.removeItem('rendezvous_auth_user');
+      localStorage.removeItem('rendezvous_hero_media_v2');
     } catch (_) {}
   }, [authUser]);
 
-  // 2. Hero Background Cycling State (3 second timer)
-  const [heroMedia, setHeroMedia] = useState<HeroMedia[]>(() => safeStorageGet<HeroMedia[]>('rendezvous_hero_media_v2', DEFAULT_HERO_MEDIA));
-
-  const [activeHeroIndex, setActiveHeroIndex] = useState<number>(0);
-
-  useEffect(() => {
-    try { localStorage.setItem('rendezvous_hero_media_v2', JSON.stringify(heroMedia)); } catch (_) {}
-  }, [heroMedia]);
-
-  // Auto 3-second cycle for hero background
-  useEffect(() => {
-    if (heroMedia.length <= 1) return;
-    const interval = setInterval(() => {
-      setActiveHeroIndex((prev) => (prev + 1) % heroMedia.length);
-    }, 3000); // 3 seconds per image/video requirement!
-
-    return () => clearInterval(interval);
-  }, [heroMedia]);
-
-
-
-  // 3. Dynamic Data States
+  // 2. Dynamic Data States (Live from Backend)
   const [results, setResults] = useState<any[]>([]);
   const [gallery, setGallery] = useState<any[]>([]);
-  const [smilePhotos, setSmilePhotos] = useState<any[]>([]);
-  const [stages, setStages] = useState<any[]>([]);
-  const [videoHighlights, setVideoHighlights] = useState<any[]>([]);
   const [eventSettings, setEventSettings] = useState<any>({});
   const [categories, setCategories] = useState<any[]>([]);
   const [houseScores, setHouseScores] = useState<HouseScore[]>([]);
   const [standingsMeta, setStandingsMeta] = useState<{ resultsCount?: number; publishedAt?: string | null; isSnapshot?: boolean; liveResultsCount?: number } | null>(null);
-
-  // CMS States
-  const [participants, setParticipants] = useState<any[]>([]);
-  const [programs, setPrograms] = useState<any[]>([]);
-  const [judges, setJudges] = useState<any[]>([]);
-  const [marks, setMarks] = useState<any[]>([]);
 
   // Unified Initial Data Fetch (Eliminating Waterfall: All endpoints fetched in parallel)
   useEffect(() => {
@@ -239,7 +159,7 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         }
 
         // Revalidate stored participant on mount to ensure fresh live data
-        const currentSavedAuth = safeStorageGet<AuthUser | null>('rendezvous_auth_user', null);
+        const currentSavedAuth = safeStorageGet<AuthUser | null>('festival_auth_user', null) || safeStorageGet<AuthUser | null>('rendezvous_auth_user', null);
         if (currentSavedAuth && currentSavedAuth.role === 'participant' && currentSavedAuth.participant) {
           const cNo = currentSavedAuth.participant.codeNumber || currentSavedAuth.username;
           if (cNo) {
@@ -321,15 +241,15 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       const candidateTeams = found.candidateTeams || [];
       const candidateTeamIds = candidateTeams.map((t: any) => t.id);
 
-      // Raw schedule from real registered comps
-      const rawComps = data.registeredComps || data.registeredPrograms || found.registeredPrograms || found.schedule || found.registeredComps || [];
+      // Registered competitions from live database
+      const rawComps = data.registeredComps || data.registeredPrograms || found.registeredPrograms || found.registeredComps || [];
       const mappedSchedule = rawComps.map((prog: any, idx: number) => ({
         id: prog.id || prog.competitionId || `prog_${idx}`,
-        program: prog.program || prog.name || prog.eventName || prog.title || 'Registered Program',
-        category: prog.category || found.categoryName || found.category || 'General',
-        stage: prog.stage || (prog.stageType === 'on_stage' ? 'On Stage' : prog.stageType === 'off_stage' ? 'Off Stage' : 'Main Stage'),
-        time: prog.time || prog.startTime || '09:00 AM',
-        status: prog.status || 'upcoming',
+        program: prog.program || prog.name || prog.eventName || prog.title || prog.competitionName || 'Registered Program',
+        category: prog.category || found.categoryName || found.category || '',
+        stage: prog.stage || (prog.stageType === 'on_stage' ? 'On Stage' : prog.stageType === 'off_stage' ? 'Off Stage' : ''),
+        time: prog.time || prog.startTime || '',
+        status: prog.status || '',
         participationType: prog.participationType || 'individual'
       }));
 
@@ -422,20 +342,6 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         console.warn("API fetch error in loginUnifiedByChestNo, falling back", e);
       }
 
-      // Check in CMS state participants array if API didn't return found
-      if (!found) {
-        const localPart = (participants || []).find(p => 
-          (p.codeNumber && p.codeNumber.toString().trim().toLowerCase() === cleanChest.toLowerCase()) ||
-          (p.chestNumber && p.chestNumber.toString().trim().toLowerCase() === cleanChest.toLowerCase()) ||
-          (p.id && p.id.toString().trim().toLowerCase() === cleanChest.toLowerCase())
-        );
-        if (localPart) {
-          found = localPart;
-          apiRegisteredComps = localPart.registeredPrograms || localPart.schedule || [];
-          apiParticipantResults = localPart.results || [];
-        }
-      }
-
       if (!found || found.isNotFound) {
         return { success: false, error: 'Participant not found for this chest number' };
       }
@@ -443,18 +349,18 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       const candidateTeams = found.candidateTeams || [];
       const candidateTeamIds = candidateTeams.map((t: any) => t.id);
 
-      // Raw schedule strictly from real registered comps
+      // Registered competitions from live database
       const rawScheduleList = apiRegisteredComps.length > 0
         ? apiRegisteredComps
-        : (found.registeredPrograms || found.schedule || found.registeredComps || []);
+        : (found.registeredPrograms || found.registeredComps || []);
 
       const mappedSchedule = rawScheduleList.map((prog: any, idx: number) => ({
         id: prog.id || prog.competitionId || `prog_${idx}`,
         program: prog.program || prog.name || prog.eventName || prog.title || prog.competitionName || 'Registered Program',
-        category: prog.category || found.categoryName || found.category || 'General',
-        stage: prog.stage || (prog.stageType === 'on_stage' ? 'On Stage' : prog.stageType === 'off_stage' ? 'Off Stage' : 'Main Stage'),
-        time: prog.time || prog.startTime || '09:00 AM',
-        status: prog.status || 'upcoming',
+        category: prog.category || found.categoryName || found.category || '',
+        stage: prog.stage || (prog.stageType === 'on_stage' ? 'On Stage' : prog.stageType === 'off_stage' ? 'Off Stage' : ''),
+        time: prog.time || prog.startTime || '',
+        status: prog.status || '',
         participationType: prog.participationType || 'individual'
       }));
 
@@ -573,74 +479,8 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   };
 
-  // Hero Media Handlers (Max 5 items limit enforcement)
-  const addHeroMedia = (media: Omit<HeroMedia, 'id'>) => {
-    if (heroMedia.length >= 5) {
-      return { success: false, error: 'Maximum limit of 5 hero background media items reached! Please delete an item first.' };
-    }
-    const newItem: HeroMedia = {
-      ...media,
-      id: `hm-${Date.now()}`
-    };
-    setHeroMedia((prev) => [...prev, newItem]);
-    return { success: true };
-  };
-
-  const removeHeroMedia = (id: string) => {
-    if (heroMedia.length <= 1) {
-      alert('At least 1 hero background item is required.');
-      return;
-    }
-    setHeroMedia((prev) => prev.filter((item) => item.id !== id));
-    setActiveHeroIndex(0);
-  };
-
-  // Result handlers
-  const addResult = (item: Omit<ResultItem, 'id'>) => {
-    const newResult: ResultItem = { ...item, id: `r-${Date.now()}` };
-    setResults((prev) => [newResult, ...prev]);
-  };
-
-  const updateResult = (item: ResultItem) => {
-    setResults((prev) => prev.map((r) => (r.id === item.id ? item : r)));
-  };
-
-  const deleteResult = (id: string) => {
-    setResults((prev) => prev.filter((r) => r.id !== id));
-  };
-
-  // Gallery & SMILE handlers
-  const addGalleryItem = (item: Omit<GalleryItem, 'id'>) => {
-    const newItem: GalleryItem = { ...item, id: `g-${Date.now()}` };
-    setGallery((prev) => [newItem, ...prev]);
-  };
-
-  const addSmilePhoto = (photo: Omit<SmilePhoto, 'id'>) => {
-    const newPhoto: SmilePhoto = { ...photo, id: `sm-${Date.now()}` };
-    setSmilePhotos((prev) => [newPhoto, ...prev]);
-  };
-
-  const updateStage = (stage: Stage) => {
-    setStages((prev) => prev.map((s) => (s.id === stage.id ? stage : s)));
-  };
-
-  const addVideoHighlight = (video: Omit<VideoHighlight, 'id'>) => {
-    const newVid: VideoHighlight = { ...video, id: `v-${Date.now()}` };
-    setVideoHighlights((prev) => [newVid, ...prev]);
-  };
-
-  // CMS Handlers
-  const addParticipant = (p: ParticipantProfile) => setParticipants(prev => [p, ...prev]);
+  // Participant update handler
   const updateParticipant = (p: ParticipantProfile) => {
-    setParticipants(prev => {
-      const exists = prev.find(x => x.codeNumber === p.codeNumber);
-      if (exists) {
-        return prev.map(x => x.codeNumber === p.codeNumber ? p : x);
-      } else {
-        return [p, ...prev];
-      }
-    });
-    // Also update authUser if it's the current user
     setAuthUser(prev => {
       if (prev?.role === 'participant' && prev.participant?.codeNumber === p.codeNumber) {
         return { ...prev, avatarUrl: p.avatarUrl, participant: p };
@@ -648,20 +488,6 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       return prev;
     });
   };
-  const deleteParticipant = (codeNumber: string) => setParticipants(prev => prev.filter(x => x.codeNumber !== codeNumber));
-
-  const addProgram = (p: Program) => setPrograms(prev => [p, ...prev]);
-  const updateProgram = (p: Program) => setPrograms(prev => prev.map(x => x.id === p.id ? p : x));
-  const deleteProgram = (id: string) => setPrograms(prev => prev.filter(x => x.id !== id));
-
-  const addJudge = (j: JudgeProfile) => setJudges(prev => [j, ...prev]);
-  const updateJudge = (j: JudgeProfile) => setJudges(prev => prev.map(x => x.id === j.id ? j : x));
-  const deleteJudge = (id: string) => setJudges(prev => prev.filter(x => x.id !== id));
-
-  const addMark = (m: MarkEntry) => setMarks(prev => [m, ...prev]);
-  const updateMark = (m: MarkEntry) => setMarks(prev => prev.map(x => x.id === m.id ? m : x));
-  const deleteMark = (id: string) => setMarks(prev => prev.filter(x => x.id !== id));
-
 
   return (
     <FestivalContext.Provider
@@ -675,58 +501,17 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         loginInitialTab,
         openLoginModal,
 
-        heroMedia,
-        activeHeroIndex,
-        setActiveHeroIndex,
-        addHeroMedia,
-        removeHeroMedia,
-
         results,
-        addResult,
-        updateResult,
-        deleteResult,
-
         gallery,
-        addGalleryItem,
-
-        smilePhotos,
-        addSmilePhoto,
-
-        stages,
-        updateStage,
-
-        videoHighlights,
-        addVideoHighlight,
 
         activeModalView,
         setActiveModalView,
 
-        participants,
-        addParticipant,
         updateParticipant,
-        deleteParticipant,
-
-        programs,
-        addProgram,
-        updateProgram,
-        deleteProgram,
-
-        judges,
-        addJudge,
-        updateJudge,
-        deleteJudge,
-
-        marks,
-        addMark,
-        updateMark,
-        deleteMark,
 
         houseScores,
-
         categories,
-
         eventSettings,
-
         standingsMeta
       }}
     >

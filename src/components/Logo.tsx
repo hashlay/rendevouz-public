@@ -68,9 +68,15 @@ export const Logo: React.FC<LogoProps> = ({
           {(rawSubtitle || rawBadge) && (
             <div className="flex items-center justify-start gap-1.5 mt-1 w-full">
               {showSubBadge && (
-                <span className="inline-block w-1.5 h-1.5 rounded-full shrink-0 animate-pulse bg-purple-400" />
+                <span
+                  style={{ backgroundColor: 'var(--color-primary-accent, #10b981)' }}
+                  className="inline-block w-1.5 h-1.5 rounded-full shrink-0 animate-pulse"
+                />
               )}
-              <span className={`font-sora uppercase font-semibold tracking-wider ${subTextSize} text-left text-purple-300`}>
+              <span
+                style={{ color: 'var(--color-primary-accent, #a7f3d0)' }}
+                className={`font-sora uppercase font-semibold tracking-wider ${subTextSize} text-left`}
+              >
                 {rawSubtitle || rawBadge}
               </span>
             </div>

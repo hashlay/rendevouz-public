@@ -47,10 +47,11 @@ export const CertificateImage: React.FC<CertificateImageProps> = ({
       ctx.strokeRect(45, 45, 1110, 760);
 
       // Header
-      ctx.fillStyle = '#FF2B2B';
+      ctx.fillStyle = eventSettings?.primaryColor || '#F59E0B';
       ctx.font = 'bold 22px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('RENDEZVOUS SILVER EDITION', 600, 120);
+      const festivalCertTitle = (eventSettings?.festivalName || eventSettings?.eventTitle || 'FANOUS 2K26').toUpperCase();
+      ctx.fillText(festivalCertTitle, 600, 120);
 
       ctx.fillStyle = '#FFFFFF';
       ctx.font = '900 46px sans-serif';
