@@ -1250,7 +1250,21 @@ export const generatePosterShareCaption = (
   const formattedNum = String(compIndex || 1).padStart(2, '0');
   const slogan = eventSettings?.festivalTagline || eventSettings?.slogan || 'Meelad Fest';
   const campus = eventSettings?.campusName || eventSettings?.sectorName || 'Swalahul Huda Academy';
-  const hashtags = eventSettings?.shareHashtags || '#Fanous2K26 #SwalahulHudaAcademy #MeeladFest #Results #Muchila';
+
+  // Enforce strictly 3 to 4 hashtags
+  let hashtagList: string[] = [];
+  if (eventSettings?.shareHashtags && typeof eventSettings.shareHashtags === 'string') {
+    hashtagList = eventSettings.shareHashtags
+      .trim()
+      .split(/\s+/)
+      .filter((tag: string) => Boolean(tag && tag.startsWith('#')))
+      .slice(0, 4);
+  }
+  if (hashtagList.length === 0) {
+    const cleanTag = festivalTitle.replace(/[^a-zA-Z0-9]/g, '');
+    hashtagList = [`#${cleanTag}`, '#MeeladFest', '#Results', '#Winners'];
+  }
+  const hashtags = hashtagList.slice(0, 4).join(' ');
 
   const rank1List = (results || []).filter((r: any) => r.rank === 1);
   const rank2List = (results || []).filter((r: any) => r.rank === 2);
@@ -1295,7 +1309,74 @@ ${rankLines}
 🌿 Congratulations to all the winners and participants!
 May your talents continue to shine. ✨
 ${campus}
-${hashtags}`;
+
+${hashtags}
+
+© All rights reserved | Developed by Zenith Software`;
+};
+
+/**
+ * Generates a clean share caption for individual participant certificates.
+ * Follows 3-4 hashtags and copyright credit to Zenith Software.
+ */
+export const generateCertificateShareCaption = (
+  participantName: string,
+  chestNumber: string,
+  eventName: string,
+  category: string,
+  rank: number | string,
+  eventSettings?: any
+): string => {
+  const festivalTitle = (eventSettings?.festivalName || 'FANOUS 2K26').toUpperCase();
+  const slogan = eventSettings?.festivalTagline || eventSettings?.slogan || 'Meelad Fest';
+  const campus = eventSettings?.campusName || eventSettings?.sectorName || 'Swalahul Huda Academy';
+  const rankEmoji = rank === 1 || rank === '1' ? '🥇 1st Place' : rank === 2 || rank === '2' ? '🥈 2nd Place' : rank === 3 || rank === '3' ? '🥉 3rd Place' : `Rank ${rank}`;
+
+  const cleanTag = festivalTitle.replace(/[^a-zA-Z0-9]/g, '');
+  const hashtags = `#${cleanTag} #Certificate #Winners #MeeladFest`;
+
+  return `🎓 ${festivalTitle} — OFFICIAL CERTIFICATE
+✨ ${slogan}
+
+Participant: ${participantName} (Chest #${chestNumber})
+Competition: ${eventName} (${category})
+Award: ${rankEmoji}
+
+Congratulations on this remarkable achievement!
+${campus}
+
+${hashtags}
+
+© All rights reserved | Developed by Zenith Software`;
+};
+
+/**
+ * Generates a clean share caption for individual participant winner poster.
+ */
+export const generateParticipantPosterShareCaption = (
+  eventName: string,
+  category: string,
+  eventSettings?: any
+): string => {
+  const festivalTitle = (eventSettings?.festivalName || 'FANOUS 2K26').toUpperCase();
+  const slogan = eventSettings?.festivalTagline || eventSettings?.slogan || 'Meelad Fest';
+  const campus = eventSettings?.campusName || eventSettings?.sectorName || 'Swalahul Huda Academy';
+
+  const cleanTag = festivalTitle.replace(/[^a-zA-Z0-9]/g, '');
+  const hashtags = `#${cleanTag} #ResultPoster #Winners #MeeladFest`;
+
+  return `🏆 ${festivalTitle} — RESULT POSTER
+✨ ${slogan}
+
+Competition: ${eventName}
+Category: ${category}
+
+Congratulations to all the winners!
+${campus}
+
+${hashtags}
+
+© All rights reserved | Developed by Zenith Software`;
 };
 
 /**

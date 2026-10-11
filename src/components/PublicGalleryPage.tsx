@@ -349,7 +349,7 @@ export const PublicGalleryPage: React.FC = () => {
               {showShareMenu && (
                 <div className="mt-3 p-3 bg-[#18181C] border border-[#2D2D35] rounded-xl flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2">
                   <a
-                    href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`Check out this photo from ${eventSettings?.festivalName || 'the festival'}: ${activeItem.title}\n${activeItem.imageUrl}`)}`}
+                    href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`Check out this photo from ${eventSettings?.festivalName || 'the festival'}: ${activeItem.title}\n${activeItem.imageUrl}\n\n© All rights reserved | Developed by Zenith Software`)}`}
                     target="_blank"
                     rel="noreferrer"
                     className="px-3 py-1.5 bg-[#25D366]/20 border border-[#25D366]/40 hover:bg-[#25D366] text-white text-xs font-mono font-bold uppercase rounded-lg transition-all flex items-center gap-1.5"

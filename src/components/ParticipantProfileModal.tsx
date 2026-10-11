@@ -6,6 +6,7 @@ import { CertificateImage } from './CertificateImage';
 // Toggle to false in future to re-enable certificates in participant modal
 const CERTIFICATES_DISABLED = true;
 import { PosterImage } from './PosterImage';
+import { generateCertificateShareCaption, generateParticipantPosterShareCaption } from '../utils/posterRenderer';
 
 interface ParticipantProfileModalProps {
   isOpen: boolean;
@@ -78,13 +79,35 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
     win?.document.write(`<img src="${dataUrl}" style="max-width:100%;height:auto;" onload="window.print();window.close();" />`);
   };
 
-  const handleShare = async (title: string, text: string, dataUrl: string) => {
+  const handleShare = async (title: string, text: string, dataUrl?: string) => {
+    if (dataUrl && navigator.canShare) {
+      try {
+        const res = await fetch(dataUrl);
+        const blob = await res.blob();
+        const file = new File([blob], `${title.replace(/\s+/g, '_')}.jpg`, { type: 'image/jpeg' });
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({ title, text, files: [file] });
+          return;
+        }
+      } catch (err: any) {
+        if (err.name === 'AbortError') return;
+      }
+    }
+
     if (navigator.share) {
       try {
         await navigator.share({ title, text, url: window.location.href });
-      } catch (e) { }
+        return;
+      } catch (e: any) {
+        if (e.name === 'AbortError') return;
+      }
+    }
+
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+      alert('Caption copied to clipboard! You can paste and share it.');
     } else {
-      alert(`${title}: ${text}`);
+      alert(`${title}\n\n${text}`);
     }
   };
 
@@ -709,7 +732,15 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                           onClick={() => {
                             const imgEl = document.getElementById(`cert-img-data-${res.id}`) as HTMLImageElement;
                             if (imgEl && imgEl.src) {
-                              handleShare('Official Certificate', `Rank ${res.rank} Certificate for ${res.eventName}`, imgEl.src);
+                              const caption = generateCertificateShareCaption(
+                                cleanName,
+                                p.codeNumber || '',
+                                res.eventName,
+                                res.category || catName,
+                                res.rank,
+                                eventSettings
+                              );
+                              handleShare(`Certificate — ${res.eventName}`, caption, imgEl.src);
                             }
                           }}
                           className="flex-1 px-3 py-2.5 bg-white/10 hover:bg-emerald-500 hover:text-black text-white text-xs font-mono font-bold rounded-xl border border-white/15 transition-all flex items-center justify-center gap-2 shadow-sm"
@@ -794,7 +825,12 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                         onClick={() => {
                           const imgEl = document.getElementById(`poster-img-data-${poster.id}`) as HTMLImageElement;
                           if (imgEl && imgEl.src) {
-                            handleShare('Result Poster', `Winner Poster for ${poster.eventName}`, imgEl.src);
+                            const caption = generateParticipantPosterShareCaption(
+                              poster.eventName,
+                              poster.category,
+                              eventSettings
+                            );
+                            handleShare(`Result Poster — ${poster.eventName}`, caption, imgEl.src);
                           }
                         }}
                         className="flex-1 px-4 py-2 bg-white/5 hover:bg-purple-500 hover:text-white text-white text-xs font-mono font-bold rounded-lg transition-colors flex items-center justify-center gap-2"

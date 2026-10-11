@@ -110,10 +110,21 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings, dragBlo
     return phone || '+91 7483138340';
   };
   const sanitizeCopyright = (cr?: string) => {
-    if (!cr) {
-      return '© 2026 FANOUS 2K26 – Meelad Fest. Swalahul Huda Academy. All rights reserved. Developed by Zenith.';
+    const devCredit = 'Developed by Zenith Software';
+    const festTitle = sanitizeTitle(cmsSettings?.footerLogoTitle);
+    const festSub = sanitizeSubtitle(cmsSettings?.footerLogoSubtitle);
+    const festBadge = sanitizeBadge(cmsSettings?.footerLogoBadge);
+
+    if (!cr || typeof cr !== 'string' || cr.trim().length === 0) {
+      return `© ${new Date().getFullYear()} ${festTitle} – ${festSub}. ${festBadge}. All rights reserved. ${devCredit}`;
     }
-    return cr;
+
+    // Strip any previously typed developer credit so we avoid duplicates, preserving user text up to All rights reserved
+    let base = cr.trim().replace(/\s*[•\|\-]?\s*(Developed by|Powered by|Designed by|Built by).*$/i, '').trim();
+    if (!base.endsWith('.')) {
+      base += '.';
+    }
+    return `${base} ${devCredit}`;
   };
 
   return (

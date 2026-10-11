@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { VideoHighlight } from '../types';
 import { Play, X, Download, Share2, Video } from 'lucide-react';
 import { getMediaUrl } from '../utils/mediaUrl';
+import { useFestival } from '../context/FestivalContext';
 
 // Lazy-rendered card that only mounts when visible in viewport
 const VideoCard: React.FC<{
@@ -93,6 +94,7 @@ const VideoCard: React.FC<{
 VideoCard.displayName = 'VideoCard';
 
 export const VideoHighlights: React.FC = React.memo(() => {
+  const { eventSettings } = useFestival();
   const [activeVideo, setActiveVideo] = useState<VideoHighlight | null>(null);
   const [highlights, setHighlights] = useState<VideoHighlight[]>([]);
   const [loading, setLoading] = useState(true);
@@ -134,7 +136,8 @@ export const VideoHighlights: React.FC = React.memo(() => {
   }, [activeVideo]);
 
   const handleShare = useCallback(async (video: VideoHighlight) => {
-    const text = `Check out this amazing performance: ${video.title} by ${video.performer} at SSF Sahityotsav!`;
+    const festTitle = eventSettings?.festivalName || 'the festival';
+    const text = `Check out this performance: ${video.title}${video.performer ? ` by ${video.performer}` : ''} at ${festTitle}!\n\n© All rights reserved | Developed by Zenith Software`;
     const url = window.location.origin + video.videoUrl;
     
     if (navigator.share) {
@@ -142,9 +145,9 @@ export const VideoHighlights: React.FC = React.memo(() => {
         await navigator.share({ title: video.title, text, url });
       } catch (_) {}
     } else {
-      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text + ' ' + url)}`, '_blank');
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text + '\n' + url)}`, '_blank');
     }
-  }, []);
+  }, [eventSettings?.festivalName]);
 
   const handleDownload = useCallback((video: VideoHighlight) => {
     const a = document.createElement('a');
