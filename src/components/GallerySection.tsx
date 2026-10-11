@@ -165,7 +165,6 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ onNavigate }) =>
                 onClick={() => {
                   setActiveItem(item);
                   setCopied(false);
-                  setShowShareMenu(false);
                 }}
                 className="group relative bg-[#161619] border border-[#2A2A32] rounded-xl overflow-hidden cursor-pointer shadow-md sm:hover:border-white/40 transition-colors duration-300 flex flex-col"
               >
@@ -217,7 +216,6 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ onNavigate }) =>
           className="fixed inset-0 z-[99999] bg-black/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200"
           onClick={() => {
             setActiveItem(null);
-            setShowShareMenu(false);
           }}
         >
           <div
@@ -235,7 +233,6 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ onNavigate }) =>
               <button
                 onClick={() => {
                   setActiveItem(null);
-                  setShowShareMenu(false);
                 }}
                 className="p-1.5 text-zinc-400 hover:text-white bg-white/5 border border-white/10 rounded-lg transition-colors cursor-pointer"
                 title="Close"

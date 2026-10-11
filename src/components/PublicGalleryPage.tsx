@@ -263,7 +263,6 @@ export const PublicGalleryPage: React.FC = () => {
           className="fixed inset-0 z-[99999] bg-black/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200"
           onClick={() => {
             setActiveItem(null);
-            setShowShareMenu(false);
           }}
         >
           <div
@@ -281,7 +280,6 @@ export const PublicGalleryPage: React.FC = () => {
               <button
                 onClick={() => {
                   setActiveItem(null);
-                  setShowShareMenu(false);
                 }}
                 className="p-1.5 text-zinc-400 hover:text-white bg-white/5 border border-white/10 rounded-lg transition-colors cursor-pointer"
                 title="Close"
