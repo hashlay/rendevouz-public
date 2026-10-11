@@ -149,46 +149,7 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return () => clearInterval(interval);
   }, [heroMedia]);
 
-  // Purge legacy demo mock data from localStorage once on boot
-  useEffect(() => {
-    try {
-      const storedAuth = localStorage.getItem('rendezvous_auth_user');
-      if (storedAuth && (
-        storedAuth.includes('Festival Competition') ||
-        storedAuth.includes('3012') ||
-        storedAuth.includes('3016') ||
-        storedAuth.includes('Ajmal') ||
-        storedAuth.includes('Tashmeer') ||
-        storedAuth.includes('Main Team')
-      )) {
-        localStorage.removeItem('rendezvous_auth_user');
-        setAuthUser(null);
-      }
-      if (!localStorage.getItem('rendezvous_data_cleaned_v7')) {
-        localStorage.removeItem('rendezvous_results_v2');
-        localStorage.removeItem('rendezvous_gallery_v2');
-        localStorage.removeItem('rendezvous_smile_photos_v2');
-        localStorage.removeItem('rendezvous_stages_v2');
-        localStorage.removeItem('rendezvous_videos_v2');
-        localStorage.removeItem('rendezvous_participants_v2');
-        localStorage.removeItem('rendezvous_programs_v2');
-        localStorage.removeItem('rendezvous_judges_v2');
-        localStorage.removeItem('rendezvous_marks_v2');
-        
-        setResults([]);
-        setGallery([]);
-        setSmilePhotos([]);
-        setStages([]);
-        setVideoHighlights([]);
-        setParticipants([]);
-        setPrograms([]);
-        setJudges([]);
-        setMarks([]);
-        
-        localStorage.setItem('rendezvous_data_cleaned_v7', 'true');
-      }
-    } catch (_) {}
-  }, []);
+
 
   // 3. Dynamic Data States
   const [results, setResults] = useState<any[]>([]);
