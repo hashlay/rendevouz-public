@@ -18,7 +18,6 @@ import {
   DEFAULT_HERO_MEDIA,
   RESULTS_DATA,
   GALLERY_DATA,
-  SMILE_PHOTOS,
   STAGES_DATA,
   VIDEO_HIGHLIGHTS,
   NO_DP_AVATAR
@@ -34,8 +33,8 @@ interface FestivalContextType {
   logout: () => void;
   isLoginModalOpen: boolean;
   setIsLoginModalOpen: (open: boolean) => void;
-  loginInitialTab: 'participant' | 'committee' | 'developer';
-  openLoginModal: (tab?: 'participant' | 'committee' | 'developer') => void;
+  loginInitialTab: 'participant';
+  openLoginModal: (tab?: 'participant') => void;
 
   // Hero Media State (Cycling background)
   heroMedia: HeroMedia[];
@@ -84,8 +83,8 @@ interface FestivalContextType {
   deleteMark: (id: string) => void;
 
   // UI Portals State
-  activeModalView: 'none' | 'login' | 'participant-profile' | 'admin-dashboard' | 'judge-dashboard' | 'results-board';
-  setActiveModalView: (view: 'none' | 'login' | 'participant-profile' | 'admin-dashboard' | 'judge-dashboard' | 'results-board') => void;
+  activeModalView: 'none' | 'login' | 'participant-profile';
+  setActiveModalView: (view: 'none' | 'login' | 'participant-profile') => void;
   
   // Dynamic Standings
   houseScores: HouseScore[];
@@ -118,8 +117,8 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [authUser, setAuthUser] = useState<AuthUser | null>(() => safeStorageGet<AuthUser | null>('rendezvous_auth_user', null));
 
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [loginInitialTab, setLoginInitialTab] = useState<'participant' | 'committee' | 'developer'>('participant');
-  const [activeModalView, setActiveModalView] = useState<'none' | 'login' | 'participant-profile' | 'admin-dashboard' | 'judge-dashboard' | 'results-board'>('none');
+  const [loginInitialTab, setLoginInitialTab] = useState<'participant'>('participant');
+  const [activeModalView, setActiveModalView] = useState<'none' | 'login' | 'participant-profile'>('none');
 
   useEffect(() => {
     try {
@@ -295,7 +294,7 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }, []);
 
   // Auth Handlers
-  const openLoginModal = (tab: 'participant' | 'committee' | 'developer' = 'participant') => {
+  const openLoginModal = (tab: 'participant' = 'participant') => {
     setLoginInitialTab(tab);
     setIsLoginModalOpen(true);
     setActiveModalView('login');

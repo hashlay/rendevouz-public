@@ -1,7 +1,6 @@
 import React from 'react';
 import { INSTITUTION } from '../data/festivalData';
-import { Trophy, Radio, Calendar, MapPin, ChevronRight, Settings } from 'lucide-react';
-import { useFestival } from '../context/FestivalContext';
+import { Trophy, Radio, Calendar, MapPin, ChevronRight } from 'lucide-react';
 
 interface HeroSectionProps {
   onNavigate: (sectionId: string) => void;
@@ -11,7 +10,6 @@ interface HeroSectionProps {
 }
 
 export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSettings, heroMedia: propHeroMedia, dragBlocks }) => {
-  const { authUser, setActiveModalView } = useFestival();
   const [desktopIndex, setDesktopIndex] = React.useState(0);
   const [mobileIndex, setMobileIndex] = React.useState(0);
 
@@ -97,18 +95,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
         {/* Subtle atmospheric blending */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#012002]/90 via-[#012002]/30 to-transparent pointer-events-none" />
       </div>
-
-      {/* Admin Quick Action Button */}
-      {authUser && (authUser.role === 'admin' || authUser.role === 'superadmin') && (
-        <div className="absolute top-24 right-4 sm:right-8 z-30 bg-black/50 border border-emerald-500/30 backdrop-blur-md rounded-full px-3 py-1.5 shadow-lg">
-          <button
-            onClick={() => setActiveModalView('admin-dashboard')}
-            className="text-[10px] text-emerald-400 font-mono hover:underline flex items-center gap-1.5"
-          >
-            <Settings className="w-3.5 h-3.5" /> Manage Hero Media
-          </button>
-        </div>
-      )}
 
       <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 w-full z-20 text-center">
         <div className="flex flex-col items-center select-none pt-2 sm:pt-4">
