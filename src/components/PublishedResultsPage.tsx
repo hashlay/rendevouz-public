@@ -229,7 +229,7 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
               Results Standings
             </h1>
             <p className="text-zinc-400 text-xs sm:text-sm max-w-2xl leading-relaxed font-sans">
-              Every published result from Festival. Results stream in live as the juries sign them off.
+              Every published result from {eventSettings?.festivalName || 'the festival'}. Results stream in live as the juries sign them off.
             </p>
 
             <div style={{ color: 'var(--color-primary-accent)', borderColor: 'var(--color-primary-accent)' }} className="inline-block bg-[#1B1B1F] border px-3 py-1 rounded-full text-[11px] font-mono font-bold tracking-wider uppercase mt-3">

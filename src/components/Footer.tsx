@@ -78,39 +78,39 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings, dragBlo
 
   // Sanitization helpers to guarantee clean Rendezvous 26 presentation
   const sanitizeLogo = (logo?: string) => {
-    if (!logo || logo.includes('tabassum') || logo.includes('zenith_gold') || logo.includes('mas') || logo.endsWith('.jpg')) return '/fanous_logo.png';
+    if (!logo || logo.includes('tabassum') || logo.includes('zenith_gold') || logo.includes('mas')) return '/fanous_logo.png';
     return logo;
   };
   const sanitizeTitle = (title?: string) => {
-    if (!title || title.toUpperCase().includes('TABASSUM')) return 'FANOUS';
+    if (!title) return 'FANOUS';
     return title;
   };
   const sanitizeSubtitle = (sub?: string) => {
-    if (!sub || sub.toUpperCase().includes('MEELAD') || sub.toUpperCase().includes('FEST')) return '2K26';
+    if (!sub) return '2K26';
     return sub;
   };
   const sanitizeBadge = (badge?: string) => {
-    if (!badge || badge.toUpperCase().includes('NOORUL')) return 'SWALAHUL HUDA ACADEMY';
+    if (!badge) return 'SWALAHUL HUDA ACADEMY';
     return badge;
   };
   const sanitizeDesc = (desc?: string) => {
-    if (!desc || desc.toUpperCase().includes('TABASSUM') || desc.toUpperCase().includes('NOORUL')) {
+    if (!desc) {
       return 'FANOUS 2K26 is a vibrant celebration of talent, creativity, knowledge, and togetherness, proudly organized by Swalahul Huda Academy for Meelad Fest.';
     }
     return desc;
   };
   const sanitizeLocation = (loc?: string) => {
-    if (!loc || loc.toUpperCase().includes('JEPPU') || loc.toUpperCase().includes('MAS GARDEN')) return 'Rifayiya Juma Masjid Muchila';
+    if (!loc) return 'Rifayiya Juma Masjid Muchila';
     return loc;
   };
   const sanitizeEmail = (email?: string) => {
-    return 'zenith.theorganizer@gmail.com';
+    return email || 'zenith.theorganizer@gmail.com';
   };
   const sanitizePhone = (phone?: string) => {
-    return '+91 7483138340';
+    return phone || '+91 7483138340';
   };
   const sanitizeCopyright = (cr?: string) => {
-    if (!cr || cr.toUpperCase().includes('NOORUL') || cr.toUpperCase().includes('TABASSUM') || cr.toUpperCase().includes('RABBANI')) {
+    if (!cr) {
       return '© 2026 FANOUS 2K26 – Meelad Fest. Swalahul Huda Academy. All rights reserved. Developed by Zenith.';
     }
     return cr;

@@ -1,5 +1,4 @@
 import React from 'react';
-import { INSTITUTION } from '../data/festivalData';
 import { Trophy, Radio, Calendar, MapPin, ChevronRight } from 'lucide-react';
 
 interface HeroSectionProps {

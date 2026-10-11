@@ -1,6 +1,5 @@
 import React from 'react';
-import { INSTITUTION } from '../data/festivalData';
-import { BookOpen, Sparkles, Award, ShieldCheck, ArrowRight, Quote } from 'lucide-react';
+import { BookOpen, Award, ArrowRight, Quote } from 'lucide-react';
 
 interface AboutSectionProps {
   onOpenConceptModal: () => void;

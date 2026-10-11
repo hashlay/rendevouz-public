@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Logo } from './Logo';
-import { Trophy, Radio, Menu, X, User, Lock, ScanFace, ShieldCheck, Code, Settings } from 'lucide-react';
+import { Radio, Menu, X, User } from 'lucide-react';
 import { useFestival } from '../context/FestivalContext';
 
 interface HeaderProps {

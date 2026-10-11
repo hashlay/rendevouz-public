@@ -15,12 +15,7 @@ export const FullConceptModal: React.FC<FullConceptModalProps> = ({ isOpen, onCl
 
   // Safe paragraph resolution - strictly ensures an Array of strings is returned
   const paragraphs: string[] = React.useMemo(() => {
-    if (
-      typeof cmsSettings?.conceptModalDescription === 'string' &&
-      cmsSettings.conceptModalDescription.trim() &&
-      !cmsSettings.conceptModalDescription.toUpperCase().includes('TABASSUM') &&
-      !cmsSettings.conceptModalDescription.toUpperCase().includes('NOORUL')
-    ) {
+    if (typeof cmsSettings?.conceptModalDescription === 'string' && cmsSettings.conceptModalDescription.trim()) {
       return cmsSettings.conceptModalDescription.split('\n').map((s: string) => s.trim()).filter(Boolean);
     }
 
@@ -40,18 +35,10 @@ export const FullConceptModal: React.FC<FullConceptModalProps> = ({ isOpen, onCl
     ];
   }, [cmsSettings?.conceptModalDescription]);
 
-  const modalTitle = (!cmsSettings?.conceptModalTitle || cmsSettings.conceptModalTitle.toUpperCase().includes('SMILE') || cmsSettings.conceptModalTitle.toUpperCase().includes('TABASSUM'))
-    ? (FULL_CONCEPT_TEXT?.title || 'FANOUS 2K26 — MEELAD FEST')
-    : cmsSettings.conceptModalTitle;
-
-  const modalSubtitle = (!cmsSettings?.conceptModalSubtitle || cmsSettings.conceptModalSubtitle.toUpperCase().includes('NOORUL'))
-    ? (FULL_CONCEPT_TEXT?.institution || 'Swalahul Huda Academy • Under Rifayiya Juma Masjid Muchila')
-    : cmsSettings.conceptModalSubtitle;
-
+  const modalTitle = cmsSettings?.conceptModalTitle || FULL_CONCEPT_TEXT?.title || 'FANOUS 2K26 — MEELAD FEST';
+  const modalSubtitle = cmsSettings?.conceptModalSubtitle || FULL_CONCEPT_TEXT?.institution || 'Swalahul Huda Academy • Under Rifayiya Juma Masjid Muchila';
   const modalBadge = cmsSettings?.conceptModalBadge || FULL_CONCEPT_TEXT?.badge || 'Festival Concept & Vision';
-  const modalFooter = (!cmsSettings?.conceptModalFooter || cmsSettings.conceptModalFooter.toUpperCase().includes('TABASSUM') || cmsSettings.conceptModalFooter.toUpperCase().includes('RENDEZVOUS'))
-    ? 'FANOUS 2K26 • Swalahul Huda Academy'
-    : cmsSettings.conceptModalFooter;
+  const modalFooter = cmsSettings?.conceptModalFooter || 'FANOUS 2K26 • Swalahul Huda Academy';
 
   return (
     <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-xl flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200 py-8" onClick={onClose}>
