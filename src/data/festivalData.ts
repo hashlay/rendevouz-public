@@ -22,7 +22,7 @@ export const FULL_CONCEPT_TEXT = {
   institution: "Thwaiba Valliyad",
   badge: "Festival Concept & Vision",
   paragraphs: [
-    "Querencia is the premier annual arts, literary, and cultural festival presented by Thwaiba Valliyad, carrying the theme \"Decoding a Century of Wisdom\". Standing as a vibrant platform dedicated to nurturing intellectual, literary, and moral excellence among students across L Zone, Hi Zone, D Zone, and General categories.",
+    "Querencia is the premier annual arts, literary, and cultural festival presented by Thwaiba Valliyad, carrying the theme \"Decoding a Century of Wisdom\". Standing as a vibrant platform dedicated to nurturing intellectual, literary, and moral excellence among students across D-Zone, Hi-Zone, L-Zone, and General categories.",
     "The festival is designed to nurture and showcase the multidimensional talents of students across diverse artistic, literary, and oratory disciplines. Through rigorous academic competitions, creative writing, elocution, calligraphy, and cultural renditions, participants are inspired to achieve the highest benchmarks of performance and moral integrity.",
     "Querencia symbolizes a sanctuary where one feels authentic, strong, and inspired. Rooted in traditional ethics and progressive scholastic aspirations, this grand platform fosters brotherhood, healthy competitive spirit, and collaborative leadership among students.",
     "With comprehensive judging standards, dynamic digital tabulation, and an inspiring celebration of youth potential, Querencia unites students, teachers, and the broader community in a joyous commemoration of wisdom and creative devotion."
