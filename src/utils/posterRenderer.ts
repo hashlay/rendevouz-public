@@ -1312,7 +1312,7 @@ ${campus}
 
 ${hashtags}
 
-© All rights reserved | Developed by Zenith Software`;
+© Zenith Software`;
 };
 
 /**
@@ -1347,7 +1347,7 @@ ${campus}
 
 ${hashtags}
 
-© All rights reserved | Developed by Zenith Software`;
+© Zenith Software`;
 };
 
 /**
@@ -1376,7 +1376,7 @@ ${campus}
 
 ${hashtags}
 
-© All rights reserved | Developed by Zenith Software`;
+© Zenith Software`;
 };
 
 /**
