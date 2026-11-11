@@ -82,25 +82,25 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings, dragBlo
     return logo;
   };
   const sanitizeTitle = (title?: string) => {
-    if (!title) return 'FANOUS';
+    if (!title) return 'QUERENCIA';
     return title;
   };
   const sanitizeSubtitle = (sub?: string) => {
-    if (!sub) return '2K26';
+    if (!sub) return 'Devoding a Century of wisdom';
     return sub;
   };
   const sanitizeBadge = (badge?: string) => {
-    if (!badge) return 'SWALAHUL HUDA ACADEMY';
+    if (!badge) return 'THWAIBA VALLYAD';
     return badge;
   };
   const sanitizeDesc = (desc?: string) => {
     if (!desc) {
-      return 'FANOUS 2K26 is a vibrant celebration of talent, creativity, knowledge, and togetherness, proudly organized by Swalahul Huda Academy for Meelad Fest.';
+      return 'Querencia is a vibrant celebration of talent, creativity, knowledge, and togetherness, proudly organized by Thwaiba Vallyad under the theme "Devoding a Century of wisdom".';
     }
     return desc;
   };
   const sanitizeLocation = (loc?: string) => {
-    if (!loc) return 'Rifayiya Juma Masjid Muchila';
+    if (!loc) return 'Thwaiba Vallyad';
     return loc;
   };
   const sanitizeEmail = (email?: string) => {

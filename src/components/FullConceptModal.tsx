@@ -28,17 +28,17 @@ export const FullConceptModal: React.FC<FullConceptModalProps> = ({ isOpen, onCl
     }
 
     return [
-      "FANOUS 2K26 is the premier annual arts, literary, and cultural festival presented by Swalahul Huda Academy, functioning under the guidance and management of Rifayiya Juma Masjid Muchila.",
-      "Commemorating the auspicious occasion of Meelad Fest, FANOUS stands as a radiant beacon of intellectual illumination, spiritual devotion, and artistic excellence.",
-      "The festival is designed to nurture and showcase the multidimensional talents of students across diverse artistic, literary, and oratory disciplines.",
-      "With comprehensive judging standards, dynamic digital tabulation, and an inspiring celebration of youth potential, FANOUS 2K26 unites students, teachers, and the broader community."
+      "Querencia is the premier annual arts, literary, and cultural festival presented by Thwaiba Vallyad, carrying the theme \"Devoding a Century of wisdom\". Standing as a vibrant platform dedicated to nurturing intellectual, literary, and moral excellence among students across L Zone, Hi Zone, D Zone, and General categories.",
+      "The festival is designed to nurture and showcase the multidimensional talents of students across diverse artistic, literary, and oratory disciplines. Through rigorous academic competitions, creative writing, elocution, calligraphy, and cultural renditions, participants are inspired to achieve the highest benchmarks of performance and moral integrity.",
+      "Querencia symbolizes a sanctuary where one feels authentic, strong, and inspired. Rooted in traditional ethics and progressive scholastic aspirations, this grand platform fosters brotherhood, healthy competitive spirit, and collaborative leadership among students.",
+      "With comprehensive judging standards, dynamic digital tabulation, and an inspiring celebration of youth potential, Querencia unites students, teachers, and the broader community in a joyous commemoration of wisdom and creative devotion."
     ];
   }, [cmsSettings?.conceptModalDescription]);
 
-  const modalTitle = cmsSettings?.conceptModalTitle || FULL_CONCEPT_TEXT?.title || 'FANOUS 2K26 — MEELAD FEST';
-  const modalSubtitle = cmsSettings?.conceptModalSubtitle || FULL_CONCEPT_TEXT?.institution || 'Swalahul Huda Academy • Under Rifayiya Juma Masjid Muchila';
+  const modalTitle = cmsSettings?.conceptModalTitle || FULL_CONCEPT_TEXT?.title || 'QUERENCIA — DEVODING A CENTURY OF WISDOM';
+  const modalSubtitle = cmsSettings?.conceptModalSubtitle || FULL_CONCEPT_TEXT?.institution || 'Thwaiba Vallyad • Devoding a Century of wisdom';
   const modalBadge = cmsSettings?.conceptModalBadge || FULL_CONCEPT_TEXT?.badge || 'Festival Concept & Vision';
-  const modalFooter = cmsSettings?.conceptModalFooter || 'FANOUS 2K26 • Swalahul Huda Academy';
+  const modalFooter = cmsSettings?.conceptModalFooter || 'QUERENCIA • Thwaiba Vallyad';
 
   return (
     <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-xl flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200 py-8" onClick={onClose}>

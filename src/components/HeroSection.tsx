@@ -99,10 +99,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
         <div className="flex flex-col items-center select-none pt-2 sm:pt-4">
           {/* 1. Main Festival Brand Title: Clean Sora Font */}
           <h1 className="font-sora font-extrabold text-[#F4F8F4] text-4xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight uppercase select-none my-1 drop-shadow-md leading-none sm:leading-tight">
-            {cmsSettings?.heroTitle || 'FANOUS 2K26'}
+            {cmsSettings?.heroTitle || 'QUERENCIA'}
           </h1>
 
-          {/* 2. Theme Subtitle: Meelad Fest (Semi-bold, 5% smaller than Fanous 2K26) */}
+          {/* 2. Theme Subtitle: Devoding a Century of wisdom */}
           <h2
             className="font-sora font-semibold text-[2rem] sm:text-[3.4rem] md:text-[4.2rem] lg:text-[5.6rem] tracking-tight select-none my-1 leading-none sm:leading-tight drop-shadow-md"
             style={{
@@ -111,12 +111,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
               WebkitTextStroke: '0.4px rgba(0, 0, 0, 0.6)'
             }}
           >
-            {(cmsSettings?.heroSubtitle || 'Meelad Fest').replace(/^["“']+|["”']+$/g, '')}
+            {(cmsSettings?.heroSubtitle || 'Devoding a Century of wisdom').replace(/^["“']+|["”']+$/g, '')}
           </h2>
 
           {/* 3. Campus Name Badge */}
           <p className="font-sora text-xs sm:text-sm md:text-base font-bold text-[#A2D5A4] tracking-[0.25em] sm:tracking-[0.35em] uppercase mt-2 sm:mt-3 mb-5 sm:mb-8 select-none">
-            {cmsSettings?.heroLogoBadge || cmsSettings?.campusName || 'SWALAHUL HUDA ACADEMY'}
+            {cmsSettings?.heroLogoBadge || cmsSettings?.campusName || 'THWAIBA VALLYAD'}
           </p>
 
           {/* 4. Date & Venue Details Bar */}

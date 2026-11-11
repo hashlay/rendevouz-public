@@ -45,16 +45,16 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenConceptModal, 
               </div>
 
               <h3 className="text-lg sm:text-xl font-bold text-white mb-1.5 pt-1">
-                {cmsSettings?.aboutTitle || 'Swalahul Huda Academy'}
+                {cmsSettings?.aboutTitle || 'Thwaiba Vallyad'}
               </h3>
               <p style={{ color: 'var(--color-primary-accent)' }} className="text-xs font-semibold uppercase tracking-wider mb-3 font-mono">
-                {cmsSettings?.aboutSubtitle || 'Meelad Fest 2K26'}
+                {cmsSettings?.aboutSubtitle || 'Querencia — Devoding a Century of wisdom'}
               </p>
 
               <div className="text-zinc-300 text-xs sm:text-sm leading-relaxed mb-5 whitespace-pre-line">
                 {cmsSettings?.aboutDescription || (
                   <>
-                    <strong>Swalahul Huda Academy</strong>, functioning under the guidance and management of <strong>Rifayiya Juma Masjid Muchila</strong>, proudly presents <strong>FANOUS 2K26</strong> in grand commemoration of <strong>Meelad Fest</strong>. This annual celebration serves as a distinguished platform for promoting academic brilliance, creative expression, and moral integrity.
+                    <strong>Thwaiba Vallyad</strong> proudly presents <strong>QUERENCIA</strong> under the theme <strong>Devoding a Century of wisdom</strong>. A distinguished arts, cultural, and literary platform dedicated to nurturing intellectual, literary, and moral excellence across <strong>L Zone</strong>, <strong>Hi Zone</strong>, <strong>D Zone</strong>, and <strong>General</strong> categories.
                   </>
                 )}
               </div>
@@ -62,10 +62,10 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenConceptModal, 
               {/* Theme Breakdown Box */}
               <div className="bg-zinc-900/60 border rounded-xl p-4 mb-5" style={{ borderColor: 'var(--color-primary-accent)' }}>
                 <div className="flex items-center gap-2 text-white font-bold text-xs mb-1.5">
-                  <span>Theme: "{cmsSettings?.themeTitle || 'Meelad Fest'}"</span>
+                  <span>Theme: "{cmsSettings?.themeTitle || 'Devoding a Century of wisdom'}"</span>
                 </div>
                 <p className="text-xs text-zinc-300 leading-relaxed italic whitespace-pre-line">
-                  "{cmsSettings?.themeDescription || 'An inspiring confluence of artistic devotion, ethical scholarship, and youth talent commemorating Meelad Fest at Rifayiya Juma Masjid Muchila.'}"
+                  "{cmsSettings?.themeDescription || 'An inspiring confluence of artistic devotion, ethical scholarship, and youth talent celebrating Querencia at Thwaiba Vallyad.'}"
                 </p>
               </div>
 
@@ -108,13 +108,13 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenConceptModal, 
                 {/* Bottom Overlay Label */}
                 <div className="absolute bottom-3 left-3 right-3 text-left">
                   <span className="text-[10px] font-bold uppercase tracking-widest block font-mono" style={{ color: 'var(--color-primary-accent)' }}>
-                    {cmsSettings?.aboutImageTitle || 'FANOUS 2K26'}
+                    {cmsSettings?.aboutImageTitle || 'QUERENCIA'}
                   </span>
                   <h4 className="text-base font-extrabold text-white leading-tight">
                     {cmsSettings?.aboutImageSubtitle || 'Grand Cultural & Literary Fest'}
                   </h4>
                   <p className="text-[11px] text-zinc-300 mt-0.5">
-                    {cmsSettings?.aboutImageLocation || 'Rifayiya Juma Masjid Muchila'}
+                    {cmsSettings?.aboutImageLocation || 'Thwaiba Vallyad'}
                   </p>
                 </div>
               </div>
@@ -123,7 +123,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenConceptModal, 
               <div className="p-3 bg-[#141414] border-t border-white/10 flex items-center justify-between text-[11px] text-zinc-400">
                 <div className="flex items-center gap-1.5">
                   <Award className="w-3.5 h-3.5" style={{ color: 'var(--color-primary-accent)' }} />
-                  <span>{cmsSettings?.aboutImageFooter || 'Swalahul Huda Academy'}</span>
+                  <span>{cmsSettings?.aboutImageFooter || 'Thwaiba Vallyad'}</span>
                 </div>
               </div>
             </div>
