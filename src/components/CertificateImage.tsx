@@ -50,7 +50,7 @@ export const CertificateImage: React.FC<CertificateImageProps> = ({
       ctx.fillStyle = eventSettings?.primaryColor || '#F59E0B';
       ctx.font = 'bold 22px sans-serif';
       ctx.textAlign = 'center';
-      const festivalCertTitle = (eventSettings?.festivalName || eventSettings?.eventTitle || 'FANOUS 2K26').toUpperCase();
+      const festivalCertTitle = (eventSettings?.festivalName || eventSettings?.eventTitle || 'QUERENCIA').toUpperCase();
       ctx.fillText(festivalCertTitle, 600, 120);
 
       ctx.fillStyle = '#FFFFFF';

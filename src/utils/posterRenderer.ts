@@ -1246,10 +1246,10 @@ export const generatePosterShareCaption = (
   results: any[],
   eventSettings?: any
 ): string => {
-  const festivalTitle = (eventSettings?.festivalName || 'FANOUS 2K26').toUpperCase();
+  const festivalTitle = (eventSettings?.festivalName || 'QUERENCIA').toUpperCase();
   const formattedNum = String(compIndex || 1).padStart(2, '0');
-  const slogan = eventSettings?.festivalTagline || eventSettings?.slogan || 'Meelad Fest';
-  const campus = eventSettings?.campusName || eventSettings?.sectorName || 'Swalahul Huda Academy';
+  const slogan = eventSettings?.tagline || eventSettings?.festivalTagline || eventSettings?.slogan || 'Decoding a Century of Wisdom';
+  const campus = eventSettings?.campusName || eventSettings?.sectorName || 'Thwaiba Valliyad';
 
   // Enforce strictly 3 to 4 hashtags
   let hashtagList: string[] = [];

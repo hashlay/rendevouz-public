@@ -23,9 +23,9 @@ export const Logo: React.FC<LogoProps> = ({
   showIcon = true,
   customIconUrl = '',
 }) => {
-  const rawTitle = (title !== undefined && title !== null && title !== '') ? title : 'FANOUS 2K26';
-  const rawSubtitle = (subtitle !== undefined && subtitle !== null && subtitle !== '') ? subtitle : 'Meelad Fest';
-  const rawBadge = (badge !== undefined && badge !== null && badge !== '') ? badge : 'Swalahul Huda Academy';
+  const rawTitle = (title !== undefined && title !== null && title !== '') ? title : 'QUERENCIA';
+  const rawSubtitle = (subtitle !== undefined && subtitle !== null && subtitle !== '') ? subtitle : 'Decoding a Century of Wisdom';
+  const rawBadge = (badge !== undefined && badge !== null && badge !== '') ? badge : 'Thwaiba Valliyad';
 
   // Dimension scales
   const scales = {
@@ -43,12 +43,12 @@ export const Logo: React.FC<LogoProps> = ({
       {showIcon && (
         <div className="relative group shrink-0 flex items-center justify-center">
           <img
-            src={customIconUrl || '/fanous_logo.png'}
-            alt="FANOUS 2K26 Logo"
+            src={customIconUrl || '/querencia_logo.png'}
+            alt="QUERENCIA Logo"
             onError={(e) => {
               const target = e.currentTarget;
-              if (!target.src.endsWith('/fanous_logo.png')) {
-                target.src = '/fanous_logo.png';
+              if (!target.src.endsWith('/querencia_logo.png')) {
+                target.src = '/querencia_logo.png';
               }
             }}
             className="object-contain transition-transform duration-300 group-hover:scale-105"
