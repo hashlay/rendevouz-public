@@ -45,16 +45,16 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenConceptModal, 
               </div>
 
               <h3 className="text-lg sm:text-xl font-bold text-white mb-1.5 pt-1">
-                {cmsSettings?.aboutTitle || 'Thwaiba Vallyad'}
+                {cmsSettings?.aboutTitle || 'Thwaiba Valliyad'}
               </h3>
               <p style={{ color: 'var(--color-primary-accent)' }} className="text-xs font-semibold uppercase tracking-wider mb-3 font-mono">
-                {cmsSettings?.aboutSubtitle || 'Querencia — Devoding a Century of wisdom'}
+                {cmsSettings?.aboutSubtitle || 'Querencia — Decoding a Century of Wisdom'}
               </p>
 
               <div className="text-zinc-300 text-xs sm:text-sm leading-relaxed mb-5 whitespace-pre-line">
                 {cmsSettings?.aboutDescription || (
                   <>
-                    <strong>Thwaiba Vallyad</strong> proudly presents <strong>QUERENCIA</strong> under the theme <strong>Devoding a Century of wisdom</strong>. A distinguished arts, cultural, and literary platform dedicated to nurturing intellectual, literary, and moral excellence across <strong>L Zone</strong>, <strong>Hi Zone</strong>, <strong>D Zone</strong>, and <strong>General</strong> categories.
+                    <strong>Thwaiba Valliyad</strong> proudly presents <strong>QUERENCIA</strong> under the theme <strong>Decoding a Century of Wisdom</strong>. A distinguished arts, cultural, and literary platform dedicated to nurturing intellectual, literary, and moral excellence across <strong>L Zone</strong>, <strong>Hi Zone</strong>, <strong>D Zone</strong>, and <strong>General</strong> categories.
                   </>
                 )}
               </div>
@@ -62,10 +62,10 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenConceptModal, 
               {/* Theme Breakdown Box */}
               <div className="bg-zinc-900/60 border rounded-xl p-4 mb-5" style={{ borderColor: 'var(--color-primary-accent)' }}>
                 <div className="flex items-center gap-2 text-white font-bold text-xs mb-1.5">
-                  <span>Theme: "{cmsSettings?.themeTitle || 'Devoding a Century of wisdom'}"</span>
+                  <span>Theme: "{cmsSettings?.themeTitle || 'Decoding a Century of Wisdom'}"</span>
                 </div>
                 <p className="text-xs text-zinc-300 leading-relaxed italic whitespace-pre-line">
-                  "{cmsSettings?.themeDescription || 'An inspiring confluence of artistic devotion, ethical scholarship, and youth talent celebrating Querencia at Thwaiba Vallyad.'}"
+                  "{cmsSettings?.themeDescription || 'An inspiring confluence of artistic devotion, ethical scholarship, and youth talent celebrating Querencia at Thwaiba Valliyad.'}"
                 </p>
               </div>
 
@@ -88,8 +88,8 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenConceptModal, 
               {/* Photo Frame */}
               <div className="relative aspect-[4/3] sm:aspect-[16/11] overflow-hidden">
                 <img
-                  src={cmsSettings?.aboutImage || "https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3?auto=format&fit=crop&w=1200&q=80"}
-                  alt={cmsSettings?.aboutImageTitle || "FANOUS 2K26"}
+                  src={cmsSettings?.aboutImage || "/querencia_logo.png"}
+                  alt={cmsSettings?.aboutImageTitle || "QUERENCIA"}
                   className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 filter brightness-95 contrast-105"
                   referrerPolicy="no-referrer"
                 />
@@ -114,7 +114,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenConceptModal, 
                     {cmsSettings?.aboutImageSubtitle || 'Grand Cultural & Literary Fest'}
                   </h4>
                   <p className="text-[11px] text-zinc-300 mt-0.5">
-                    {cmsSettings?.aboutImageLocation || 'Thwaiba Vallyad'}
+                    {cmsSettings?.aboutImageLocation || 'Thwaiba Valliyad'}
                   </p>
                 </div>
               </div>
@@ -123,7 +123,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onOpenConceptModal, 
               <div className="p-3 bg-[#141414] border-t border-white/10 flex items-center justify-between text-[11px] text-zinc-400">
                 <div className="flex items-center gap-1.5">
                   <Award className="w-3.5 h-3.5" style={{ color: 'var(--color-primary-accent)' }} />
-                  <span>{cmsSettings?.aboutImageFooter || 'Thwaiba Vallyad'}</span>
+                  <span>{cmsSettings?.aboutImageFooter || 'Thwaiba Valliyad'}</span>
                 </div>
               </div>
             </div>

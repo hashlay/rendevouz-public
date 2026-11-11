@@ -28,17 +28,17 @@ export const FullConceptModal: React.FC<FullConceptModalProps> = ({ isOpen, onCl
     }
 
     return [
-      "Querencia is the premier annual arts, literary, and cultural festival presented by Thwaiba Vallyad, carrying the theme \"Devoding a Century of wisdom\". Standing as a vibrant platform dedicated to nurturing intellectual, literary, and moral excellence among students across L Zone, Hi Zone, D Zone, and General categories.",
+      "Querencia is the premier annual arts, literary, and cultural festival presented by Thwaiba Valliyad, carrying the theme \"Decoding a Century of Wisdom\". Standing as a vibrant platform dedicated to nurturing intellectual, literary, and moral excellence among students across L Zone, Hi Zone, D Zone, and General categories.",
       "The festival is designed to nurture and showcase the multidimensional talents of students across diverse artistic, literary, and oratory disciplines. Through rigorous academic competitions, creative writing, elocution, calligraphy, and cultural renditions, participants are inspired to achieve the highest benchmarks of performance and moral integrity.",
       "Querencia symbolizes a sanctuary where one feels authentic, strong, and inspired. Rooted in traditional ethics and progressive scholastic aspirations, this grand platform fosters brotherhood, healthy competitive spirit, and collaborative leadership among students.",
       "With comprehensive judging standards, dynamic digital tabulation, and an inspiring celebration of youth potential, Querencia unites students, teachers, and the broader community in a joyous commemoration of wisdom and creative devotion."
     ];
   }, [cmsSettings?.conceptModalDescription]);
 
-  const modalTitle = cmsSettings?.conceptModalTitle || FULL_CONCEPT_TEXT?.title || 'QUERENCIA — DEVODING A CENTURY OF WISDOM';
-  const modalSubtitle = cmsSettings?.conceptModalSubtitle || FULL_CONCEPT_TEXT?.institution || 'Thwaiba Vallyad • Devoding a Century of wisdom';
+  const modalTitle = cmsSettings?.conceptModalTitle || FULL_CONCEPT_TEXT?.title || 'QUERENCIA — DECODING A CENTURY OF WISDOM';
+  const modalSubtitle = cmsSettings?.conceptModalSubtitle || FULL_CONCEPT_TEXT?.institution || 'Thwaiba Valliyad • Decoding a Century of Wisdom';
   const modalBadge = cmsSettings?.conceptModalBadge || FULL_CONCEPT_TEXT?.badge || 'Festival Concept & Vision';
-  const modalFooter = cmsSettings?.conceptModalFooter || 'QUERENCIA • Thwaiba Vallyad';
+  const modalFooter = cmsSettings?.conceptModalFooter || 'QUERENCIA • Thwaiba Valliyad';
 
   return (
     <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-xl flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200 py-8" onClick={onClose}>

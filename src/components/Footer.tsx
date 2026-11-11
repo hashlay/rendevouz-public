@@ -78,7 +78,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings, dragBlo
 
   // Sanitization helpers to guarantee clean Rendezvous 26 presentation
   const sanitizeLogo = (logo?: string) => {
-    if (!logo || logo.includes('tabassum') || logo.includes('zenith_gold') || logo.includes('mas')) return '/fanous_logo.png';
+    if (!logo || logo.includes('tabassum') || logo.includes('zenith_gold') || logo.includes('mas') || logo.includes('fanous')) return '/querencia_logo.png';
     return logo;
   };
   const sanitizeTitle = (title?: string) => {
@@ -86,21 +86,21 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, cmsSettings, dragBlo
     return title;
   };
   const sanitizeSubtitle = (sub?: string) => {
-    if (!sub) return 'Devoding a Century of wisdom';
+    if (!sub) return 'Decoding a Century of Wisdom';
     return sub;
   };
   const sanitizeBadge = (badge?: string) => {
-    if (!badge) return 'THWAIBA VALLYAD';
+    if (!badge) return 'THWAIBA VALLIYAD';
     return badge;
   };
   const sanitizeDesc = (desc?: string) => {
     if (!desc) {
-      return 'Querencia is a vibrant celebration of talent, creativity, knowledge, and togetherness, proudly organized by Thwaiba Vallyad under the theme "Devoding a Century of wisdom".';
+      return 'Querencia is a vibrant celebration of talent, creativity, knowledge, and togetherness, proudly organized by Thwaiba Valliyad under the theme "Decoding a Century of Wisdom".';
     }
     return desc;
   };
   const sanitizeLocation = (loc?: string) => {
-    if (!loc) return 'Thwaiba Vallyad';
+    if (!loc) return 'Thwaiba Valliyad';
     return loc;
   };
   const sanitizeEmail = (email?: string) => {

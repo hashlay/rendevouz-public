@@ -12,8 +12,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
   const [desktopIndex, setDesktopIndex] = React.useState(0);
   const [mobileIndex, setMobileIndex] = React.useState(0);
 
-  const defaultDesktopImages = ['/fanous_hero_desktop.jpg'];
-  const defaultMobileImages = ['/fanous_hero_mobile.jpg'];
+  const defaultDesktopImages: string[] = [];
+  const defaultMobileImages: string[] = [];
 
   const customDesktop = propHeroMedia?.filter(m => m.device !== 'mobile').sort((a, b) => (a.order || 0) - (b.order || 0)).map(m => m.url).filter((url): url is string => Boolean(url && typeof url === 'string' && url.trim().length > 0)) || [];
   const customMobile = propHeroMedia?.filter(m => m.device !== 'desktop').sort((a, b) => (a.order || 0) - (b.order || 0)).map(m => m.url).filter((url): url is string => Boolean(url && typeof url === 'string' && url.trim().length > 0)) || [];
@@ -69,7 +69,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
             <img
               key={`mob-${idx}-${src}`}
               src={src}
-              alt="FANOUS 2K26 Background"
+              alt="QUERENCIA Background"
               className={`absolute inset-0 w-full h-full object-cover filter brightness-[0.70] contrast-[1.05] transition-opacity duration-1000 ${
                 idx === mobileIndex ? 'opacity-100' : 'opacity-0'
               }`}
@@ -83,7 +83,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
             <img
               key={`desk-${idx}-${src}`}
               src={src}
-              alt="FANOUS 2K26 Background"
+              alt="QUERENCIA Background"
               className={`absolute inset-0 w-full h-full object-cover filter brightness-[0.65] contrast-[1.05] transition-opacity duration-1000 ${
                 idx === desktopIndex ? 'opacity-100' : 'opacity-0'
               }`}
@@ -102,7 +102,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
             {cmsSettings?.heroTitle || 'QUERENCIA'}
           </h1>
 
-          {/* 2. Theme Subtitle: Devoding a Century of wisdom */}
+          {/* 2. Theme Subtitle: Decoding a Century of Wisdom */}
           <h2
             className="font-sora font-semibold text-[2rem] sm:text-[3.4rem] md:text-[4.2rem] lg:text-[5.6rem] tracking-tight select-none my-1 leading-none sm:leading-tight drop-shadow-md"
             style={{
@@ -111,12 +111,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
               WebkitTextStroke: '0.4px rgba(0, 0, 0, 0.6)'
             }}
           >
-            {(cmsSettings?.heroSubtitle || 'Devoding a Century of wisdom').replace(/^["“']+|["”']+$/g, '')}
+            {(cmsSettings?.heroSubtitle || 'Decoding a Century of Wisdom').replace(/^["“']+|["”']+$/g, '')}
           </h2>
 
           {/* 3. Campus Name Badge */}
           <p className="font-sora text-xs sm:text-sm md:text-base font-bold text-[#A2D5A4] tracking-[0.25em] sm:tracking-[0.35em] uppercase mt-2 sm:mt-3 mb-5 sm:mb-8 select-none">
-            {cmsSettings?.heroLogoBadge || cmsSettings?.campusName || 'THWAIBA VALLYAD'}
+            {cmsSettings?.heroLogoBadge || cmsSettings?.campusName || 'THWAIBA VALLIYAD'}
           </p>
 
           {/* 4. Date & Venue Details Bar */}
@@ -127,12 +127,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
             >
               <div className="flex items-center gap-2 text-[#F4F8F4] font-mono text-xs sm:text-sm font-medium">
                 <Calendar className="w-4 h-4 shrink-0" style={{ color: 'var(--color-primary-accent, #18BA46)' }} />
-                <span>{cmsSettings?.heroDate || 'October 9, 2026'}</span>
+                <span>{cmsSettings?.heroDate || 'November 27, 28, 29, 2026'}</span>
               </div>
               <div className="hidden sm:block w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: 'var(--color-primary-accent, #18BA46)' }} />
               <div className="flex items-center gap-2 text-[#F4F8F4] font-mono text-xs sm:text-sm font-medium">
                 <MapPin className="w-4 h-4 shrink-0" style={{ color: 'var(--color-primary-accent, #18BA46)' }} />
-                <span>{cmsSettings?.heroLocation || 'Rifayiya Juma Masjid Muchila'}</span>
+                <span>{cmsSettings?.heroLocation || 'Thwaiba Valliyad'}</span>
               </div>
             </div>
           </div>

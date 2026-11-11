@@ -1328,12 +1328,12 @@ export const generateCertificateShareCaption = (
   eventSettings?: any
 ): string => {
   const festivalTitle = (eventSettings?.festivalName || 'QUERENCIA').toUpperCase();
-  const slogan = eventSettings?.tagline || eventSettings?.festivalTagline || eventSettings?.slogan || 'Devoding a Century of wisdom';
-  const campus = eventSettings?.campusName || eventSettings?.sectorName || 'Thwaiba Vallyad';
+  const slogan = eventSettings?.tagline || eventSettings?.festivalTagline || eventSettings?.slogan || 'Decoding a Century of Wisdom';
+  const campus = eventSettings?.campusName || eventSettings?.sectorName || 'Thwaiba Valliyad';
   const rankEmoji = rank === 1 || rank === '1' ? '🥇 1st Place' : rank === 2 || rank === '2' ? '🥈 2nd Place' : rank === 3 || rank === '3' ? '🥉 3rd Place' : `Rank ${rank}`;
 
   const cleanTag = festivalTitle.replace(/[^a-zA-Z0-9]/g, '');
-  const hashtags = `#${cleanTag} #Certificate #Winners #ThwaibaVallyad`;
+  const hashtags = `#${cleanTag} #Certificate #Winners #ThwaibaValliyad`;
 
   return `🎓 ${festivalTitle} — OFFICIAL CERTIFICATE
 ✨ ${slogan}
@@ -1359,11 +1359,11 @@ export const generateParticipantPosterShareCaption = (
   eventSettings?: any
 ): string => {
   const festivalTitle = (eventSettings?.festivalName || 'QUERENCIA').toUpperCase();
-  const slogan = eventSettings?.tagline || eventSettings?.festivalTagline || eventSettings?.slogan || 'Devoding a Century of wisdom';
-  const campus = eventSettings?.campusName || eventSettings?.sectorName || 'Thwaiba Vallyad';
+  const slogan = eventSettings?.tagline || eventSettings?.festivalTagline || eventSettings?.slogan || 'Decoding a Century of Wisdom';
+  const campus = eventSettings?.campusName || eventSettings?.sectorName || 'Thwaiba Valliyad';
 
   const cleanTag = festivalTitle.replace(/[^a-zA-Z0-9]/g, '');
-  const hashtags = `#${cleanTag} #ResultPoster #Winners #ThwaibaVallyad`;
+  const hashtags = `#${cleanTag} #ResultPoster #Winners #ThwaibaValliyad`;
 
   return `🏆 ${festivalTitle} — RESULT POSTER
 ✨ ${slogan}
