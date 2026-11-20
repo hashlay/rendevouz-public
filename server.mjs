@@ -362,7 +362,7 @@ app.get(['/api/settings', '/api/public/settings'], async (req, res) => {
     settings.participantLoginCriteria = 'class';
   }
   if (!settings.availableClasses || settings.availableClasses.length === 0) {
-    settings.availableClasses = ['+1', '+2'];
+    settings.availableClasses = ['JD1', 'JD2', 'JD3', 'HS1', 'HS2', 'BS1'];
   }
   res.json(settings);
 });

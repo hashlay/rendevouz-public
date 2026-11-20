@@ -118,7 +118,7 @@ export const FestivalProvider: React.FC<{ children: React.ReactNode }> = ({ chil
               merged.participantLoginCriteria = 'class';
             }
             if (!merged.availableClasses || merged.availableClasses.length === 0) {
-              merged.availableClasses = ['+1', '+2'];
+              merged.availableClasses = ['JD1', 'JD2', 'JD3', 'HS1', 'HS2', 'BS1'];
             }
             return merged;
           });

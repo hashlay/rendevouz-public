@@ -18,19 +18,19 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   const [isSigningIn, setIsSigningIn] = useState(false);
   const dateInputRef = React.useRef<HTMLInputElement>(null);
 
-  // Participant verification criteria mode is Class / Grade (+1 Junior, +2 Senior)
+  // Participant verification criteria mode is Class / Grade
   const criteriaMode = 'class';
   const rawClasses: string[] = (Array.isArray(eventSettings?.availableClasses) && eventSettings.availableClasses.length > 0)
     ? eventSettings.availableClasses
-    : ['+1', '+2'];
+    : ['JD1', 'JD2', 'JD3', 'HS1', 'HS2', 'BS1'];
   const availableClasses: string[] = Array.from(new Set(rawClasses.map(c => c.replace(/^Class\s*/i, '').trim()))).filter(Boolean);
-  if (availableClasses.length === 0) availableClasses.push('+1', '+2');
+  if (availableClasses.length === 0) availableClasses.push('JD1', 'JD2', 'JD3', 'HS1', 'HS2', 'BS1');
 
   const getClassLabel = (cls: string) => {
     const clean = cls.replace(/^Class\s*/i, '').trim();
     if (clean === '+1' || clean.toLowerCase() === 'junior') return '+1 (Junior)';
     if (clean === '+2' || clean.toLowerCase() === 'senior') return '+2 (Senior)';
-    return cls;
+    return clean;
   };
 
   React.useEffect(() => {
