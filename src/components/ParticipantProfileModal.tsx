@@ -684,18 +684,30 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                   if (m <= 0) {
                     computedGrade = '';
                   } else if (!computedGrade) {
-                    if (isGroup) {
-                      if (m >= 95) computedGrade = 'A+';
-                      else if (m >= 80) computedGrade = 'A';
-                      else if (m >= 55) computedGrade = 'B';
-                      else if (m >= 30) computedGrade = 'C';
-                      else computedGrade = '';
-                    } else {
-                      if (m >= 95) computedGrade = 'A+';
-                      else if (m >= 85) computedGrade = 'A';
-                      else if (m >= 70) computedGrade = 'B';
-                      else if (m >= 50) computedGrade = 'C';
-                      else computedGrade = '';
+                    let matrix = eventSettings?.gradeMatrix && Array.isArray(eventSettings.gradeMatrix) && eventSettings.gradeMatrix.length > 0 ? eventSettings.gradeMatrix : [
+                      { id: '1', minMark: 95, maxMark: 100, indGrade: 'A+', indPoints: 10, groupGrade: 'A+', groupPoints: 20 },
+                      { id: '2', minMark: 90, maxMark: 95, indGrade: 'A', indPoints: 9, groupGrade: 'A', groupPoints: 19 },
+                      { id: '3', minMark: 85, maxMark: 90, indGrade: 'A', indPoints: 8, groupGrade: 'A', groupPoints: 18 },
+                      { id: '4', minMark: 80, maxMark: 85, indGrade: 'B+', indPoints: 7, groupGrade: 'A', groupPoints: 17 },
+                      { id: '5', minMark: 75, maxMark: 80, indGrade: 'B', indPoints: 6, groupGrade: 'B+', groupPoints: 16 },
+                      { id: '6', minMark: 70, maxMark: 75, indGrade: 'B', indPoints: 5, groupGrade: 'B', groupPoints: 15 },
+                      { id: '7', minMark: 65, maxMark: 70, indGrade: 'C+', indPoints: 4, groupGrade: 'B', groupPoints: 14 },
+                      { id: '8', minMark: 55, maxMark: 65, indGrade: 'C', indPoints: 3, groupGrade: 'B', groupPoints: 13 },
+                      { id: '9', minMark: 50, maxMark: 55, indGrade: 'C', indPoints: 2, groupGrade: 'C+', groupPoints: 12 },
+                      { id: '10', minMark: 40, maxMark: 50, indGrade: 'D+', indPoints: 1, groupGrade: 'C', groupPoints: 11 },
+                      { id: '11', minMark: 30, maxMark: 40, indGrade: 'D', indPoints: 0, groupGrade: 'C', groupPoints: 10 },
+                      { id: '12', minMark: 0, maxMark: 30, indGrade: '-', indPoints: 0, groupGrade: '-', groupPoints: 5 }
+                    ];
+                    if (eventSettings?.categorySpecificGradesEnabled && res.categoryId && eventSettings?.categoryGradeMatrices?.[res.categoryId] && Array.isArray(eventSettings.categoryGradeMatrices[res.categoryId])) {
+                      matrix = eventSettings.categoryGradeMatrices[res.categoryId];
+                    }
+                    const sorted = [...matrix].sort((a: any, b: any) => Number(b.minMark) - Number(a.minMark));
+                    for (const row of sorted) {
+                      if (m >= Number(row.minMark)) {
+                        const found = isGroup ? row.groupGrade : row.indGrade;
+                        computedGrade = (!found || found === '-' || found === 'None') ? '' : found;
+                        break;
+                      }
                     }
                   }
                 }

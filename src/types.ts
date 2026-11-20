@@ -369,7 +369,7 @@ export interface ResultItem {
   eventName: string;
   department: string;
   points: number;
-  grade: 'A+' | 'A' | 'B' | 'C' | 'First' | 'Second' | 'Third' | string;
+  grade: 'A+' | 'A' | 'B+' | 'B' | 'C+' | 'C' | 'D+' | 'D' | 'First' | 'Second' | 'Third' | string;
   participationType?: 'Individual' | 'Group' | string;
   totalMark?: number;
   avatarUrl?: string;
