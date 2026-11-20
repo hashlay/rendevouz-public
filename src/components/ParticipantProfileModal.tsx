@@ -713,42 +713,41 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                 }
 
                 const isGradeSystem = eventSettings?.gradeSystemEnabled !== false;
+                const isCombinedSystem = eventSettings?.combineGradeAndRankPoints === true;
                 const computedPoints = res.points !== undefined && res.points !== null ? Number(res.points) : (() => {
                   if (isAbsentResult) return 0;
-                  if (!isGradeSystem) {
-                    if (res.rank === 1) return Number(eventSettings?.globalPointsRank1) || 20;
-                    if (res.rank === 2) return Number(eventSettings?.globalPointsRank2) || 14;
-                    if (res.rank === 3) return Number(eventSettings?.globalPointsRank3) || 7;
-                    return 0;
-                  }
                   const m = Math.round(Number(rawMarks) || 0);
-                  if (m <= 0) return 0;
-                  if (isGroup) {
-                    if (m >= 95) return 20;
-                    if (m >= 90) return 19;
-                    if (m >= 85) return 18;
-                    if (m >= 80) return 17;
-                    if (m >= 75) return 16;
-                    if (m >= 70) return 15;
-                    if (m >= 65) return 14;
-                    if (m >= 55) return 13;
-                    if (m >= 50) return 12;
-                    if (m >= 40) return 11;
-                    if (m >= 30) return 10;
-                    return 5;
-                  } else {
-                    if (m >= 95) return 10;
-                    if (m >= 90) return 9;
-                    if (m >= 85) return 8;
-                    if (m >= 80) return 7;
-                    if (m >= 75) return 6;
-                    if (m >= 70) return 5;
-                    if (m >= 65) return 4;
-                    if (m >= 55) return 3;
-                    if (m >= 50) return 2;
-                    if (m >= 40) return 1;
-                    return 0;
+
+                  let gradePoints = 0;
+                  if (isGradeSystem && m > 0) {
+                    let matrix = eventSettings?.gradeMatrix && Array.isArray(eventSettings.gradeMatrix) && eventSettings.gradeMatrix.length > 0 ? eventSettings.gradeMatrix : [];
+                    if (eventSettings?.categorySpecificGradesEnabled && res.categoryId && eventSettings?.categoryGradeMatrices?.[res.categoryId] && Array.isArray(eventSettings.categoryGradeMatrices[res.categoryId])) {
+                      matrix = eventSettings.categoryGradeMatrices[res.categoryId];
+                    }
+                    const sorted = [...matrix].sort((a: any, b: any) => Number(b.minMark) - Number(a.minMark));
+                    for (const row of sorted) {
+                      if (m >= Number(row.minMark)) {
+                        gradePoints = isGroup ? Number(row.groupPoints) : Number(row.indPoints);
+                        break;
+                      }
+                    }
                   }
+
+                  let rankPoints = 0;
+                  if (!isGradeSystem || isCombinedSystem) {
+                    if (res.rank === 1) rankPoints = Number(eventSettings?.globalPointsRank1) || 20;
+                    else if (res.rank === 2) rankPoints = Number(eventSettings?.globalPointsRank2) || 14;
+                    else if (res.rank === 3) rankPoints = Number(eventSettings?.globalPointsRank3) || 7;
+                    else if (res.rank && res.rank >= 4 && res.rank <= 10) rankPoints = Number((eventSettings as any)?.['globalPointsRank' + res.rank]) || 0;
+                  }
+
+                  if (isGradeSystem && isCombinedSystem) {
+                    return gradePoints + rankPoints;
+                  }
+                  if (isGradeSystem) {
+                    return gradePoints;
+                  }
+                  return rankPoints;
                 })();
 
                 return (
