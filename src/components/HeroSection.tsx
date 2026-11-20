@@ -106,7 +106,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
 
       <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 w-full z-20 text-center">
         <div className="flex flex-col items-center select-none pt-2 sm:pt-4">
-          {/* 1. Main Festival Brand Title: Clean Sora Font */}
+                    {/* 1. Main Festival Brand Title: Clean Sora Font */}
           <h1
             className="font-sora font-extrabold text-4xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight uppercase select-none my-1 drop-shadow-md leading-none sm:leading-tight"
             style={{ color: 'var(--color-text-primary, #F4F8F4)' }}
@@ -114,25 +114,45 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
             {cmsSettings?.heroTitle || 'QUERENCIA'}
           </h1>
 
-          {/* 2. Theme Subtitle: Decoding a Century of Wisdom */}
-          <h2
-            className="font-sora font-semibold text-[2rem] sm:text-[3.4rem] md:text-[4.2rem] lg:text-[5.6rem] tracking-tight select-none my-1 leading-none sm:leading-tight drop-shadow-md"
-            style={{
-              color: cmsSettings?.heroSubtitleColor || 'var(--color-primary-accent, #F5C451)',
-              textShadow: '0 2px 14px rgba(0, 0, 0, 0.95), 0 0 2px rgba(0, 0, 0, 0.9)',
-              WebkitTextStroke: '0.4px rgba(0, 0, 0, 0.6)'
-            }}
-          >
-            {(cmsSettings?.heroSubtitle || 'Decoding a Century of Wisdom').replace(/^["“']+|["”']+$/g, '')}
-          </h2>
+          {/* 2. Theme Subtitle: Sophisticated Literary Editorial Styling */}
+          <div className="relative my-2 sm:my-3 max-w-4xl mx-auto flex items-center justify-center gap-2 sm:gap-4 px-2">
+            <span
+              className="hidden sm:inline-block h-[1px] w-8 sm:w-16 opacity-60 shrink-0"
+              style={{ background: 'linear-gradient(to right, transparent, var(--color-primary-accent, #F5C451))' }}
+            />
+            <h2
+              className="font-serif italic font-medium text-xl sm:text-2xl md:text-3xl lg:text-[2.6rem] tracking-normal select-none leading-tight"
+              style={{
+                fontFamily: "'Playfair Display', Georgia, 'Times New Roman', serif",
+                background: 'linear-gradient(135deg, #FFFFFF 0%, var(--color-primary-accent, #F5C451) 50%, #D49B20 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                filter: 'drop-shadow(0 2px 14px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 16px color-mix(in srgb, var(--color-primary-accent, #F5C451) 35%, transparent))',
+                letterSpacing: '0.015em'
+              }}
+            >
+              &ldquo;{(cmsSettings?.heroSubtitle || 'Decoding a Century of Wisdom').replace(/^[\"“']+|[\"”']+$/g, '')}&rdquo;
+            </h2>
+            <span
+              className="hidden sm:inline-block h-[1px] w-8 sm:w-16 opacity-60 shrink-0"
+              style={{ background: 'linear-gradient(to left, transparent, var(--color-primary-accent, #F5C451))' }}
+            />
+          </div>
 
           {/* 3. Campus Name Badge: Linked dynamically to CMS textSecondary / primaryAccent */}
-          <p
-            className="font-sora text-xs sm:text-sm md:text-base font-bold tracking-[0.25em] sm:tracking-[0.35em] uppercase mt-2 sm:mt-3 mb-5 sm:mb-8 select-none"
-            style={{ color: 'var(--color-primary-accent, var(--color-text-secondary, #A2D5A4))' }}
-          >
-            {cmsSettings?.heroLogoBadge || cmsSettings?.campusName || 'THWAIBA VALLIYAD'}
-          </p>
+          <div className="mt-1 sm:mt-2 mb-5 sm:mb-8">
+            <span
+              className="inline-flex items-center gap-2 font-mono text-[10px] sm:text-xs font-bold tracking-[0.25em] sm:tracking-[0.35em] uppercase px-3.5 py-1 rounded-full bg-white/5 border backdrop-blur-sm select-none"
+              style={{
+                color: 'var(--color-primary-accent, var(--color-text-secondary, #A2D5A4))',
+                borderColor: 'color-mix(in srgb, var(--color-primary-accent, #F5C451) 30%, transparent)'
+              }}
+            >
+              <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: 'var(--color-primary-accent, #F5C451)' }} />
+              {cmsSettings?.heroLogoBadge || cmsSettings?.campusName || 'THWAIBA VALLIYAD'}
+              <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: 'var(--color-primary-accent, #F5C451)' }} />
+            </span>
+          </div>
 
           {/* 4. Date & Venue Details Bar */}
           <div className="flex justify-center mb-5 sm:mb-8 w-full max-w-md mx-auto">
