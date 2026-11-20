@@ -154,6 +154,8 @@
 /* 2. Page Body & Modal Background (--color-body-bg) */
 body,
 main,
+[class*="bg-[#012002]"],
+[class*="bg-[#012002]"],
 [class*="bg-[#0D0D0D]"],
 [class*="bg-[#0d0d0d]"],
 [class*="bg-[#080808]"],
@@ -168,6 +170,8 @@ main,
 }
 
 /* 3. Card & Section Container Background (--color-card-bg) */
+[class*="bg-[#07380B]"],
+[class*="bg-[#07380b]"],
 [class*="bg-[#161619]"],
 [class*="bg-[#141417]"],
 [class*="bg-[#141414]"],
@@ -182,6 +186,8 @@ main,
 }
 
 /* 4. Elevated Card & Header Background (--color-card-elevated-bg) */
+[class*="bg-[#0B4A12]"],
+[class*="bg-[#0b4a12]"],
 [class*="bg-[#1A1A1E]"],
 [class*="bg-[#18181C]"],
 [class*="bg-[#18181B]"],
@@ -198,6 +204,8 @@ main,
 }
 
 /* 5. Subtle Border & Divider Lines (--color-border-subtle) */
+[class*="border-[#176523]"],
+[class*="border-[#176523]"],
 [class*="border-[#2D2D35]"],
 [class*="border-[#2A2A32]"],
 [class*="border-[#25252D]"],
@@ -226,6 +234,8 @@ h3:not(.logo-text):not(.text-primary-accent),
 }
 
 /* 7. Secondary Sub-header Text (--color-text-secondary) */
+[class*="text-[#A2D5A4]"],
+[class*="text-[#a2d5a4]"],
 [class*="text-[#E4E4E7]"],
 [class*="text-zinc-200"],
 [class*="text-zinc-300"],

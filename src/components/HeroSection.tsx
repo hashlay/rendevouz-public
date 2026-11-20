@@ -60,7 +60,11 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
   };
 
   return (
-    <section id="hero" className="relative min-h-[90vh] sm:min-h-screen flex items-center justify-center overflow-hidden bg-[#012002] pt-24 pb-12 sm:pb-16">
+    <section
+      id="hero"
+      className="relative min-h-[90vh] sm:min-h-screen flex items-center justify-center overflow-hidden pt-24 pb-12 sm:pb-16"
+      style={{ backgroundColor: 'var(--color-body-bg, #012002)' }}
+    >
       {/* Background Media */}
       <div className="absolute inset-0 z-0 overflow-hidden select-none pointer-events-none">
         {/* Mobile View */}
@@ -91,14 +95,22 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
           ))}
         </div>
 
-        {/* Subtle atmospheric blending */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#012002]/90 via-[#012002]/30 to-transparent pointer-events-none" />
+        {/* Dynamic atmospheric blending based on CMS body background color */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: 'linear-gradient(to top, var(--color-body-bg, #012002) 0%, color-mix(in srgb, var(--color-body-bg, #012002) 75%, transparent) 40%, transparent 100%)'
+          }}
+        />
       </div>
 
       <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 w-full z-20 text-center">
         <div className="flex flex-col items-center select-none pt-2 sm:pt-4">
           {/* 1. Main Festival Brand Title: Clean Sora Font */}
-          <h1 className="font-sora font-extrabold text-[#F4F8F4] text-4xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight uppercase select-none my-1 drop-shadow-md leading-none sm:leading-tight">
+          <h1
+            className="font-sora font-extrabold text-4xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight uppercase select-none my-1 drop-shadow-md leading-none sm:leading-tight"
+            style={{ color: 'var(--color-text-primary, #F4F8F4)' }}
+          >
             {cmsSettings?.heroTitle || 'QUERENCIA'}
           </h1>
 
@@ -106,7 +118,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
           <h2
             className="font-sora font-semibold text-[2rem] sm:text-[3.4rem] md:text-[4.2rem] lg:text-[5.6rem] tracking-tight select-none my-1 leading-none sm:leading-tight drop-shadow-md"
             style={{
-              color: cmsSettings?.heroSubtitleColor || '#F5C451',
+              color: cmsSettings?.heroSubtitleColor || 'var(--color-primary-accent, #F5C451)',
               textShadow: '0 2px 14px rgba(0, 0, 0, 0.95), 0 0 2px rgba(0, 0, 0, 0.9)',
               WebkitTextStroke: '0.4px rgba(0, 0, 0, 0.6)'
             }}
@@ -114,8 +126,11 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
             {(cmsSettings?.heroSubtitle || 'Decoding a Century of Wisdom').replace(/^["“']+|["”']+$/g, '')}
           </h2>
 
-          {/* 3. Campus Name Badge */}
-          <p className="font-sora text-xs sm:text-sm md:text-base font-bold text-[#A2D5A4] tracking-[0.25em] sm:tracking-[0.35em] uppercase mt-2 sm:mt-3 mb-5 sm:mb-8 select-none">
+          {/* 3. Campus Name Badge: Linked dynamically to CMS textSecondary / primaryAccent */}
+          <p
+            className="font-sora text-xs sm:text-sm md:text-base font-bold tracking-[0.25em] sm:tracking-[0.35em] uppercase mt-2 sm:mt-3 mb-5 sm:mb-8 select-none"
+            style={{ color: 'var(--color-primary-accent, var(--color-text-secondary, #A2D5A4))' }}
+          >
             {cmsSettings?.heroLogoBadge || cmsSettings?.campusName || 'THWAIBA VALLIYAD'}
           </p>
 
@@ -123,21 +138,21 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
           <div className="flex justify-center mb-5 sm:mb-8 w-full max-w-md mx-auto">
             <div
               className="inline-flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6 bg-black/40 backdrop-blur-xl border px-6 sm:px-8 py-2.5 sm:py-3 rounded-full shadow-lg w-full sm:w-auto"
-              style={{ borderColor: 'var(--color-border-subtle, #176523)' }}
+              style={{ borderColor: 'var(--color-border-subtle, rgba(255, 255, 255, 0.15))' }}
             >
-              <div className="flex items-center gap-2 text-[#F4F8F4] font-mono text-xs sm:text-sm font-medium">
+              <div className="flex items-center gap-2 font-mono text-xs sm:text-sm font-medium" style={{ color: 'var(--color-text-primary, #F4F8F4)' }}>
                 <Calendar className="w-4 h-4 shrink-0" style={{ color: 'var(--color-primary-accent, #18BA46)' }} />
                 <span>{cmsSettings?.heroDate || 'November 27, 28, 29, 2026'}</span>
               </div>
               <div className="hidden sm:block w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: 'var(--color-primary-accent, #18BA46)' }} />
-              <div className="flex items-center gap-2 text-[#F4F8F4] font-mono text-xs sm:text-sm font-medium">
+              <div className="flex items-center gap-2 font-mono text-xs sm:text-sm font-medium" style={{ color: 'var(--color-text-primary, #F4F8F4)' }}>
                 <MapPin className="w-4 h-4 shrink-0" style={{ color: 'var(--color-primary-accent, #18BA46)' }} />
                 <span>{cmsSettings?.heroLocation || 'Thwaiba Valliyad'}</span>
               </div>
             </div>
           </div>
 
-          {/* Dual Action Buttons: Kept right together below date bar with normal spacing */}
+          {/* Dual Action Buttons: Linked dynamically to CMS primaryAccent & borderSubtle */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-4 sm:mb-8 w-full max-w-md mx-auto sm:max-w-none">
             <button
               onClick={() => onNavigate('results')}
@@ -152,8 +167,11 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
             {isLiveStreamEnabled() ? (
               <button
                 onClick={() => onNavigate('live')}
-                className="w-full sm:w-auto px-7 py-3.5 bg-black/40 hover:bg-black/70 border text-[#F4F8F4] text-xs sm:text-sm font-extrabold uppercase tracking-wider rounded-xl backdrop-blur-lg transition-all duration-300 flex items-center justify-center gap-2 transform hover:-translate-y-0.5 cursor-pointer shadow-md hover:border-emerald-400/60"
-                style={{ borderColor: 'var(--color-border-subtle, #176523)' }}
+                className="w-full sm:w-auto px-7 py-3.5 bg-black/40 hover:bg-black/70 border text-xs sm:text-sm font-extrabold uppercase tracking-wider rounded-xl backdrop-blur-lg transition-all duration-300 flex items-center justify-center gap-2 transform hover:-translate-y-0.5 cursor-pointer shadow-md hover:brightness-125"
+                style={{
+                  borderColor: 'var(--color-primary-accent, #18BA46)',
+                  color: 'var(--color-text-primary, #F4F8F4)'
+                }}
               >
                 <Radio className="w-4 h-4 animate-pulse" style={{ color: 'var(--color-primary-accent, #18BA46)' }} />
                 <span>Watch Live Stream</span>
@@ -161,8 +179,11 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onNavigate, cmsSetting
             ) : (
               <button
                 onClick={() => onNavigate('team-points')}
-                className="w-full sm:w-auto px-7 py-3.5 bg-black/40 hover:bg-black/70 border text-[#F4F8F4] text-xs sm:text-sm font-extrabold uppercase tracking-wider rounded-xl backdrop-blur-lg transition-all duration-300 flex items-center justify-center gap-2 transform hover:-translate-y-0.5 cursor-pointer shadow-md hover:border-emerald-400/60"
-                style={{ borderColor: 'var(--color-border-subtle, #176523)' }}
+                className="w-full sm:w-auto px-7 py-3.5 bg-black/40 hover:bg-black/70 border text-xs sm:text-sm font-extrabold uppercase tracking-wider rounded-xl backdrop-blur-lg transition-all duration-300 flex items-center justify-center gap-2 transform hover:-translate-y-0.5 cursor-pointer shadow-md hover:brightness-125"
+                style={{
+                  borderColor: 'var(--color-primary-accent, #18BA46)',
+                  color: 'var(--color-text-primary, #F4F8F4)'
+                }}
               >
                 <Trophy className="w-4 h-4" style={{ color: 'var(--color-primary-accent, #18BA46)' }} />
                 <span>View Team Standings</span>

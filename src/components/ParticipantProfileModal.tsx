@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { X, User, Calendar, Award, Sparkles, Download, CheckCircle, ExternalLink, Printer } from 'lucide-react';
+import { X, User, Calendar, Award, Sparkles, Download, CheckCircle, ExternalLink, Printer, Search } from 'lucide-react';
 import { useFestival } from '../context/FestivalContext';
 import { CertificateImage } from './CertificateImage';
 
@@ -337,6 +337,53 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
     return postersList;
   }, [competitionPosters, participantDeclaredResults, p]);
 
+  // Search input state to filter registered programs, results, certificates, and posters simultaneously
+  const [programSearchQuery, setProgramSearchQuery] = useState('');
+
+  const filteredSchedule = useMemo(() => {
+    if (!p.schedule || !Array.isArray(p.schedule)) return [];
+    if (!programSearchQuery.trim()) return p.schedule;
+    const q = programSearchQuery.trim().toLowerCase();
+    return p.schedule.filter(sc => {
+      const name = (sc.program || sc.name || sc.eventName || '').toLowerCase();
+      const cat = (sc.category || '').toLowerCase();
+      return name.includes(q) || cat.includes(q);
+    });
+  }, [p.schedule, programSearchQuery]);
+
+  const filteredDeclaredResults = useMemo(() => {
+    if (!participantDeclaredResults || !Array.isArray(participantDeclaredResults)) return [];
+    if (!programSearchQuery.trim()) return participantDeclaredResults;
+    const q = programSearchQuery.trim().toLowerCase();
+    return participantDeclaredResults.filter(res => {
+      const name = (res.eventName || res.competitionName || res.program || res.raw?.program || '').toLowerCase();
+      const cat = (res.category || '').toLowerCase();
+      return name.includes(q) || cat.includes(q);
+    });
+  }, [participantDeclaredResults, programSearchQuery]);
+
+  const filteredCertificates = useMemo(() => {
+    if (!participantCertificates || !Array.isArray(participantCertificates)) return [];
+    if (!programSearchQuery.trim()) return participantCertificates;
+    const q = programSearchQuery.trim().toLowerCase();
+    return participantCertificates.filter(res => {
+      const name = (res.eventName || '').toLowerCase();
+      const cat = (res.category || '').toLowerCase();
+      return name.includes(q) || cat.includes(q);
+    });
+  }, [participantCertificates, programSearchQuery]);
+
+  const filteredPosters = useMemo(() => {
+    if (!participantPosters || !Array.isArray(participantPosters)) return [];
+    if (!programSearchQuery.trim()) return participantPosters;
+    const q = programSearchQuery.trim().toLowerCase();
+    return participantPosters.filter(poster => {
+      const name = (poster.eventName || '').toLowerCase();
+      const cat = (poster.category || '').toLowerCase();
+      return name.includes(q) || cat.includes(q);
+    });
+  }, [participantPosters, programSearchQuery]);
+
   if (!p || p.isNotFound || !p.name || (p.name.startsWith('Participant ') && (!p.schedule || p.schedule.length === 0))) {
     return (
       <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0D0D0F] p-6 text-center animate-in fade-in duration-200">
@@ -458,24 +505,82 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
         </div>
 
         <div className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm text-zinc-300 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>Festival Status: <strong className="text-emerald-400">Active Participant</strong></span>
+          <span>Festival Status: <strong style={{ color: 'var(--color-success-accent, #10B981)' }}>Active Participant</strong></span>
           <span className="text-xs text-zinc-400 font-mono">Verified Credentials</span>
         </div>
 
-        {/* Section A: Registered Programs */}
+        {/* Section A: Registered Programs with Program Search */}
         <div className="space-y-4">
-          <h4 className="text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
-            <Calendar className="w-5 h-5" style={{ color: 'var(--color-primary-accent)' }} />
-            <span>Your Registered Programs</span>
-          </h4>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <h4 className="text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
+              <Calendar className="w-5 h-5" style={{ color: 'var(--color-primary-accent, #F5C542)' }} />
+              <span>Your Registered Programs</span>
+              {p.schedule && p.schedule.length > 0 && (
+                <span
+                  className="text-[11px] font-mono px-2 py-0.5 rounded-full font-bold ml-1"
+                  style={{
+                    backgroundColor: 'color-mix(in srgb, var(--color-primary-accent, #F5C542) 20%, transparent)',
+                    color: 'var(--color-primary-accent, #F5C542)',
+                    border: '1px solid color-mix(in srgb, var(--color-primary-accent, #F5C542) 40%, transparent)'
+                  }}
+                >
+                  {filteredSchedule.length}
+                </span>
+              )}
+            </h4>
+
+            {/* Program Search Bar placed directly in front of the heading */}
+            <div className="relative w-full sm:w-72">
+              <Search
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none"
+                style={{ color: 'var(--color-primary-accent, #F5C542)' }}
+              />
+              <input
+                type="text"
+                value={programSearchQuery}
+                onChange={(e) => setProgramSearchQuery(e.target.value)}
+                placeholder="Search program name..."
+                className="w-full pl-9 pr-8 py-2 text-xs rounded-xl border font-mono outline-none transition-all shadow-inner focus:ring-1"
+                style={{
+                  borderColor: programSearchQuery
+                    ? 'var(--color-primary-accent, #F5C542)'
+                    : 'var(--color-border-subtle, rgba(255, 255, 255, 0.15))',
+                  backgroundColor: 'var(--color-card-elevated-bg, rgba(20, 20, 20, 0.8))',
+                  color: 'var(--color-text-primary, #FFFFFF)'
+                }}
+              />
+              {programSearchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setProgramSearchQuery('')}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white transition-colors cursor-pointer"
+                  title="Clear search"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+          </div>
 
           {(!p.schedule || p.schedule.length === 0) ? (
             <div className="bg-black/30 border border-white/10 rounded-3xl p-8 text-center text-sm text-zinc-400 font-mono">
               No registered program
             </div>
+          ) : filteredSchedule.length === 0 ? (
+            <div className="bg-black/30 border border-white/10 rounded-3xl p-8 text-center text-sm text-zinc-400 font-mono space-y-2">
+              <p>No registered programs matching <strong className="text-white">"{programSearchQuery}"</strong></p>
+              <button
+                type="button"
+                onClick={() => setProgramSearchQuery('')}
+                className="inline-block text-xs font-bold underline cursor-pointer"
+                style={{ color: 'var(--color-primary-accent, #F5C542)' }}
+              >
+                Clear Search Filter
+              </button>
+            </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {p.schedule.map((sc) => {
+              {filteredSchedule.map((sc) => {
                 const scCleanName = (sc.program || sc.name || sc.eventName || '').replace(/\s*\([^)]*Group[^)]*\)/gi, '').trim().toLowerCase();
                 const matchingResult = participantDeclaredResults.find(r => {
                   const rName = (r.eventName || r.program || r.raw?.program || '').replace(/\s*\([^)]*Group[^)]*\)/gi, '').trim().toLowerCase();
@@ -506,7 +611,7 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                           ABSENT
                         </span>
                       ) : statusToRender === 'live' ? (
-                        <span style={{ backgroundColor: 'var(--color-primary-accent)' }} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-white text-[10px] font-bold uppercase tracking-widest rounded-full animate-pulse shadow-md">
+                        <span style={{ backgroundColor: 'var(--color-primary-accent, #F5C542)' }} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-white text-[10px] font-bold uppercase tracking-widest rounded-full animate-pulse shadow-md">
                           <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
                           LIVE NOW
                         </span>
@@ -531,8 +636,20 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h4 className="text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
-              <Award className="w-5 h-5 text-amber-400" />
+              <Award className="w-5 h-5 text-amber-400" style={{ color: 'var(--color-primary-accent, #F5C542)' }} />
               <span>Declared Results</span>
+              {filteredDeclaredResults.length > 0 && (
+                <span
+                  className="text-[11px] font-mono px-2 py-0.5 rounded-full font-bold ml-1"
+                  style={{
+                    backgroundColor: 'color-mix(in srgb, var(--color-primary-accent, #F5C542) 20%, transparent)',
+                    color: 'var(--color-primary-accent, #F5C542)',
+                    border: '1px solid color-mix(in srgb, var(--color-primary-accent, #F5C542) 40%, transparent)'
+                  }}
+                >
+                  {filteredDeclaredResults.length}
+                </span>
+              )}
             </h4>
           </div>
 
@@ -540,9 +657,13 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
             <div className="bg-black/30 border border-white/10 rounded-3xl p-8 text-center text-sm text-zinc-400 font-mono">
               No results declared yet for your programs.
             </div>
+          ) : filteredDeclaredResults.length === 0 ? (
+            <div className="bg-black/30 border border-white/10 rounded-3xl p-8 text-center text-sm text-zinc-400 font-mono">
+              No declared results matching "{programSearchQuery}"
+            </div>
           ) : (
             <div className="space-y-4">
-              {participantDeclaredResults.map((res) => {
+              {filteredDeclaredResults.map((res) => {
                 const rawMarks = res.totalMark ?? res.marks ?? res.averageMark ?? (res as any).totalMarks ?? (res.raw ? (res.raw.averageMark ?? res.raw.totalMark ?? res.raw.judge1Mark) : undefined);
                 
                 const isAbsentResult = Boolean(
@@ -660,12 +781,16 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                               eventName: res.eventName || 'All'
                             });
                           }}
-                          style={{ color: '#ffffff' }}
-                          className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white border border-emerald-400/40 text-xs font-bold font-mono transition-all flex items-center gap-1.5 cursor-pointer shadow-sm hover:shadow-emerald-900/30"
+                          style={{
+                            backgroundColor: 'var(--color-primary-accent, #F5C542)',
+                            color: '#000000',
+                            borderColor: 'var(--color-primary-accent, #F5C542)'
+                          }}
+                          className="px-3.5 py-1.5 rounded-xl hover:brightness-110 active:scale-95 text-xs font-bold font-mono transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
                           title="View official standings for this competition"
                         >
-                          <span style={{ color: '#ffffff' }} className="font-bold tracking-wide text-white">View Result</span>
-                          <ExternalLink className="w-3.5 h-3.5 text-white shrink-0" style={{ color: '#ffffff' }} />
+                          <span className="font-bold tracking-wide">View Result</span>
+                          <ExternalLink className="w-3.5 h-3.5 shrink-0" />
                         </button>
                       )}
                       <div className="text-xs font-mono text-zinc-400 bg-white/5 border border-white/10 px-3 py-1.5 rounded-xl text-center">
@@ -683,17 +808,33 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
         {isCertificatesEnabled && (
           <div className="space-y-4">
             <h4 className="text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
-              <Award className="w-5 h-5 text-emerald-400" />
+              <Award className="w-5 h-5" style={{ color: 'var(--color-primary-accent, #F5C542)' }} />
               <span>Official Certificates</span>
+              {filteredCertificates.length > 0 && (
+                <span
+                  className="text-[11px] font-mono px-2 py-0.5 rounded-full font-bold ml-1"
+                  style={{
+                    backgroundColor: 'color-mix(in srgb, var(--color-primary-accent, #F5C542) 20%, transparent)',
+                    color: 'var(--color-primary-accent, #F5C542)',
+                    border: '1px solid color-mix(in srgb, var(--color-primary-accent, #F5C542) 40%, transparent)'
+                  }}
+                >
+                  {filteredCertificates.length}
+                </span>
+              )}
             </h4>
 
             {participantCertificates.length === 0 ? (
               <div className="bg-black/30 border border-white/10 rounded-3xl p-8 text-center text-sm text-zinc-400 font-mono">
                 No certificates available yet. (Certificates are awarded for Rank 1, 2, and 3 after admin verification).
               </div>
+            ) : filteredCertificates.length === 0 ? (
+              <div className="bg-black/30 border border-white/10 rounded-3xl p-8 text-center text-sm text-zinc-400 font-mono">
+                No certificates matching "{programSearchQuery}"
+              </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {participantCertificates.map((res) => {
+                {filteredCertificates.map((res) => {
                   return (
                     <div key={`cert-${res.id}`} className="bg-black/50 border border-white/10 hover:border-emerald-500/50 rounded-3xl p-6 flex flex-col justify-between gap-4 transition-all">
                       <div>
@@ -757,7 +898,8 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                             const imgEl = document.getElementById(`cert-img-data-${res.id}`) as HTMLImageElement;
                             if (imgEl && imgEl.src) handlePrint(imgEl.src);
                           }}
-                          className="flex-1 px-3 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-mono font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm shadow-emerald-900/40"
+                          style={{ backgroundColor: 'var(--color-primary-accent, #F5C542)', color: '#000000' }}
+                          className="flex-1 px-3 py-2.5 hover:brightness-110 text-xs font-mono font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm"
                         >
                           <Printer className="w-4 h-4" /> Print
                         </button>
@@ -773,17 +915,33 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
         {/* Section D: Official Winner Posters */}
         <div className="space-y-4">
           <h4 className="text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-purple-400" />
+            <Sparkles className="w-5 h-5" style={{ color: 'var(--color-primary-accent, #F5C542)' }} />
             <span>Official Winner Posters</span>
+            {filteredPosters.length > 0 && (
+              <span
+                className="text-[11px] font-mono px-2 py-0.5 rounded-full font-bold ml-1"
+                style={{
+                  backgroundColor: 'color-mix(in srgb, var(--color-primary-accent, #F5C542) 20%, transparent)',
+                  color: 'var(--color-primary-accent, #F5C542)',
+                  border: '1px solid color-mix(in srgb, var(--color-primary-accent, #F5C542) 40%, transparent)'
+                }}
+              >
+                {filteredPosters.length}
+              </span>
+            )}
           </h4>
 
           {participantPosters.length === 0 ? (
             <div className="bg-black/30 border border-white/10 rounded-3xl p-8 text-center text-sm text-zinc-400 font-mono">
               No winner posters available yet. (Winner posters are generated for Rank 1, 2, and 3).
             </div>
+          ) : filteredPosters.length === 0 ? (
+            <div className="bg-black/30 border border-white/10 rounded-3xl p-8 text-center text-sm text-zinc-400 font-mono">
+              No winner posters matching "{programSearchQuery}"
+            </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {participantPosters.map((poster) => {
+              {filteredPosters.map((poster) => {
                 return (
                   <div key={`poster-${poster.id}`} className="bg-black/50 border border-white/10 hover:border-purple-500/50 rounded-3xl p-6 flex flex-col justify-between gap-4 transition-all">
                     <div>
