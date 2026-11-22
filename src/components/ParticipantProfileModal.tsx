@@ -683,61 +683,67 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                   const m = Math.round(Number(rawMarks) || 0);
                   if (m <= 0) {
                     computedGrade = '';
-                  } else if (!computedGrade) {
-                    let matrix = eventSettings?.gradeMatrix && Array.isArray(eventSettings.gradeMatrix) && eventSettings.gradeMatrix.length > 0 ? eventSettings.gradeMatrix : [
-                      { id: '1', minMark: 95, maxMark: 100, indGrade: 'A+', indPoints: 10, groupGrade: 'A+', groupPoints: 20 },
-                      { id: '2', minMark: 90, maxMark: 95, indGrade: 'A', indPoints: 9, groupGrade: 'A', groupPoints: 19 },
-                      { id: '3', minMark: 85, maxMark: 90, indGrade: 'A', indPoints: 8, groupGrade: 'A', groupPoints: 18 },
-                      { id: '4', minMark: 80, maxMark: 85, indGrade: 'B+', indPoints: 7, groupGrade: 'A', groupPoints: 17 },
-                      { id: '5', minMark: 75, maxMark: 80, indGrade: 'B', indPoints: 6, groupGrade: 'B+', groupPoints: 16 },
-                      { id: '6', minMark: 70, maxMark: 75, indGrade: 'B', indPoints: 5, groupGrade: 'B', groupPoints: 15 },
-                      { id: '7', minMark: 65, maxMark: 70, indGrade: 'C+', indPoints: 4, groupGrade: 'B', groupPoints: 14 },
-                      { id: '8', minMark: 55, maxMark: 65, indGrade: 'C', indPoints: 3, groupGrade: 'B', groupPoints: 13 },
-                      { id: '9', minMark: 50, maxMark: 55, indGrade: 'C', indPoints: 2, groupGrade: 'C+', groupPoints: 12 },
-                      { id: '10', minMark: 40, maxMark: 50, indGrade: 'D+', indPoints: 1, groupGrade: 'C', groupPoints: 11 },
-                      { id: '11', minMark: 30, maxMark: 40, indGrade: 'D', indPoints: 0, groupGrade: 'C', groupPoints: 10 },
-                      { id: '12', minMark: 0, maxMark: 30, indGrade: '-', indPoints: 0, groupGrade: '-', groupPoints: 5 }
-                    ];
-                    if (eventSettings?.categorySpecificGradesEnabled && res.categoryId && eventSettings?.categoryGradeMatrices?.[res.categoryId] && Array.isArray(eventSettings.categoryGradeMatrices[res.categoryId])) {
-                      matrix = eventSettings.categoryGradeMatrices[res.categoryId];
-                    }
-                    const sorted = [...matrix].sort((a: any, b: any) => Number(b.minMark) - Number(a.minMark));
-                    for (const row of sorted) {
-                      if (m >= Number(row.minMark)) {
-                        const found = isGroup ? row.groupGrade : row.indGrade;
-                        computedGrade = (!found || found === '-' || found === 'None') ? '' : found;
-                        break;
-                      }
-                    }
+                                    } else if (!computedGrade) {
+                    if (m >= 90) computedGrade = 'A+';
+                    else if (m >= 70) computedGrade = 'A';
+                    else if (m >= 60) computedGrade = 'B';
+                    else if (m >= 50) computedGrade = 'C';
+                    else computedGrade = '';
                   }
                 }
 
                 const isGradeSystem = eventSettings?.gradeSystemEnabled !== false;
                 const isCombinedSystem = eventSettings?.combineGradeAndRankPoints === true;
+                const pointDistributionMode = eventSettings?.pointDistributionMode || (eventSettings?.categorySpecificGradesEnabled ? 'category_wise' : 'team_size');
                 const computedPoints = res.points !== undefined && res.points !== null ? Number(res.points) : (() => {
                   if (isAbsentResult) return 0;
                   const m = Math.round(Number(rawMarks) || 0);
 
                   let gradePoints = 0;
-                  if (isGradeSystem && m > 0) {
-                    let matrix = eventSettings?.gradeMatrix && Array.isArray(eventSettings.gradeMatrix) && eventSettings.gradeMatrix.length > 0 ? eventSettings.gradeMatrix : [];
-                    if (eventSettings?.categorySpecificGradesEnabled && res.categoryId && eventSettings?.categoryGradeMatrices?.[res.categoryId] && Array.isArray(eventSettings.categoryGradeMatrices[res.categoryId])) {
-                      matrix = eventSettings.categoryGradeMatrices[res.categoryId];
-                    }
-                    const sorted = [...matrix].sort((a: any, b: any) => Number(b.minMark) - Number(a.minMark));
-                    for (const row of sorted) {
-                      if (m >= Number(row.minMark)) {
-                        gradePoints = isGroup ? Number(row.groupPoints) : Number(row.indPoints);
-                        break;
+                  if (isGradeSystem && m > 0 && computedGrade) {
+                    if (pointDistributionMode === 'team_size') {
+                      const tiers = (eventSettings?.teamSizePointTiers && Array.isArray(eventSettings.teamSizePointTiers) && eventSettings.teamSizePointTiers.length > 0)
+                        ? eventSettings.teamSizePointTiers
+                        : [
+                          { id: 'tier_ind', name: '1 Member', minMembers: 1, maxMembers: 1, pointsAPlus: 6, pointsA: 5, pointsB: 3, pointsC: 1 },
+                          { id: 'tier_2', name: '2 Members', minMembers: 2, maxMembers: 2, pointsAPlus: 7, pointsA: 6, pointsB: 4, pointsC: 2 },
+                          { id: 'tier_3', name: '3 Members', minMembers: 3, maxMembers: 3, pointsAPlus: 10, pointsA: 9, pointsB: 6, pointsC: 3 },
+                          { id: 'tier_4_5', name: '4-5 Members', minMembers: 4, maxMembers: 5, pointsAPlus: 18, pointsA: 15, pointsB: 10, pointsC: 5 },
+                          { id: 'tier_10', name: '10 Members', minMembers: 10, maxMembers: 10, pointsAPlus: 25, pointsA: 20, pointsB: 12, pointsC: 6 },
+                          { id: 'tier_project', name: 'Project', minMembers: 1, maxMembers: 99, matchKeywords: ['project', 'പ്രോജക്ട്'], pointsAPlus: 25, pointsA: 20, pointsB: 12, pointsC: 6 },
+                          { id: 'tier_vlog', name: 'Vlog', minMembers: 1, maxMembers: 99, matchKeywords: ['vlog', 'social story'], pointsAPlus: 25, pointsA: 20, pointsB: 12, pointsC: 6 }
+                        ];
+                      const compName = (res.eventName || (res as any).competitionName || '').toLowerCase();
+                      const teamSize = Number((res as any).teamSize) || (isGroup ? 2 : 1);
+                      let matchedTier = tiers.find((t: any) => Array.isArray(t.matchKeywords) && t.matchKeywords.some((kw: string) => compName.includes(kw.toLowerCase())));
+                      if (!matchedTier) matchedTier = tiers.find((t: any) => teamSize >= t.minMembers && teamSize <= t.maxMembers);
+                      if (!matchedTier) matchedTier = teamSize === 1 ? tiers[0] : (tiers.find((t: any) => t.minMembers > 1) || tiers[0]);
+                      if (matchedTier) {
+                        if (computedGrade === 'A+') gradePoints = matchedTier.pointsAPlus;
+                        else if (computedGrade === 'A') gradePoints = matchedTier.pointsA;
+                        else if (computedGrade === 'B+' || computedGrade === 'B') gradePoints = matchedTier.pointsB;
+                        else if (computedGrade === 'C+' || computedGrade === 'C') gradePoints = matchedTier.pointsC;
+                      }
+                    } else {
+                      let matrix = eventSettings?.gradeMatrix && Array.isArray(eventSettings.gradeMatrix) && eventSettings.gradeMatrix.length > 0 ? eventSettings.gradeMatrix : [];
+                      if (eventSettings?.categorySpecificGradesEnabled && res.categoryId && eventSettings?.categoryGradeMatrices?.[res.categoryId]) {
+                        matrix = eventSettings.categoryGradeMatrices[res.categoryId];
+                      }
+                      const sorted = [...matrix].sort((a: any, b: any) => Number(b.minMark) - Number(a.minMark));
+                      for (const row of sorted) {
+                        if (m >= Number(row.minMark)) {
+                          gradePoints = isGroup ? Number(row.groupPoints) : Number(row.indPoints);
+                          break;
+                        }
                       }
                     }
                   }
 
                   let rankPoints = 0;
                   if (!isGradeSystem || isCombinedSystem) {
-                    if (res.rank === 1) rankPoints = Number(eventSettings?.globalPointsRank1) || 20;
-                    else if (res.rank === 2) rankPoints = Number(eventSettings?.globalPointsRank2) || 14;
-                    else if (res.rank === 3) rankPoints = Number(eventSettings?.globalPointsRank3) || 7;
+                    if (res.rank === 1) rankPoints = Number(eventSettings?.globalPointsRank1) || 5;
+                    else if (res.rank === 2) rankPoints = Number(eventSettings?.globalPointsRank2) || 3;
+                    else if (res.rank === 3) rankPoints = Number(eventSettings?.globalPointsRank3) || 1;
                     else if (res.rank && res.rank >= 4 && res.rank <= 10) rankPoints = Number((eventSettings as any)?.['globalPointsRank' + res.rank]) || 0;
                   }
 

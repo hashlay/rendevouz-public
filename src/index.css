@@ -117,15 +117,15 @@
 }
 
 :root {
-  --color-primary-accent: #18BA46;
-  --color-body-bg: #012002;
-  --color-card-bg: #07380B;
-  --color-card-elevated-bg: #0B4A12;
-  --color-border-subtle: #176523;
-  --color-text-primary: #F4F8F4;
-  --color-text-secondary: #A2D5A4;
-  --color-text-muted: #7EA681;
-  --color-gold-accent: #FFA28A;
+  --color-primary-accent: #F5C542;
+  --color-body-bg: #080808;
+  --color-card-bg: #141414;
+  --color-card-elevated-bg: #202020;
+  --color-border-subtle: #333333;
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #C5C5C5;
+  --color-text-muted: #929292;
+  --color-gold-accent: #F5C542;
   --color-success-accent: #10B981;
 }
 
