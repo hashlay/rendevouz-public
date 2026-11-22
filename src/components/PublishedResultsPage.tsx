@@ -435,7 +435,19 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
                                             const sorted = [...matrix].sort((a: any, b: any) => Number(b.minMark) - Number(a.minMark));
                                             for (const row of sorted) {
                                               if (m >= Number(row.minMark)) {
-                                                gradePoints = isGroup ? Number(row.groupPoints) : Number(row.indPoints);
+                                                if (!isGroup || teamSize === 1) {
+                                                  gradePoints = Number(row.indPoints) || 0;
+                                                } else if (teamSize === 2) {
+                                                  gradePoints = (row.group2Points !== undefined && row.group2Points !== null) ? Number(row.group2Points) : (Number(row.groupPoints) || 0);
+                                                } else if (teamSize === 3) {
+                                                  gradePoints = (row.group3Points !== undefined && row.group3Points !== null) ? Number(row.group3Points) : (Number(row.groupPoints) || 0);
+                                                } else if (teamSize === 4 || teamSize === 5) {
+                                                  gradePoints = (row.group4_5Points !== undefined && row.group4_5Points !== null) ? Number(row.group4_5Points) : (Number(row.groupPoints) || 0);
+                                                } else if (teamSize >= 10) {
+                                                  gradePoints = (row.group10Points !== undefined && row.group10Points !== null) ? Number(row.group10Points) : (row.group4_5Points !== undefined ? Number(row.group4_5Points) : (Number(row.groupPoints) || 0));
+                                                } else {
+                                                  gradePoints = (row.group4_5Points !== undefined && row.group4_5Points !== null) ? Number(row.group4_5Points) : (Number(row.groupPoints) || 0);
+                                                }
                                                 break;
                                               }
                                             }

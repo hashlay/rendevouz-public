@@ -20,6 +20,30 @@ export const DEFAULT_TEAM_SIZE_TIERS: TeamSizePointTier[] = [
   { id: 'tier_vlog', name: 'Vlog / Social Story', minMembers: 1, maxMembers: 99, matchKeywords: ['vlog', 'social story', 'വ്ലോഗ്', 'സോഷ്യൽ സ്റ്റോറി'], pointsAPlus: 25, pointsA: 20, pointsB: 12, pointsC: 6 }
 ];
 
+export interface GradeMatrixRow {
+  id: string;
+  minMark: number;
+  maxMark: number;
+  indGrade: string;
+  indPoints: number; // 1 Member (Individual)
+  groupGrade?: string;
+  groupPoints?: number;
+  group2Points?: number; // 2 Members (Group)
+  group3Points?: number; // 3 Members (Group)
+  group4_5Points?: number; // 4 or 5 Members (Group)
+  group10Points?: number; // 10 Members / Project / Special
+}
+
+export const DEFAULT_GRADE_MATRIX: GradeMatrixRow[] = [
+  { id: '1', minMark: 90, maxMark: 100, indGrade: 'A+', indPoints: 6, groupGrade: 'A+', groupPoints: 10, group2Points: 7, group3Points: 10, group4_5Points: 18, group10Points: 25 },
+  { id: '2', minMark: 70, maxMark: 89, indGrade: 'A', indPoints: 5, groupGrade: 'A', groupPoints: 9, group2Points: 6, group3Points: 9, group4_5Points: 15, group10Points: 20 },
+  { id: '3', minMark: 60, maxMark: 69, indGrade: 'B', indPoints: 3, groupGrade: 'B', groupPoints: 6, group2Points: 4, group3Points: 6, group4_5Points: 10, group10Points: 12 },
+  { id: '4', minMark: 50, maxMark: 59, indGrade: 'C', indPoints: 1, groupGrade: 'C', groupPoints: 3, group2Points: 2, group3Points: 3, group4_5Points: 5, group10Points: 6 },
+  { id: '5', minMark: 0, maxMark: 49, indGrade: '-', indPoints: 0, groupGrade: '-', groupPoints: 0, group2Points: 0, group3Points: 0, group4_5Points: 0, group10Points: 0 }
+];
+
+export const OFFICIAL_GRADE_MATRIX: GradeMatrixRow[] = DEFAULT_GRADE_MATRIX;
+
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
