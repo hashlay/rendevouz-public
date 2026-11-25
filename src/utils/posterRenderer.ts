@@ -92,429 +92,103 @@ export const getPosterDisplayUnitName = (unitOrTeamName?: string, config?: any):
   return raw;
 };
 
+export const DEFAULT_POSTER_THEMES = [
+  '/themes/theme_green_waves.jpg',
+  '/themes/theme_green_cards.jpg',
+  '/themes/theme_red_star.jpg'
+];
+
+const OLD_THEME_PATTERNS = [
+  'theme_brown', 'theme_blue', 'theme_yellow', 'theme_purple',
+  'theme_green.jpg', 'theme_phytolore', 'theme_white_brown', 'theme_yellow_scroll'
+];
+
+export function isOldDefaultTheme(url: string): boolean {
+  if (!url || typeof url !== 'string') return true;
+  return OLD_THEME_PATTERNS.some(pat => url.includes(pat));
+}
+
 export function getDefaultThemeConfig(themeIdx: number = 0): any {
+  // Theme 1 (Index 0) - Green Waves
   if (themeIdx === 0) {
     return {
-      titleColor: '#A94029',
-      winnerColor: '#482722',
-      unitColor: '#B36A50',
-      titleSize: 36,
-      resultLabelText: '',
-      resultLabelX: -9999,
-      resultLabelY: -9999,
-      resultLabelSize: 0,
-      resultLabelColor: '#ffffff',
-      resultNumX: 350,
-      resultNumY: 414,
-      resultNumSize: 76,
-      resultNumColor: '#8D3020',
-      resultNumFont: '600 "Sora", sans-serif',
-      categorySize: 26,
-      categoryColor: '#916C63',
-      categoryX: 450,
-      categoryY: 348,
-      categoryFont: '300 "Sora", sans-serif',
-      compNameX: 450,
-      compNameY: 414,
-      compNameSize: 52,
-      compNameColor: '#A94029',
-      compNameFont: '600 "Sora", sans-serif',
-      winnerSize: 34,
-      unitSize: 22,
-      rankSize: 32,
-      titleX: 540,
-      titleY: 110,
-      rankBadgeShape: 'none',
-      rankBadgeShapeSize: 20,
-      rankFont: '500 "Fractul Alt", sans-serif',
-      rankTextColor: '#482722',
-      rank1Color: '#8D3020',
-      rank2Color: '#8D3020',
-      rank3Color: '#8D3020',
-      rank1Text: 'I',
-      rank2Text: 'II',
-      rank3Text: 'III',
-      winnerFont: '500 "Fractul Alt", sans-serif',
-      unitFont: '500 "Fractul Alt", sans-serif',
-      rank1BadgeX: 416,
-      rank1BadgeY: 512,
-      rank1NameX: 450,
-      rank1NameY: 512,
-      rank1UnitX: 450,
-      rank1UnitY: 538,
-      rank2BadgeX: 416,
-      rank2BadgeY: 590,
-      rank2NameX: 450,
-      rank2NameY: 590,
-      rank2UnitX: 450,
-      rank2UnitY: 618,
-      rank3BadgeX: 416,
-      rank3BadgeY: 680,
-      rank3NameX: 450,
-      rank3NameY: 680,
-      rank3UnitX: 450,
-      rank3UnitY: 708,
-      fontFamily: '500 "Fractul Alt", sans-serif',
-      uppercaseNames: false,
-      showCampusName: false,
-      showFestName: false,
-      showFooter: false,
-      showFooterBg: false,
-      footerLine1: '',
-      footerLine2: '',
-      campusNameUppercase: true,
-      festNameUppercase: true,
-      resultLabelUppercase: true,
-      resultNumUppercase: false,
-      categoryUppercase: false,
-      compNameUppercase: false,
-      winnerUppercase: false,
-      unitUppercase: false,
-      useTeamColors: false,
-      unitColors: {} as Record<string, string>,
-      unitLanguage: 'en',
-      unitArabicNames: {
-        'Sirafi Seafarers': 'TEAM السِّيرَافِي',
-        'Tabrizi Taraz': 'TEAM التَّبْرِيزِي',
-        'Zanzibari Souqs': 'TEAM الزَّنْجَبَارِي',
-      },
-    };
-  }
-
-  if (themeIdx === 1) {
-    return {
-      titleColor: '#1268B0',
-      winnerColor: '#173C60',
-      unitColor: '#4689BC',
-      titleSize: 36,
-      resultLabelText: '',
-      resultLabelX: -9999,
-      resultLabelY: -9999,
-      resultLabelSize: 0,
-      resultLabelColor: '#ffffff',
-      resultNumX: 350,
-      resultNumY: 414,
-      resultNumSize: 76,
-      resultNumColor: '#07519C',
-      resultNumFont: '600 "Sora", sans-serif',
-      categorySize: 26,
-      categoryColor: '#637C94',
-      categoryX: 450,
-      categoryY: 348,
-      categoryFont: '300 "Sora", sans-serif',
-      compNameX: 450,
-      compNameY: 414,
-      compNameSize: 52,
-      compNameColor: '#1268B0',
-      compNameFont: '600 "Sora", sans-serif',
-      winnerSize: 34,
-      unitSize: 22,
-      rankSize: 32,
-      titleX: 540,
-      titleY: 110,
-      rankBadgeShape: 'none',
-      rankBadgeShapeSize: 20,
-      rankFont: '500 "Fractul Alt", sans-serif',
-      rankTextColor: '#173C60',
-      rank1Color: '#07519C',
-      rank2Color: '#07519C',
-      rank3Color: '#07519C',
-      rank1Text: 'I',
-      rank2Text: 'II',
-      rank3Text: 'III',
-      winnerFont: '500 "Fractul Alt", sans-serif',
-      unitFont: '500 "Fractul Alt", sans-serif',
-      rank1BadgeX: 416,
-      rank1BadgeY: 512,
-      rank1NameX: 450,
-      rank1NameY: 512,
-      rank1UnitX: 450,
-      rank1UnitY: 538,
-      rank2BadgeX: 416,
-      rank2BadgeY: 590,
-      rank2NameX: 450,
-      rank2NameY: 590,
-      rank2UnitX: 450,
-      rank2UnitY: 618,
-      rank3BadgeX: 416,
-      rank3BadgeY: 680,
-      rank3NameX: 450,
-      rank3NameY: 680,
-      rank3UnitX: 450,
-      rank3UnitY: 708,
-      fontFamily: '500 "Fractul Alt", sans-serif',
-      uppercaseNames: false,
-      showCampusName: false,
-      showFestName: false,
-      showFooter: false,
-      showFooterBg: false,
-      footerLine1: '',
-      footerLine2: '',
-      campusNameUppercase: true,
-      festNameUppercase: true,
-      resultLabelUppercase: true,
-      resultNumUppercase: false,
-      categoryUppercase: false,
-      compNameUppercase: false,
-      winnerUppercase: false,
-      unitUppercase: false,
-      useTeamColors: false,
-      unitColors: {} as Record<string, string>,
-      unitLanguage: 'en',
-      unitArabicNames: {
-        'Sirafi Seafarers': 'TEAM السِّيرَافِي',
-        'Tabrizi Taraz': 'TEAM التَّبْرِيزِي',
-        'Zanzibari Souqs': 'TEAM الزَّنْجَبَارِي',
-      },
-    };
-  }
-
-  // Theme 3 (Index 2) - Golden Yellow
-  if (themeIdx === 2) {
-    return {
-      titleColor: '#A07816',
-      winnerColor: '#4A3030',
-      unitColor: '#B18B42',
-      titleSize: 36,
-      resultLabelText: '',
-      resultLabelX: -9999,
-      resultLabelY: -9999,
-      resultLabelSize: 0,
-      resultLabelColor: '#ffffff',
-      resultNumX: 174,
-      resultNumY: 368,
-      resultNumSize: 76,
-      resultNumColor: '#956B12',
-      resultNumFont: '600 "Sora", sans-serif',
-      categorySize: 26,
-      categoryColor: '#80645B',
-      categoryX: 274,
-      categoryY: 304,
-      categoryFont: '300 "Sora", sans-serif',
-      compNameX: 274,
-      compNameY: 368,
-      compNameSize: 52,
-      compNameColor: '#A07816',
-      compNameFont: '600 "Sora", sans-serif',
-      winnerSize: 34,
-      unitSize: 22,
-      rankSize: 32,
-      titleX: 540,
-      titleY: 110,
-      rankBadgeShape: 'none',
-      rankBadgeShapeSize: 20,
-      rankFont: '500 "Fractul Alt", sans-serif',
-      rankTextColor: '#4A3030',
-      rank1Color: '#956B12',
-      rank2Color: '#956B12',
-      rank3Color: '#956B12',
-      rank1Text: 'I',
-      rank2Text: 'II',
-      rank3Text: 'III',
-      winnerFont: '500 "Fractul Alt", sans-serif',
-      unitFont: '500 "Fractul Alt", sans-serif',
-      rank1BadgeX: 244,
-      rank1BadgeY: 468,
-      rank1NameX: 274,
-      rank1NameY: 468,
-      rank1UnitX: 274,
-      rank1UnitY: 494,
-      rank2BadgeX: 244,
-      rank2BadgeY: 548,
-      rank2NameX: 274,
-      rank2NameY: 548,
-      rank2UnitX: 274,
-      rank2UnitY: 574,
-      rank3BadgeX: 244,
-      rank3BadgeY: 636,
-      rank3NameX: 274,
-      rank3NameY: 636,
-      rank3UnitX: 274,
-      rank3UnitY: 662,
-      fontFamily: '500 "Fractul Alt", sans-serif',
-      uppercaseNames: false,
-      showCampusName: false,
-      showFestName: false,
-      showFooter: false,
-      showFooterBg: false,
-      footerLine1: '',
-      footerLine2: '',
-      campusNameUppercase: true,
-      festNameUppercase: true,
-      resultLabelUppercase: true,
-      resultNumUppercase: false,
-      categoryUppercase: false,
-      compNameUppercase: false,
-      winnerUppercase: false,
-      unitUppercase: false,
-      useTeamColors: false,
-      unitColors: {} as Record<string, string>,
-      unitLanguage: 'en',
-      unitArabicNames: {
-        'Sirafi Seafarers': 'TEAM السِّيرَافِي',
-        'Tabrizi Taraz': 'TEAM التَّبْرِيزِي',
-        'Zanzibari Souqs': 'TEAM الزَّنْجَبَارِي',
-      },
-    };
-  }
-
-  // Theme 4 (Index 3) - Royal Purple
-  if (themeIdx === 3) {
-    return {
-      titleColor: '#7920C6',
-      winnerColor: '#39224F',
-      unitColor: '#9564B9',
-      titleSize: 36,
-      resultLabelText: '',
-      resultLabelX: -9999,
-      resultLabelY: -9999,
-      resultLabelSize: 0,
-      resultLabelColor: '#ffffff',
-      resultNumX: 449,
-      resultNumY: 425,
-      resultNumSize: 76,
-      resultNumColor: '#7012B9',
-      resultNumFont: '600 "Sora", sans-serif',
-      categorySize: 26,
-      categoryColor: '#806C94',
-      categoryX: 539,
-      categoryY: 365,
-      categoryFont: '300 "Sora", sans-serif',
-      compNameX: 539,
-      compNameY: 425,
-      compNameSize: 52,
-      compNameColor: '#7920C6',
-      compNameFont: '600 "Sora", sans-serif',
-      winnerSize: 34,
-      unitSize: 22,
-      rankSize: 32,
-      titleX: 540,
-      titleY: 110,
-      rankBadgeShape: 'none',
-      rankBadgeShapeSize: 20,
-      rankFont: '500 "Fractul Alt", sans-serif',
-      rankTextColor: '#39224F',
-      rank1Color: '#7012B9',
-      rank2Color: '#7012B9',
-      rank3Color: '#7012B9',
-      rank1Text: 'I',
-      rank2Text: 'II',
-      rank3Text: 'III',
-      winnerFont: '500 "Fractul Alt", sans-serif',
-      unitFont: '500 "Fractul Alt", sans-serif',
-      rank1BadgeX: 510,
-      rank1BadgeY: 512,
-      rank1NameX: 539,
-      rank1NameY: 512,
-      rank1UnitX: 539,
-      rank1UnitY: 538,
-      rank2BadgeX: 510,
-      rank2BadgeY: 585,
-      rank2NameX: 539,
-      rank2NameY: 585,
-      rank2UnitX: 539,
-      rank2UnitY: 611,
-      rank3BadgeX: 510,
-      rank3BadgeY: 665,
-      rank3NameX: 539,
-      rank3NameY: 665,
-      rank3UnitX: 539,
-      rank3UnitY: 691,
-      fontFamily: '500 "Fractul Alt", sans-serif',
-      uppercaseNames: false,
-      showCampusName: false,
-      showFestName: false,
-      showFooter: false,
-      showFooterBg: false,
-      footerLine1: '',
-      footerLine2: '',
-      campusNameUppercase: true,
-      festNameUppercase: true,
-      resultLabelUppercase: true,
-      resultNumUppercase: false,
-      categoryUppercase: false,
-      compNameUppercase: false,
-      winnerUppercase: false,
-      unitUppercase: false,
-      useTeamColors: false,
-      unitColors: {} as Record<string, string>,
-      unitLanguage: 'en',
-      unitArabicNames: {
-        'Sirafi Seafarers': 'TEAM السِّيرَافِي',
-        'Tabrizi Taraz': 'TEAM التَّبْرِيزِي',
-        'Zanzibari Souqs': 'TEAM الزَّنْجَبَارِي',
-      },
-    };
-  }
-
-  // Theme 5 (Index 4) - Dark Phytolore Modern (Thunder ExtraLight 01, Sora & Fractul Alt, Pink accents)
-  if (themeIdx === 4) {
-    return {
-      titleColor: '#ef066a',
+      titleColor: '#ffffff',
       winnerColor: '#ffffff',
-      unitColor: '#ef066a',
+      unitColor: '#ffffff',
       titleSize: 36,
-      resultLabelText: '',
-      resultLabelX: -9999,
-      resultLabelY: -9999,
-      resultLabelSize: 0,
-      resultLabelColor: '#ffffff',
-      resultNumX: 138,
-      resultNumY: 408,
-      resultNumSize: 105,
-      resultNumColor: '#ef066a',
-      resultNumFont: '200 "Thunder ExtraLight LC", "Thunder", sans-serif',
+      resultLabelText: 'RESULT',
+      resultLabelX: 183,
+      resultLabelY: 284,
+      resultLabelSize: 13,
+      resultLabelColor: '#84C75D',
+      resultLabelFont: '600 "Sora", sans-serif',
+      resultLabelVertical: true,
+      resultLabelLineGap: 14,
+      resultNumX: 135,
+      resultNumY: 375,
+      resultNumSize: 145,
+      resultNumColor: '#84C75D',
+      resultNumFont: '700 "Sora", sans-serif',
+      resultNumStyle: 'stroke',
+      resultNumStrokeWidth: 3.5,
       categorySize: 28,
       categoryColor: '#ffffff',
-      categoryX: 240,
+      categoryX: 296,
       categoryY: 340,
-      categoryFont: '500 "Sora", sans-serif',
-      compNameX: 240,
-      compNameY: 405,
-      compNameSize: 68,
-      compNameColor: '#ef066a',
-      compNameFont: '600 "Sora", sans-serif',
+      categoryFont: '600 "Sora", sans-serif',
+      compNameX: 296,
+      compNameY: 382,
+      compNameSize: 42,
+      compNameColor: '#FFAD03',
+      compNameFont: '700 "Sora", sans-serif',
+      compNameAlign: 'left',
+      scriptText: 'mid zone',
+      scriptX: 296,
+      scriptY: 308,
+      scriptSize: 48,
+      scriptColor: '#ffffff',
+      scriptFont: '"SignPainter", cursive',
+      showScriptText: true,
       campusNameX: 540,
       campusNameY: 70,
       campusNameSize: 28,
       campusNameColor: '#ffffff',
-      campusNameFont: 'sans-serif',
+      campusNameFont: '600 "Sora", sans-serif',
       showCampusName: false,
       festNameX: 540,
       festNameY: 120,
       festNameSize: 36,
       festNameColor: '#fbbf24',
-      festNameFont: 'sans-serif',
+      festNameFont: '700 "Sora", sans-serif',
       showFestName: false,
-      winnerSize: 34,
-      unitSize: 22,
-      rankSize: 30,
+      winnerSize: 28,
+      unitSize: 18,
+      rankSize: 40,
       titleX: 540,
       titleY: 110,
-      rank1BadgeX: 210,
-      rank1BadgeY: 498,
-      rank1NameX: 240,
-      rank1NameY: 498,
-      rank1UnitX: 240,
-      rank1UnitY: 524,
-      rank2BadgeX: 210,
-      rank2BadgeY: 578,
-      rank2NameX: 240,
-      rank2NameY: 578,
-      rank2UnitX: 240,
-      rank2UnitY: 604,
-      rank3BadgeX: 210,
-      rank3BadgeY: 663,
-      rank3NameX: 240,
-      rank3NameY: 663,
-      rank3UnitX: 240,
-      rank3UnitY: 689,
-      titleFont: '500 "Fractul Alt", sans-serif',
-      resultLabelFont: '500 "Fractul Alt", sans-serif',
-      winnerFont: '500 "Fractul Alt", sans-serif',
-      unitFont: '500 "Fractul Alt", sans-serif',
-      rankFont: '500 "Fractul Alt", sans-serif',
-      fontFamily: '500 "Fractul Alt", sans-serif',
+      rank1BadgeX: 180,
+      rank1BadgeY: 465,
+      rank1NameX: 252,
+      rank1NameY: 452,
+      rank1UnitX: 252,
+      rank1UnitY: 476,
+      rank2BadgeX: 180,
+      rank2BadgeY: 535,
+      rank2NameX: 252,
+      rank2NameY: 522,
+      rank2UnitX: 252,
+      rank2UnitY: 546,
+      rank3BadgeX: 180,
+      rank3BadgeY: 605,
+      rank3NameX: 252,
+      rank3NameY: 592,
+      rank3UnitX: 252,
+      rank3UnitY: 616,
+      titleFont: '600 "Sora", sans-serif',
+      winnerFont: '600 "Sora", sans-serif',
+      unitFont: '400 "Sora", sans-serif',
+      rankFont: '600 "Sora", sans-serif',
+      fontFamily: '500 "Sora", sans-serif',
       uppercaseNames: false,
       rankBadgeShape: 'none' as 'pill' | 'circle' | 'rectangle' | 'none',
       rankBadgeShapeSize: 20,
@@ -522,9 +196,13 @@ export function getDefaultThemeConfig(themeIdx: number = 0): any {
       rank2Color: '#ffffff',
       rank3Color: '#ffffff',
       rankTextColor: '#ffffff',
-      rank1Text: 'I',
-      rank2Text: 'II',
-      rank3Text: 'III',
+      rank1Text: '01.',
+      rank2Text: '02.',
+      rank3Text: '03.',
+      showDividers: true,
+      dividerColor: 'rgba(255, 255, 255, 0.35)',
+      dividerStartX: 252,
+      dividerEndX: 530,
       showFooter: false,
       showFooterBg: false,
       footerLine1: '',
@@ -541,6 +219,8 @@ export function getDefaultThemeConfig(themeIdx: number = 0): any {
       unitColors: {} as Record<string, string>,
       unitLanguage: 'en',
       unitArabicNames: {
+        'Nexa Mirath': 'NEXA MIRATH',
+        'Nexa Faylas': 'NEXA FAYLAS',
         'Sirafi Seafarers': 'TEAM السِّيرَافِي',
         'Tabrizi Taraz': 'TEAM التَّبْرِيزِي',
         'Zanzibari Souqs': 'TEAM الزَّنْجَبَارِي'
@@ -548,131 +228,160 @@ export function getDefaultThemeConfig(themeIdx: number = 0): any {
     };
   }
 
-  return {
-    titleColor: '#fbbf24',
-    winnerColor: '#ffffff',
-    unitColor: '#34d399',
-    titleSize: 36,
-    resultLabelText: 'RESULT',
-    resultLabelX: 470,
-    resultLabelY: 180,
-    resultLabelSize: 28,
-    resultLabelColor: '#ffffff',
-    resultNumX: 600,
-    resultNumY: 180,
-    resultNumSize: 28,
-    resultNumColor: '#ffffff',
-    categorySize: 32,
-    compNameSize: 52,
-    winnerSize: 44,
-    unitSize: 30,
-    rankSize: 38,
-    titleX: 540,
-    titleY: 110,
-    categoryX: 540,
-    categoryY: 260,
-    compNameX: 540,
-    compNameY: 330,
-    rank1BadgeX: 140,
-    rank1BadgeY: 460,
-    rank1NameX: 260,
-    rank1NameY: 448,
-    rank1UnitX: 260,
-    rank1UnitY: 483,
-    rank2BadgeX: 140,
-    rank2BadgeY: 640,
-    rank2NameX: 260,
-    rank2NameY: 628,
-    rank2UnitX: 260,
-    rank2UnitY: 663,
-    rank3BadgeX: 140,
-    rank3BadgeY: 820,
-    rank3NameX: 260,
-    rank3NameY: 808,
-    rank3UnitX: 260,
-    rank3UnitY: 843,
-    fontFamily: 'sans-serif',
-    uppercaseNames: false,
-    rankBadgeShape: 'pill',
-    rankBadgeShapeSize: 40,
-    rank1Color: '#fbbf24',
-    rank2Color: '#e2e8f0',
-    rank3Color: '#d97706',
-    rankTextColor: '#000000',
-    rank1Text: 'Rank 1',
-    rank2Text: 'Rank 2',
-    rank3Text: 'Rank 3',
-    showFooter: true,
-    showFooterBg: false,
-    footerLine1: '',
-    footerLine2: '',
+  // Theme 2 (Index 1) - Green 3D Block with 3 Horizontal Cards
+  if (themeIdx === 1) {
+    return {
+      titleColor: '#ffffff',
+      winnerColor: '#ffffff',
+      unitColor: '#ffffff',
+      titleSize: 36,
+      resultLabelText: '#Result',
+      resultLabelX: 370,
+      resultLabelY: 282,
+      resultLabelSize: 32,
+      resultLabelColor: '#ffffff',
+      resultLabelFont: '"SignPainter", cursive',
+      resultLabelVertical: false,
+      resultNumX: 450,
+      resultNumY: 282,
+      resultNumSize: 28,
+      resultNumColor: '#ffffff',
+      resultNumFont: '700 "Sora", sans-serif',
+      resultNumStyle: 'fill',
+      categorySize: 0,
+      categoryColor: '#ffffff',
+      categoryX: -9999,
+      categoryY: -9999,
+      categoryFont: '600 "Sora", sans-serif',
+      compNameX: 438,
+      compNameY: 315,
+      compNameSize: 34,
+      compNameColor: '#FFAD03',
+      compNameFont: '700 "Sora", sans-serif',
+      compNameAlign: 'center',
+      scriptText: '',
+      scriptX: -9999,
+      scriptY: -9999,
+      scriptSize: 0,
+      scriptColor: '#ffffff',
+      scriptFont: '"SignPainter", cursive',
+      showScriptText: false,
+      campusNameX: 540,
+      campusNameY: 70,
+      campusNameSize: 28,
+      campusNameColor: '#ffffff',
+      campusNameFont: '600 "Sora", sans-serif',
+      showCampusName: false,
+      festNameX: 540,
+      festNameY: 120,
+      festNameSize: 36,
+      festNameColor: '#fbbf24',
+      festNameFont: '700 "Sora", sans-serif',
+      showFestName: false,
+      winnerSize: 30,
+      unitSize: 18,
+      rankSize: 26,
+      titleX: 540,
+      titleY: 110,
+      rank1BadgeX: 220,
+      rank1BadgeY: 366,
+      rank1NameX: 220,
+      rank1NameY: 412,
+      rank1UnitX: 220,
+      rank1UnitY: 468,
+      rank2BadgeX: 440,
+      rank2BadgeY: 366,
+      rank2NameX: 440,
+      rank2NameY: 412,
+      rank2UnitX: 440,
+      rank2UnitY: 468,
+      rank3BadgeX: 660,
+      rank3BadgeY: 366,
+      rank3NameX: 660,
+      rank3NameY: 412,
+      rank3UnitX: 660,
+      rank3UnitY: 468,
+      titleFont: '600 "Sora", sans-serif',
+      winnerFont: '700 "Sora", sans-serif',
+      unitFont: '400 "Sora", sans-serif',
+      rankFont: '600 "Sora", sans-serif',
+      fontFamily: '500 "Sora", sans-serif',
+      uppercaseNames: false,
+      rankBadgeShape: 'none' as 'pill' | 'circle' | 'rectangle' | 'none',
+      rankBadgeShapeSize: 20,
+      rank1Color: '#ffffff',
+      rank2Color: '#ffffff',
+      rank3Color: '#ffffff',
+      rankTextColor: '#ffffff',
+      rank1Text: '01',
+      rank2Text: '02',
+      rank3Text: '03',
+      winnerAlign: 'center',
+      unitAlign: 'center',
+      winnerWrap: true,
+      showDividers: false,
+      showFooter: false,
+      showFooterBg: false,
+      footerLine1: '',
+      footerLine2: '',
+      campusNameUppercase: true,
+      festNameUppercase: true,
+      resultLabelUppercase: false,
+      resultNumUppercase: false,
+      categoryUppercase: false,
+      compNameUppercase: false,
+      winnerUppercase: false,
+      unitUppercase: false,
+      useTeamColors: false,
+      unitColors: {} as Record<string, string>,
+      unitLanguage: 'en',
+      unitArabicNames: {
+        'Nexa Mirath': 'NEXA MIRATH',
+        'Nexa Faylas': 'NEXA FAYLAS',
+        'Sirafi Seafarers': 'TEAM السِّيرَافِي',
+        'Tabrizi Taraz': 'TEAM التَّبْرِيزِي',
+        'Zanzibari Souqs': 'TEAM الزَّنْجَبَارِي'
+      } as Record<string, string>,
+    };
+  }
 
-    // Block Letters (Uppercase) options
-    campusNameUppercase: true,
-    festNameUppercase: true,
-    resultLabelUppercase: true,
-    resultNumUppercase: false,
-    categoryUppercase: true,
-    compNameUppercase: false,
-    winnerUppercase: false,
-    unitUppercase: true,
+  // Theme 3 (Index 2) - Red 3D Star
+  if (themeIdx === 2) {
+    const base = getDefaultThemeConfig(0);
+    return {
+      ...base,
+      resultLabelColor: '#C4020B',
+      resultNumColor: '#C4020B',
+    };
+  }
 
-    // Language / Arabic options for Units/Teams
-    useTeamColors: false,
-    unitColors: {} as Record<string, string>,
-    unitLanguage: 'ar', // 'en' | 'ar'
-    unitArabicNames: {
-      'Sirafi Seafarers': 'TEAM السِّيرَافِي',
-      'Tabrizi Taraz': 'TEAM التَّبْرِيزِي',
-      'Zanzibari Souqs': 'TEAM الزَّنْجَبَارِي',
-    },
-  };
+  return getDefaultThemeConfig(themeIdx % 3);
 }
 
 // Migrate old flat config to per-theme (same logic as PosterSettingsView)
-
 export function migrateOldConfig(templateConfig: any, defaultThemes: string[]): any {
-  if (templateConfig.themeConfigs) {
-    return templateConfig;
+  let customThemes = Array.isArray(templateConfig.customThemes) && templateConfig.customThemes.length > 0
+    ? templateConfig.customThemes
+    : defaultThemes;
+
+  if (customThemes.some(isOldDefaultTheme) || customThemes.length === 4) {
+    customThemes = defaultThemes.map((dt, idx) => {
+      const existing = customThemes[idx];
+      return existing && !isOldDefaultTheme(existing) ? existing : dt;
+    });
   }
+
+  if (templateConfig.themeConfigs) {
+    return {
+      ...templateConfig,
+      customThemes
+    };
+  }
+
   const oldConf = { ...templateConfig };
-  const customThemes = oldConf.customThemes || defaultThemes;
   const themeRules = oldConf.themeRules || [];
   delete oldConf.customThemes;
   delete oldConf.themeRules;
-
-  if (oldConf.badgeX !== undefined) {
-    oldConf.resultLabelX = oldConf.resultLabelX ?? (oldConf.badgeX - 60);
-    oldConf.resultLabelY = oldConf.resultLabelY ?? oldConf.badgeY;
-    oldConf.resultLabelSize = oldConf.resultLabelSize ?? (oldConf.badgeSize ?? 28);
-    oldConf.resultNumX = oldConf.resultNumX ?? (oldConf.badgeX + 60);
-    oldConf.resultNumY = oldConf.resultNumY ?? oldConf.badgeY;
-    oldConf.resultNumSize = oldConf.resultNumSize ?? (oldConf.badgeSize ?? 28);
-  }
-
-  const wsx = oldConf.winnersStartX ?? 140;
-  const wsy = oldConf.winnersStartY ?? 460;
-  oldConf.rank1BadgeX = oldConf.rank1BadgeX ?? wsx;
-  oldConf.rank1BadgeY = oldConf.rank1BadgeY ?? wsy;
-  oldConf.rank1NameX = oldConf.rank1NameX ?? (wsx + 120);
-  oldConf.rank1NameY = oldConf.rank1NameY ?? (wsy - 12);
-  oldConf.rank1UnitX = oldConf.rank1UnitX ?? (wsx + 120);
-  oldConf.rank1UnitY = oldConf.rank1UnitY ?? (wsy + 23);
-  oldConf.rank2BadgeX = oldConf.rank2BadgeX ?? wsx;
-  oldConf.rank2BadgeY = oldConf.rank2BadgeY ?? (wsy + 180);
-  oldConf.rank2NameX = oldConf.rank2NameX ?? (wsx + 120);
-  oldConf.rank2NameY = oldConf.rank2NameY ?? (wsy + 168);
-  oldConf.rank2UnitX = oldConf.rank2UnitX ?? (wsx + 120);
-  oldConf.rank2UnitY = oldConf.rank2UnitY ?? (wsy + 203);
-  oldConf.rank3BadgeX = oldConf.rank3BadgeX ?? wsx;
-  oldConf.rank3BadgeY = oldConf.rank3BadgeY ?? (wsy + 360);
-  oldConf.rank3NameX = oldConf.rank3NameX ?? (wsx + 120);
-  oldConf.rank3NameY = oldConf.rank3NameY ?? (wsy + 348);
-  oldConf.rank3UnitX = oldConf.rank3UnitX ?? (wsx + 120);
-  oldConf.rank3UnitY = oldConf.rank3UnitY ?? (wsy + 383);
-  oldConf.rank1Text = oldConf.rank1Text ?? ((oldConf.rankPrefix ?? 'Rank ') + '1');
-  oldConf.rank2Text = oldConf.rank2Text ?? ((oldConf.rankPrefix ?? 'Rank ') + '2');
-  oldConf.rank3Text = oldConf.rank3Text ?? ((oldConf.rankPrefix ?? 'Rank ') + '3');
 
   const themeConfigs: any = {};
   customThemes.forEach((_: any, idx: number) => {
@@ -681,8 +390,6 @@ export function migrateOldConfig(templateConfig: any, defaultThemes: string[]): 
 
   return { customThemes, themeRules, themeConfigs };
 }
-
-
 
 export const renderPosterToCanvas = async (
   canvas: HTMLCanvasElement,
@@ -702,12 +409,7 @@ export const renderPosterToCanvas = async (
   }
 
   const rawTemplateConfig = eventSettings?.posterTemplateConfig || {};
-  const defaultThemes = [
-    '/themes/theme_brown.jpg',
-    '/themes/theme_blue.jpg',
-    '/themes/theme_yellow.jpg',
-    '/themes/theme_purple.jpg'
-  ];
+  const defaultThemes = DEFAULT_POSTER_THEMES;
   let inputThemes = rawTemplateConfig.customThemes;
   if (Array.isArray(inputThemes) && inputThemes.length > 0) {
     inputThemes = defaultThemes.map((dt, idx) => inputThemes[idx] || dt);
@@ -916,20 +618,57 @@ export const renderPosterToCanvas = async (
     const rLblMetrics = ctx.measureText(rLblText);
     const rx = c.resultLabelX ?? 470;
     const ry = c.resultLabelY ?? 180;
-    ctx.fillText(rLblText, rx, ry);
+    if (c.resultLabelVertical) {
+      const chars = rLblText.split('');
+      const gap = c.resultLabelLineGap || ((c.resultLabelSize || 13) * 1.15);
+      chars.forEach((ch: string, i: number) => {
+        ctx.fillText(ch, rx, ry + i * gap);
+      });
+    } else {
+      ctx.fillText(rLblText, rx, ry);
+    }
     addRegion('resultLabel', rx - 10, ry - (c.resultLabelSize || 28) - 5, rLblMetrics.width + 20, (c.resultLabelSize || 28) + 20);
 
     // Result Number (e.g. "01", "10", "105")
     ctx.textAlign = 'left';
     ctx.font = parseFontForCanvas(c.resultNumFont || c.fontFamily, c.resultNumSize || 28, '800');
-    ctx.fillStyle = c.resultNumColor || '#ffffff';
     const rNumX = c.resultNumX ?? 600;
     const rNumY = c.resultNumY ?? 180;
-    ctx.fillText(formattedNum, rNumX, rNumY);
+    if (c.resultNumStyle === 'stroke') {
+      ctx.save();
+      ctx.strokeStyle = c.resultNumColor || '#84C75D';
+      ctx.lineWidth = c.resultNumStrokeWidth || 3.5;
+      ctx.lineJoin = 'round';
+      ctx.strokeText(formattedNum, rNumX, rNumY);
+      ctx.restore();
+    } else {
+      ctx.fillStyle = c.resultNumColor || '#ffffff';
+      ctx.fillText(formattedNum, rNumX, rNumY);
+    }
     const rNumMetrics = ctx.measureText(formattedNum);
     addRegion('resultNum', rNumX - 10, rNumY - (c.resultNumSize || 28) - 5, rNumMetrics.width + 20, (c.resultNumSize || 28) + 20);
 
-    // Category
+    
+    // Cursive Script Text (SignPainter) e.g. "mid zone"
+    if (c.showScriptText !== false && (c.scriptSize ?? 0) > 0) {
+      const sText = c.scriptTextOverride !== undefined && c.scriptTextOverride !== '' 
+        ? c.scriptTextOverride 
+        : (c.scriptText || (activeComp?.stage ? activeComp.stage : 'mid zone'));
+      if (sText) {
+        ctx.save();
+        ctx.textAlign = (c.scriptAlign || 'left') as CanvasTextAlign;
+        ctx.font = parseFontForCanvas(c.scriptFont || '"SignPainter", cursive', c.scriptSize ?? 48, '400');
+        ctx.fillStyle = c.scriptColor || '#ffffff';
+        const sx = c.scriptX ?? 296;
+        const sy = c.scriptY ?? 308;
+        ctx.fillText(sText, sx, sy);
+        const sMetrics = ctx.measureText(sText);
+        addRegion('scriptText', sx - 10, sy - (c.scriptSize ?? 48) - 5, sMetrics.width + 20, (c.scriptSize ?? 48) + 20);
+        ctx.restore();
+      }
+    }
+
+// Category
     ctx.textAlign = 'left';
     ctx.font = parseFontForCanvas(c.categoryFont || c.fontFamily, c.categorySize ?? 32, '800');
     ctx.fillStyle = c.categoryColor || 'rgba(255, 255, 255, 0.7)';
@@ -942,7 +681,7 @@ export const renderPosterToCanvas = async (
     addRegion('category', catX - 10, catY - (c.categorySize ?? 32) - 5, catMetrics.width + 20, (c.categorySize ?? 32) + 20);
 
     // Competition Name with Generic Auto-Fit
-    ctx.textAlign = 'left';
+    ctx.textAlign = (c.compNameAlign || 'left') as CanvasTextAlign;
     const rawComp = c.compNameOverride !== undefined && c.compNameOverride !== '' ? c.compNameOverride : (activeComp.name || compName || 'Competition');
     const compText = (c.compNameUppercase ? rawComp.toUpperCase() : rawComp) || 'COMPETITION';
     const compLines = (compText ? compText.split('\n') : []).filter(Boolean);
@@ -1082,9 +821,16 @@ export const renderPosterToCanvas = async (
         addRegion(badgeRegionId, bx - badgeW / 2 - 5, badgeCenterY - badgeH / 2 - 5, badgeW + 10, badgeH + 10);
 
         // Winner name (supports multi-line \n and Auto-Fit scaling for long names)
-        ctx.textAlign = 'left';
+        ctx.textAlign = (c.winnerAlign || 'left') as CanvasTextAlign;
         let winnerFontSize = c.winnerSize || 34;
-        const nameLines = winnerName.split('\n').filter(Boolean);
+        let nameLines = winnerName.split('\n').filter(Boolean);
+        if (c.winnerWrap && nameLines.length === 1 && winnerName.includes(' ')) {
+          const words = winnerName.split(' ');
+          if (words.length >= 2) {
+            const mid = Math.ceil(words.length / 2);
+            nameLines = [words.slice(0, mid).join(' '), words.slice(mid).join(' ')];
+          }
+        }
         ctx.font = parseFontForCanvas(c.winnerFont || c.fontFamily, winnerFontSize, '500');
         let longestNameLine = nameLines.length > 0 ? Math.max(...nameLines.map((l: string) => ctx.measureText(l).width)) : 0;
         while (longestNameLine > maxWinnerAllowedWidth && winnerFontSize > 14) {
@@ -1123,6 +869,7 @@ export const renderPosterToCanvas = async (
         const displayUnitName = getPosterDisplayUnitName(rawWinnerUnit || winnerUnit, c);
         const unitText = isArabic ? displayUnitName : (c.unitUppercase !== false ? displayUnitName.toUpperCase() : displayUnitName);
         const unitLines = unitText.split('\n').filter(Boolean);
+        ctx.textAlign = (c.unitAlign || c.winnerAlign || 'left') as CanvasTextAlign;
 
         ctx.font = parseFontForCanvas(unitFontFamily, unitFontSize, '500');
         let longestUnitLine = unitLines.length > 0 ? Math.max(...unitLines.map((l: string) => ctx.measureText(l).width)) : 0;
@@ -1156,6 +903,19 @@ export const renderPosterToCanvas = async (
         });
         addRegion(unitRegionId, (ux ?? calcUx) - 5, (uy ?? calcUy) - unitFontSize - 5, maxUnitW + 10, (unitLines.length * unitGap) + 10);
       }
+        // Horizontal divider line under winner row (for stacked themes like Theme 0 & Theme 2)
+        if (c.showDividers && rank < 3) {
+          const divY = (uy ?? calcUy) + (unitLines.length * unitGap) + 8;
+          ctx.save();
+          ctx.strokeStyle = c.dividerColor || 'rgba(255, 255, 255, 0.35)';
+          ctx.lineWidth = c.dividerWidth || 1;
+          ctx.beginPath();
+          ctx.moveTo(c.dividerStartX ?? nx, divY);
+          ctx.lineTo(c.dividerEndX ?? (nx + 280), divY);
+          ctx.stroke();
+          ctx.restore();
+        }
+
 
       // Smoothly shift down subsequent ranks if there was a tie
       if (hasTie) {
