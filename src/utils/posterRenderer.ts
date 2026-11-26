@@ -364,7 +364,7 @@ export function migrateOldConfig(templateConfig: any, defaultThemes: string[]): 
     ? templateConfig.customThemes
     : defaultThemes;
 
-  if (customThemes.some(isOldDefaultTheme) || customThemes.length === 4) {
+  if (customThemes.some(isOldDefaultTheme) || customThemes.length > 3 || customThemes.length === 4) {
     customThemes = defaultThemes.map((dt, idx) => {
       const existing = customThemes[idx];
       return existing && !isOldDefaultTheme(existing) ? existing : dt;
@@ -902,7 +902,7 @@ export const renderPosterToCanvas = async (
           if (w > maxUnitW) maxUnitW = w;
         });
         addRegion(unitRegionId, (ux ?? calcUx) - 5, (uy ?? calcUy) - unitFontSize - 5, maxUnitW + 10, (unitLines.length * unitGap) + 10);
-
+      }
         // Horizontal divider line under winner row (for stacked themes like Theme 0 & Theme 2)
         if (c.showDividers && rank < 3) {
           const divY = (uy ?? calcUy) + (unitLines.length * unitGap) + 8;
@@ -915,7 +915,6 @@ export const renderPosterToCanvas = async (
           ctx.stroke();
           ctx.restore();
         }
-      }
 
 
       // Smoothly shift down subsequent ranks if there was a tie

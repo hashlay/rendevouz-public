@@ -264,18 +264,26 @@ async function getDbState(force = false) {
       });
       state.db = db;
 
-      // Ensure Theme 4 exists in posterTemplateConfig
+      // Ensure only the 3 Querencia poster themes are used
+      const defaultPosterThemes = [
+        '/themes/theme_green_waves.jpg',
+        '/themes/theme_green_cards.jpg',
+        '/themes/theme_red_star.jpg'
+      ];
+      const oldThemePatterns = [
+        'theme_brown', 'theme_blue', 'theme_yellow', 'theme_purple',
+        'theme_green.jpg', 'theme_phytolore', 'theme_white_brown', 'theme_yellow_scroll'
+      ];
+      const isOldTheme = (url) => !url || typeof url !== 'string' || oldThemePatterns.some(p => url.includes(p));
+
       const ptc = state.posterTemplateConfig || state.eventSettings?.posterTemplateConfig;
-      if (ptc && Array.isArray(ptc.customThemes)) {
-        if (ptc.customThemes.length === 3) {
-          ptc.customThemes.push('/themes/theme_purple.jpg');
-        } else if (ptc.customThemes.length >= 4 && (!ptc.customThemes[3] || ptc.customThemes[3].startsWith('data:image/svg'))) {
-          ptc.customThemes[3] = '/themes/theme_purple.jpg';
-        }
-        if (ptc.themeConfigs) {
-          const ref = ptc.themeConfigs[0] || ptc.themeConfigs[1] || ptc.themeConfigs[2] || {};
-          if (!ptc.themeConfigs[3]) {
-            ptc.themeConfigs[3] = { ...ref };
+      if (ptc) {
+        if (!Array.isArray(ptc.customThemes) || ptc.customThemes.length === 0 || ptc.customThemes.some(isOldTheme)) {
+          ptc.customThemes = [...defaultPosterThemes];
+        } else if (ptc.customThemes.length > 3) {
+          ptc.customThemes = ptc.customThemes.filter(t => !isOldTheme(t)).slice(0, 3);
+          if (ptc.customThemes.length < 3) {
+            ptc.customThemes = [...defaultPosterThemes];
           }
         }
       }
