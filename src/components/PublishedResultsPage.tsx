@@ -137,7 +137,7 @@ export const PublishedResultsPage: React.FC<PublishedResultsPageProps> = ({
     const map = new Map<string, { key: string; eventName: string; category: string; competitionId?: string; items: ResultItem[]; latestUpdatedAt: string; announcementNumber: number }>();
     
     // Filter to valid published ranks (Rank 1, 2, 3)
-    const validResults = (results || []).filter(r => r.rank !== undefined && r.rank > 0 && r.rank <= 3);
+    const validResults = (results || []).filter(r => r.rank !== undefined && Number(r.rank) > 0 && Number(r.rank) <= 3);
     
     validResults.forEach((res) => {
       const eventName = res.eventName || (res as any).competitionName || (res as any).program || 'Competition';

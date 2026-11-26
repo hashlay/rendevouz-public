@@ -534,9 +534,10 @@ function calculatePoints(r, comp, eventSettings) {
   }
 
   // Normal rank-based points if grade pointing system is disabled:
-  if (r.rank === 1) return Number(eventSettings?.globalPointsRank1 ?? 20);
-  if (r.rank === 2) return Number(eventSettings?.globalPointsRank2 ?? 14);
-  if (r.rank === 3) return Number(eventSettings?.globalPointsRank3 ?? 7);
+  const numRank = Number(r.rank);
+  if (numRank === 1) return Number(eventSettings?.globalPointsRank1 ?? 20);
+  if (numRank === 2) return Number(eventSettings?.globalPointsRank2 ?? 14);
+  if (numRank === 3) return Number(eventSettings?.globalPointsRank3 ?? 7);
   if (r.points !== undefined && r.points !== null && !r.rank) return Number(r.points);
   return 0;
 }
@@ -777,10 +778,11 @@ function computeLiveStandings(dbState) {
     let fourthToSeventhPlaceCount = 0;
 
     allUnitResults.forEach(r => {
-      if (r.rank === 1) firstPlaceCount++;
-      else if (r.rank === 2) secondPlaceCount++;
-      else if (r.rank === 3) thirdPlaceCount++;
-      else if (r.rank >= 4 && r.rank <= 7) fourthToSeventhPlaceCount++;
+      const numRank = Number(r.rank);
+      if (numRank === 1) firstPlaceCount++;
+      else if (numRank === 2) secondPlaceCount++;
+      else if (numRank === 3) thirdPlaceCount++;
+      else if (numRank >= 4 && numRank <= 7) fourthToSeventhPlaceCount++;
     });
 
     const overallPoints = allUnitResults.reduce((sum, r) => {

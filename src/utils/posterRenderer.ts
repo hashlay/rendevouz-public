@@ -687,7 +687,7 @@ export const renderPosterToCanvas = async (
 
     // Draw each rank with per-rank positions (supports multiple tied winners per rank)
     [1, 2, 3].forEach((rank) => {
-      const rankWinners = (compResults || []).filter(r => r.rank === rank);
+      const rankWinners = (compResults || []).filter(r => Number(r.rank) === rank || String(r.rank).trim() === String(rank));
       const hasRank1Override = !!(c[`rank${rank}NameOverride`] || c[`rank${rank}UnitOverride`]);
       const hasRank2Override = !!(c[`rank${rank}_2_NameOverride`] || c[`rank${rank}_2_UnitOverride`]);
 
@@ -710,7 +710,7 @@ export const renderPosterToCanvas = async (
 
         if (!res && !hasNameOverride && !hasUnitOverride && wIdx > 0) continue;
 
-        const rawWinnerName = hasNameOverride ? overrideName : (res?.participantName || 'Participant Name');
+        const rawWinnerName = hasNameOverride ? overrideName : (res?.participantName || res?.candidateName || res?.fullName || res?.name || 'Participant Name');
         const winnerName = c.winnerUppercase === false && !c.uppercaseNames ? rawWinnerName : rawWinnerName.toUpperCase();
 
         const rawWinnerUnit = hasUnitOverride ? overrideUnit : (res?.department || res?.unitName || res?.team || res?.teamName || 'Unit Name');
@@ -1020,9 +1020,9 @@ export const generatePosterShareCaption = (
   }
   const hashtags = hashtagList.slice(0, 4).join(' ');
 
-  const rank1List = (results || []).filter((r: any) => r.rank === 1);
-  const rank2List = (results || []).filter((r: any) => r.rank === 2);
-  const rank3List = (results || []).filter((r: any) => r.rank === 3);
+  const rank1List = (results || []).filter((r: any) => Number(r.rank) === 1 || String(r.rank).trim() === '1');
+  const rank2List = (results || []).filter((r: any) => Number(r.rank) === 2 || String(r.rank).trim() === '2');
+  const rank3List = (results || []).filter((r: any) => Number(r.rank) === 3 || String(r.rank).trim() === '3');
 
   const getWinnerTeam = (res: any) => {
     const rawUnit = res?.department || res?.unitName || res?.raw?.unitName || '';
