@@ -466,63 +466,6 @@ export const renderPosterToCanvas = async (
   const defaultConf = getDefaultThemeConfig(themeIdx);
   const userConf = { ...(themeConfigs[themeIdx] || {}) };
   
-  // Theme 0 default color fallback
-  if (themeIdx === 0) {
-    if (userConf.compNameColor === '#48205D') {
-      userConf.compNameColor = defaultConf.compNameColor;
-      userConf.resultNumColor = defaultConf.resultNumColor;
-      userConf.unitColor = defaultConf.unitColor;
-      userConf.rank1Color = defaultConf.rank1Color;
-      userConf.rank2Color = defaultConf.rank2Color;
-      userConf.rank3Color = defaultConf.rank3Color;
-    }
-    if (!userConf.resultNumFont || userConf.resultNumFont.includes('bold "Fractul Alt"')) {
-      userConf.resultNumFont = defaultConf.resultNumFont;
-    }
-    if (!userConf.categoryFont || userConf.categoryFont.includes('bold "Fractul Alt"')) {
-      userConf.categoryFont = defaultConf.categoryFont;
-    }
-    if (!userConf.compNameFont || userConf.compNameFont.includes('bold "Fractul Alt"')) {
-      userConf.compNameFont = defaultConf.compNameFont;
-    }
-    if (!userConf.winnerFont || userConf.winnerFont.includes('bold "Fractul Alt"')) {
-      userConf.winnerFont = defaultConf.winnerFont;
-    }
-    if (!userConf.rankFont || userConf.rankFont.includes('bold "Fractul Alt"')) {
-      userConf.rankFont = defaultConf.rankFont;
-    }
-    if (!userConf.unitFont || userConf.unitFont.includes('bold "Fractul Alt"')) {
-      userConf.unitFont = defaultConf.unitFont;
-    }
-    if (userConf.resultNumX === 140) {
-      userConf.resultNumX = defaultConf.resultNumX;
-      userConf.resultNumY = defaultConf.resultNumY;
-      userConf.resultNumSize = defaultConf.resultNumSize;
-      userConf.categoryX = defaultConf.categoryX;
-      userConf.categoryY = defaultConf.categoryY;
-      userConf.compNameX = defaultConf.compNameX;
-      userConf.compNameY = defaultConf.compNameY;
-      userConf.rank1BadgeX = defaultConf.rank1BadgeX;
-      userConf.rank1BadgeY = defaultConf.rank1BadgeY;
-      userConf.rank1NameX = defaultConf.rank1NameX;
-      userConf.rank1NameY = defaultConf.rank1NameY;
-      userConf.rank1UnitX = defaultConf.rank1UnitX;
-      userConf.rank1UnitY = defaultConf.rank1UnitY;
-      userConf.rank2BadgeX = defaultConf.rank2BadgeX;
-      userConf.rank2BadgeY = defaultConf.rank2BadgeY;
-      userConf.rank2NameX = defaultConf.rank2NameX;
-      userConf.rank2NameY = defaultConf.rank2NameY;
-      userConf.rank2UnitX = defaultConf.rank2UnitX;
-      userConf.rank2UnitY = defaultConf.rank2UnitY;
-      userConf.rank3BadgeX = defaultConf.rank3BadgeX;
-      userConf.rank3BadgeY = defaultConf.rank3BadgeY;
-      userConf.rank3NameX = defaultConf.rank3NameX;
-      userConf.rank3NameY = defaultConf.rank3NameY;
-      userConf.rank3UnitX = defaultConf.rank3UnitX;
-      userConf.rank3UnitY = defaultConf.rank3UnitY;
-    }
-  }
-
   const baseConf = { ...defaultConf, ...userConf };
   // Theme configs must NEVER supply winner name or unit overrides across all posters
   Object.keys(baseConf).forEach((k) => {
@@ -631,14 +574,16 @@ export const renderPosterToCanvas = async (
     const ry = c.resultLabelY ?? 180;
     if (c.resultLabelVertical) {
       const chars = rLblText.split('');
-      const gap = c.resultLabelLineGap || ((c.resultLabelSize || 13) * 1.15);
+      const gap = c.resultLabelLineGap || Math.max((c.resultLabelSize || 13) * 1.2, 16);
       chars.forEach((ch: string, i: number) => {
         ctx.fillText(ch, rx, ry + i * gap);
       });
+      const verticalHeight = (chars.length - 1) * gap + (c.resultLabelSize || 13);
+      addRegion('resultLabel', rx - 10, ry - (c.resultLabelSize || 13) - 5, (c.resultLabelSize || 13) + 20, verticalHeight + 20);
     } else {
       ctx.fillText(rLblText, rx, ry);
+      addRegion('resultLabel', rx - 10, ry - (c.resultLabelSize || 28) - 5, rLblMetrics.width + 20, (c.resultLabelSize || 28) + 20);
     }
-    addRegion('resultLabel', rx - 10, ry - (c.resultLabelSize || 28) - 5, rLblMetrics.width + 20, (c.resultLabelSize || 28) + 20);
 
     // Result Number (e.g. "01", "10", "105")
     ctx.textAlign = 'left';
@@ -916,23 +861,45 @@ export const renderPosterToCanvas = async (
       }
         // Horizontal divider line under winner row (for stacked themes like Theme 0 & Theme 2)
         if (c.showDividers && rank < 3) {
-          const divY = (uy ?? calcUy) + (unitLines.length * unitGap) + 8;
+          const dLen = c.dividerLength ?? 280;
+          const dYOffset = c.dividerYOffset ?? 8;
+          const divStartX = c.dividerStartX ?? nx;
+          const divY = (uy ?? calcUy) + (unitLines.length * unitGap) + dYOffset;
           ctx.save();
           ctx.strokeStyle = c.dividerColor || 'rgba(255, 255, 255, 0.35)';
           ctx.lineWidth = c.dividerWidth || 1;
           ctx.beginPath();
-          ctx.moveTo(c.dividerStartX ?? nx, divY);
-          ctx.lineTo(c.dividerEndX ?? (nx + 280), divY);
+          ctx.moveTo(divStartX, divY);
+          ctx.lineTo(divStartX + dLen, divY);
           ctx.stroke();
           ctx.restore();
         }
-
 
       // Smoothly shift down subsequent ranks if there was a tie
       if (hasTie) {
         cumulativeShiftY += (c.tiedWinnerRowGap || 72);
       }
     });
+
+    // Custom standalone divider lines (User-added & fully editable)
+    if (c.customDividers && Array.isArray(c.customDividers)) {
+      c.customDividers.forEach((div: any) => {
+        const dx = div.x ?? 260;
+        const dy = div.y ?? 420;
+        const dLen = div.length ?? 300;
+        const dThick = div.thickness ?? 2;
+        const dCol = div.color || 'rgba(255, 255, 255, 0.4)';
+
+        ctx.save();
+        ctx.strokeStyle = dCol;
+        ctx.lineWidth = dThick;
+        ctx.beginPath();
+        ctx.moveTo(dx, dy);
+        ctx.lineTo(dx + dLen, dy);
+        ctx.stroke();
+        ctx.restore();
+      });
+    }
 
     // Footer
     if (c.showFooter !== false) {
