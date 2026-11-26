@@ -120,17 +120,18 @@ export function getDefaultThemeConfig(themeIdx: number = 0): any {
       resultLabelText: 'RESULT',
       resultLabelX: 183,
       resultLabelY: 284,
-      resultLabelSize: 13,
+      resultLabelSize: 22,
       resultLabelColor: '#84C75D',
-      resultLabelFont: '600 "Sora", sans-serif',
+      resultLabelFont: '700 "Sora", sans-serif',
       resultLabelVertical: true,
-      resultLabelLineGap: 14,
+      resultLabelLineGap: 20,
+      showResultLabel: true,
       resultNumX: 135,
       resultNumY: 375,
       resultNumSize: 145,
       resultNumColor: '#84C75D',
       resultNumFont: '700 "Sora", sans-serif',
-      resultNumStyle: 'stroke',
+      resultNumStyle: 'fill',
       resultNumStrokeWidth: 3.5,
       categorySize: 28,
       categoryColor: '#ffffff',
@@ -564,45 +565,60 @@ export const renderPosterToCanvas = async (
     const formattedNum = compIdx < 10 ? compIdx.toString().padStart(2, '0') : compIdx.toString();
 
     // Result Label Word (e.g. "RESULT")
-    ctx.textAlign = 'left';
-    ctx.font = parseFontForCanvas(c.resultLabelFont || c.fontFamily, c.resultLabelSize || 28, '800');
-    ctx.fillStyle = c.resultLabelColor || '#ffffff';
-    const rawLbl = c.resultLabelText || 'RESULT';
-    const rLblText = c.resultLabelUppercase !== false ? rawLbl.toUpperCase() : rawLbl;
-    const rLblMetrics = ctx.measureText(rLblText);
-    const rx = c.resultLabelX ?? 470;
-    const ry = c.resultLabelY ?? 180;
-    if (c.resultLabelVertical) {
-      const chars = rLblText.split('');
-      const gap = c.resultLabelLineGap || Math.max((c.resultLabelSize || 13) * 1.2, 16);
-      chars.forEach((ch: string, i: number) => {
-        ctx.fillText(ch, rx, ry + i * gap);
-      });
-      const verticalHeight = (chars.length - 1) * gap + (c.resultLabelSize || 13);
-      addRegion('resultLabel', rx - 10, ry - (c.resultLabelSize || 13) - 5, (c.resultLabelSize || 13) + 20, verticalHeight + 20);
-    } else {
-      ctx.fillText(rLblText, rx, ry);
-      addRegion('resultLabel', rx - 10, ry - (c.resultLabelSize || 28) - 5, rLblMetrics.width + 20, (c.resultLabelSize || 28) + 20);
+    if (c.showResultLabel !== false) {
+      const rx = (c.resultLabelX !== undefined && !isNaN(c.resultLabelX))
+        ? c.resultLabelX
+        : (c.resultNumX !== undefined ? c.resultNumX + 48 : 183);
+      const ry = (c.resultLabelY !== undefined && !isNaN(c.resultLabelY))
+        ? c.resultLabelY
+        : (c.resultNumY !== undefined ? Math.max(c.resultNumY - 90, 80) : 284);
+      const rawLbl = c.resultLabelText || 'RESULT';
+      const rLblText = c.resultLabelUppercase !== false ? rawLbl.toUpperCase() : rawLbl;
+      const lblSize = c.resultLabelSize || 22;
+
+      ctx.save();
+      ctx.textAlign = 'left';
+      ctx.font = parseFontForCanvas(c.resultLabelFont || c.fontFamily, lblSize, '800');
+      const lblColor = (!c.resultLabelColor || c.resultLabelColor === '#000000' || c.resultLabelColor === 'black')
+        ? (c.resultNumColor || '#84C75D')
+        : c.resultLabelColor;
+      ctx.fillStyle = lblColor;
+
+      const rLblMetrics = ctx.measureText(rLblText);
+      if (c.resultLabelVertical) {
+        const chars = rLblText.split('');
+        const gap = c.resultLabelLineGap || Math.max(lblSize * 1.25, 18);
+        chars.forEach((ch: string, i: number) => {
+          ctx.fillText(ch, rx, ry + i * gap);
+        });
+        const verticalHeight = (chars.length - 1) * gap + lblSize;
+        addRegion('resultLabel', rx - 10, ry - lblSize - 5, lblSize + 20, verticalHeight + 20);
+      } else {
+        ctx.fillText(rLblText, rx, ry);
+        addRegion('resultLabel', rx - 10, ry - lblSize - 5, rLblMetrics.width + 20, lblSize + 20);
+      }
+      ctx.restore();
     }
 
-    // Result Number (e.g. "01", "10", "105")
+    // Result Number (e.g. "01", "10", "105" - Normal Solid Font by default)
     ctx.textAlign = 'left';
-    ctx.font = parseFontForCanvas(c.resultNumFont || c.fontFamily, c.resultNumSize || 28, '800');
-    const rNumX = c.resultNumX ?? 600;
-    const rNumY = c.resultNumY ?? 180;
+    ctx.font = parseFontForCanvas(c.resultNumFont || c.fontFamily, c.resultNumSize || 145, '700');
+    const rNumX = (c.resultNumX !== undefined && !isNaN(c.resultNumX)) ? c.resultNumX : 135;
+    const rNumY = (c.resultNumY !== undefined && !isNaN(c.resultNumY)) ? c.resultNumY : 375;
+    const rNumColor = (!c.resultNumColor || c.resultNumColor === '#000000') ? '#84C75D' : c.resultNumColor;
     if (c.resultNumStyle === 'stroke') {
       ctx.save();
-      ctx.strokeStyle = c.resultNumColor || '#84C75D';
+      ctx.strokeStyle = rNumColor;
       ctx.lineWidth = c.resultNumStrokeWidth || 3.5;
       ctx.lineJoin = 'round';
       ctx.strokeText(formattedNum, rNumX, rNumY);
       ctx.restore();
     } else {
-      ctx.fillStyle = c.resultNumColor || '#ffffff';
+      ctx.fillStyle = rNumColor;
       ctx.fillText(formattedNum, rNumX, rNumY);
     }
     const rNumMetrics = ctx.measureText(formattedNum);
-    addRegion('resultNum', rNumX - 10, rNumY - (c.resultNumSize || 28) - 5, rNumMetrics.width + 20, (c.resultNumSize || 28) + 20);
+    addRegion('resultNum', rNumX - 10, rNumY - (c.resultNumSize || 145) - 5, rNumMetrics.width + 20, (c.resultNumSize || 145) + 20);
 
     
     // Cursive Script Text (SignPainter) e.g. "mid zone"
