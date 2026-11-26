@@ -132,6 +132,7 @@ export function getDefaultThemeConfig(themeIdx: number = 0): any {
       resultNumColor: '#84C75D',
       resultNumFont: '700 "Sora", sans-serif',
       resultNumStyle: 'fill',
+      resultNumAlign: 'left',
       resultNumStrokeWidth: 3.5,
       categorySize: 28,
       categoryColor: '#ffffff',
@@ -250,6 +251,7 @@ export function getDefaultThemeConfig(themeIdx: number = 0): any {
       resultNumColor: '#ffffff',
       resultNumFont: '700 "Sora", sans-serif',
       resultNumStyle: 'fill',
+      resultNumAlign: 'left',
       categorySize: 0,
       categoryColor: '#ffffff',
       categoryX: -9999,
@@ -379,6 +381,7 @@ export function getDefaultThemeConfig(themeIdx: number = 0): any {
       resultNumColor: '#B01B1B',
       resultNumFont: '700 "Bebas Neue", "Sora", sans-serif',
       resultNumStyle: 'fill',
+      resultNumAlign: 'left',
       categorySize: 26,
       categoryColor: '#B01B1B',
       categoryX: 525,
@@ -731,7 +734,8 @@ export const renderPosterToCanvas = async (
     }
 
     // Result Number (e.g. "01", "10", "105" - Normal Solid Font by default)
-    ctx.textAlign = 'left';
+    const rNumAlign = (c.resultNumAlign || 'left') as CanvasTextAlign;
+    ctx.textAlign = rNumAlign;
     ctx.font = parseFontForCanvas(c.resultNumFont || c.fontFamily, c.resultNumSize || 145, '700');
     const rNumX = (c.resultNumX !== undefined && !isNaN(c.resultNumX)) ? c.resultNumX : 135;
     const rNumY = (c.resultNumY !== undefined && !isNaN(c.resultNumY)) ? c.resultNumY : 375;
@@ -761,7 +765,12 @@ export const renderPosterToCanvas = async (
       ctx.restore();
     }
     const rNumMetrics = ctx.measureText(formattedNum);
-    addRegion('resultNum', rNumX - 10, rNumY - (c.resultNumSize || 145) - 5, rNumMetrics.width + 20, (c.resultNumSize || 145) + 20);
+    const rNumHitX = rNumAlign === 'center'
+      ? rNumX - rNumMetrics.width / 2
+      : rNumAlign === 'right'
+      ? rNumX - rNumMetrics.width
+      : rNumX;
+    addRegion('resultNum', rNumHitX - 10, rNumY - (c.resultNumSize || 145) - 5, rNumMetrics.width + 20, (c.resultNumSize || 145) + 20);
 
     
     // Cursive Script Text (SignPainter) e.g. "mid zone"
