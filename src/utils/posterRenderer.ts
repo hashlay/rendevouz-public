@@ -1168,7 +1168,7 @@ export const generatePosterShareCaption = (
   eventName: string,
   category: string,
   compIndex: number,
-  results: any[],
+  _results?: any[],
   eventSettings?: any
 ): string => {
   const festivalTitle = (eventSettings?.festivalName || 'QUERENCIA').toUpperCase();
@@ -1187,41 +1187,9 @@ export const generatePosterShareCaption = (
   }
   if (hashtagList.length === 0) {
     const cleanTag = festivalTitle.replace(/[^a-zA-Z0-9]/g, '');
-    hashtagList = [`#${cleanTag}`, '#MeeladFest', '#Results', '#Winners'];
+    hashtagList = [`#${cleanTag}`, '#Fest', '#Results', '#Winners'];
   }
   const hashtags = hashtagList.slice(0, 4).join(' ');
-
-  const rank1List = (results || []).filter((r: any) => Number(r.rank) === 1 || String(r.rank).trim() === '1');
-  const rank2List = (results || []).filter((r: any) => Number(r.rank) === 2 || String(r.rank).trim() === '2');
-  const rank3List = (results || []).filter((r: any) => Number(r.rank) === 3 || String(r.rank).trim() === '3');
-
-  const getWinnerTeam = (res: any) => {
-    const rawUnit = res?.department || res?.unitName || res?.raw?.unitName || '';
-    if (!rawUnit) return '';
-    const cleanUnit = rawUnit.replace(/^team\s*[:\-]?\s*/i, '').trim();
-    const displayUnit = getPosterDisplayUnitName(cleanUnit, eventSettings?.posterTemplateConfig) || cleanUnit;
-    const finalUnit = displayUnit.replace(/^team\s*[:\-]?\s*/i, '').trim();
-    return finalUnit ? `Team ${finalUnit}` : '';
-  };
-
-  const formatRankLine = (emoji: string, rankStr: string, list: any[]) => {
-    if (list.length === 0) return '';
-    return list
-      .map((r: any) => {
-        const pName = r.participantName || r.name || 'Participant';
-        const team = getWinnerTeam(r);
-        return `${emoji} ${rankStr} — ${pName}${team ? `    ${team}` : ''}`;
-      })
-      .join('\n');
-  };
-
-  const rankLines = [
-    formatRankLine('🥇', '1st', rank1List),
-    formatRankLine('🥈', '2nd', rank2List),
-    formatRankLine('🥉', '3rd', rank3List)
-  ]
-    .filter(Boolean)
-    .join('\n');
 
   return `🏆 ${festivalTitle} — RESULT ${formattedNum}
 ✨ ${slogan}
@@ -1229,11 +1197,21 @@ export const generatePosterShareCaption = (
 ${eventName}
 ${category}
 
-${rankLines}
-
 🌿 Congratulations to all the winners and participants!
 May your talents continue to shine. ✨
 ${campus}
+
+Rsa official instagram 
+
+https://www.instagram.com/rsa_valliad?dmpr=cHRvejR6eHdhcmI4
+
+Join for updates 
+
+https://chat.whatsapp.com/BmWjnyYGyj1ByWYwJphiaj?s=sh&p=a&mlu=4&ilr=4
+
+QUERENCIA 2026 Website
+
+https://fanous.hashlay.in
 
 ${hashtags}
 
@@ -1288,7 +1266,7 @@ export const generateParticipantPosterShareCaption = (
   const campus = eventSettings?.campusName || eventSettings?.sectorName || 'Thwaiba Valliyad';
 
   const cleanTag = festivalTitle.replace(/[^a-zA-Z0-9]/g, '');
-  const hashtags = `#${cleanTag} #ResultPoster #Winners #ThwaibaValliyad`;
+  const hashtags = `#${cleanTag} #Fest #Results #Winners`;
 
   return `🏆 ${festivalTitle} — RESULT POSTER
 ✨ ${slogan}
@@ -1296,8 +1274,21 @@ export const generateParticipantPosterShareCaption = (
 Competition: ${eventName}
 Category: ${category}
 
-Congratulations to all the winners!
+🌿 Congratulations to all the winners and participants!
+May your talents continue to shine. ✨
 ${campus}
+
+Rsa official instagram 
+
+https://www.instagram.com/rsa_valliad?dmpr=cHRvejR6eHdhcmI4
+
+Join for updates 
+
+https://chat.whatsapp.com/BmWjnyYGyj1ByWYwJphiaj?s=sh&p=a&mlu=4&ilr=4
+
+QUERENCIA 2026 Website
+
+https://fanous.hashlay.in
 
 ${hashtags}
 
