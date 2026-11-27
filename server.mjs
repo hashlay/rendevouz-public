@@ -950,16 +950,15 @@ app.get('/api/public/standings', async (req, res) => {
     } catch (_) {}
   }
 
-  // Strictly return published snapshot if available
+  // Strictly return published snapshot only. If not published yet, return empty list!
   if (publishedSnapshot && Array.isArray(publishedSnapshot.standings) && publishedSnapshot.standings.length > 0) {
     res.setHeader('x-standings-results-count', String(publishedSnapshot.resultsCount || 0));
     res.setHeader('x-standings-published-at', String(publishedSnapshot.publishedAt || ''));
     return res.json(publishedSnapshot.standings);
   }
 
-  // Fallback to live calculated standings when no frozen snapshot is published
-  const liveStandings = computeLiveStandings(dbState);
-  res.json(liveStandings);
+  // Strictly snapshot mode: Keep team points hidden until admin explicitly clicks "Publish Standings"
+  res.json([]);
 });
 
 // Publish Standings snapshot (called from Admin panel)
