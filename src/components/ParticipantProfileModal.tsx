@@ -693,9 +693,9 @@ export const ParticipantProfileModal: React.FC<ParticipantProfileModalProps> = (
                 }
 
                 const isGradeSystem = eventSettings?.gradeSystemEnabled !== false;
-                const isCombinedSystem = eventSettings?.combineGradeAndRankPoints === true;
+                const isCombinedSystem = eventSettings?.combineGradeAndRankPoints === true || (Number(eventSettings?.globalPointsRank1) > 0 && isGradeSystem);
                 const pointDistributionMode = eventSettings?.pointDistributionMode || (eventSettings?.categorySpecificGradesEnabled ? 'category_wise' : 'team_size');
-                const computedPoints = res.points !== undefined && res.points !== null ? Number(res.points) : (() => {
+                const computedPoints = (res.points !== undefined && res.points !== null && !isNaN(Number(res.points))) ? Number(res.points) : (() => {
                   if (isAbsentResult) return 0;
                   const m = Math.round(Number(rawMarks) || 0);
 

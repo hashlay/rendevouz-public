@@ -461,23 +461,52 @@ app.get('/api/public/competitions', async (req, res) => {
   res.json(competitions);
 });
 
-function calculateGrade(mark, isGroup = false) {
-  const m = Number(mark) || 0;
-  if (m <= 0) return '';
+const DEFAULT_TEAM_SIZE_TIERS = [
+  { id: 'tier_ind', name: '1 Member', minMembers: 1, maxMembers: 1, pointsAPlus: 6, pointsA: 5, pointsB: 3, pointsC: 1, pointsNoGrade: 0 },
+  { id: 'tier_2', name: '2 Members', minMembers: 2, maxMembers: 2, pointsAPlus: 7, pointsA: 6, pointsB: 4, pointsC: 2, pointsNoGrade: 0 },
+  { id: 'tier_3', name: '3 Members', minMembers: 3, maxMembers: 3, pointsAPlus: 10, pointsA: 9, pointsB: 6, pointsC: 3, pointsNoGrade: 0 },
+  { id: 'tier_4_5', name: '4-5 Members', minMembers: 4, maxMembers: 5, pointsAPlus: 18, pointsA: 15, pointsB: 10, pointsC: 5, pointsNoGrade: 0 },
+  { id: 'tier_10', name: '10 Members', minMembers: 10, maxMembers: 10, pointsAPlus: 25, pointsA: 20, pointsB: 12, pointsC: 6, pointsNoGrade: 0 },
+  { id: 'tier_project', name: 'Project', minMembers: 1, maxMembers: 99, matchKeywords: ['project', 'പ്രോജക്ട്'], pointsAPlus: 25, pointsA: 20, pointsB: 12, pointsC: 6, pointsNoGrade: 0 },
+  { id: 'tier_vlog', name: 'Vlog', minMembers: 1, maxMembers: 99, matchKeywords: ['vlog', 'social story'], pointsAPlus: 25, pointsA: 20, pointsB: 12, pointsC: 6, pointsNoGrade: 0 }
+];
 
-  if (isGroup) {
-    if (m >= 95) return 'A+';
-    if (m >= 80) return 'A';
-    if (m >= 55) return 'B';
-    if (m >= 30) return 'C';
-    return '';
-  } else {
-    if (m >= 95) return 'A+';
-    if (m >= 85) return 'A';
-    if (m >= 70) return 'B';
-    if (m >= 50) return 'C';
-    return '';
+const DEFAULT_GRADE_MATRIX = [
+  { id: '1', minMark: 90, maxMark: 100, indGrade: 'A+', indPoints: 6, groupGrade: 'A+', groupPoints: 12, group2Points: 7, group3Points: 10, group4_5Points: 18, group10Points: 25 },
+  { id: '2', minMark: 70, maxMark: 89, indGrade: 'A', indPoints: 5, groupGrade: 'A', groupPoints: 10, group2Points: 6, group3Points: 9, group4_5Points: 15, group10Points: 20 },
+  { id: '3', minMark: 60, maxMark: 69, indGrade: 'B', indPoints: 3, groupGrade: 'B', groupPoints: 6, group2Points: 4, group3Points: 6, group4_5Points: 10, group10Points: 12 },
+  { id: '4', minMark: 50, maxMark: 59, indGrade: 'C', indPoints: 1, groupGrade: 'C', groupPoints: 2, group2Points: 2, group3Points: 3, group4_5Points: 5, group10Points: 6 },
+  { id: '5', minMark: 0, maxMark: 49, indGrade: '-', indPoints: 0, groupGrade: '-', groupPoints: 0, group2Points: 0, group3Points: 0, group4_5Points: 0, group10Points: 0 }
+];
+
+function calculateGrade(mark, isGroup = false, eventSettings = {}, categoryId = null) {
+  const m = Math.round(Number(mark) || 0);
+  if (m <= 0 || isNaN(m)) return '';
+
+  const settings = eventSettings || {};
+
+  // Custom gradeMatrix if configured in settings
+  if (settings?.gradeMatrix && Array.isArray(settings.gradeMatrix) && settings.gradeMatrix.length > 0) {
+    let matrix = settings.gradeMatrix;
+    if (settings?.categorySpecificGradesEnabled && categoryId && settings?.categoryGradeMatrices?.[categoryId] && Array.isArray(settings.categoryGradeMatrices[categoryId]) && settings.categoryGradeMatrices[categoryId].length > 0) {
+      matrix = settings.categoryGradeMatrices[categoryId];
+    }
+    const sorted = [...matrix].sort((a, b) => Number(b.minMark) - Number(a.minMark));
+    for (const row of sorted) {
+      if (m >= Number(row.minMark)) {
+        const g = isGroup ? row.groupGrade : row.indGrade;
+        return (!g || g === '-' || g === 'None') ? '' : g;
+      }
+    }
   }
+
+  // Official Sahityotsav '26 Scale:
+  // A+: 90–100, A: 70–89, B: 60–69, C: 50–59, Below 50: No grade
+  if (m >= 90) return 'A+';
+  if (m >= 70) return 'A';
+  if (m >= 60) return 'B';
+  if (m >= 50) return 'C';
+  return '';
 }
 
 function getNormalizedMark(r) {
@@ -495,52 +524,110 @@ function getNormalizedMark(r) {
   return 0;
 }
 
-function calculatePoints(r, comp, eventSettings) {
-  // Grade Pointing System: enabled by default for this festival
-  const isGradePointSystem = eventSettings?.gradeSystemEnabled !== false;
-  if (isGradePointSystem) {
-    if (r.status === 'absent' || r.isAbsent) return 0;
-    const mark = getNormalizedMark(r);
-    const m = Number(mark) || 0;
-    if (m <= 0) return 0;
+function calculateResultPoints(r, comp, eventSettings = {}) {
+  const settings = eventSettings || {};
+  const gradeSystemEnabled = settings?.gradeSystemEnabled !== false;
+  const combineGradeAndRankPoints = settings?.combineGradeAndRankPoints === true || (Number(settings?.globalPointsRank1) > 0 && gradeSystemEnabled);
+  const pointDistributionMode = settings?.pointDistributionMode || (settings?.categorySpecificGradesEnabled ? 'category_wise' : 'team_size');
 
-    const isGroup = !!r.teamId || comp?.participationType === 'group' || (comp && comp.isGroup === true);
-    if (isGroup) {
-      if (m >= 95) return 20;
-      if (m >= 90) return 19;
-      if (m >= 85) return 18;
-      if (m >= 80) return 17;
-      if (m >= 75) return 16;
-      if (m >= 70) return 15;
-      if (m >= 65) return 14;
-      if (m >= 55) return 13;
-      if (m >= 50) return 12;
-      if (m >= 40) return 11;
-      if (m >= 30) return 10;
-      return 5;
+  if (r.status === 'absent' || r.isAbsent) return 0;
+  const mark = getNormalizedMark(r);
+  const m = Math.round(Number(mark) || 0);
+
+  const isGroup = !!r.teamId || comp?.participationType === 'group' || comp?.isGroup === true || String(comp?.participationType).toLowerCase() === 'group';
+  const catId = r.categoryId || comp?.categoryId;
+  const grade = r.grade || (m > 0 ? calculateGrade(m, isGroup, settings, catId) : '');
+
+  const compName = (comp?.name || r.eventName || r.competitionName || '').toLowerCase();
+  let teamSize = Number(comp?.teamSize) || (isGroup ? 2 : 1);
+  if (r.teamId && Array.isArray(r.teamMemberIds) && r.teamMemberIds.length > 0) {
+    teamSize = r.teamMemberIds.length;
+  }
+
+  // 1. Calculate Grade Points based on active Point Distribution Mode
+  let gradePoints = 0;
+  if (gradeSystemEnabled && m > 0 && grade) {
+    if (pointDistributionMode === 'team_size') {
+      const tiers = (settings?.teamSizePointTiers && Array.isArray(settings.teamSizePointTiers) && settings.teamSizePointTiers.length > 0)
+        ? settings.teamSizePointTiers
+        : DEFAULT_TEAM_SIZE_TIERS;
+
+      let matchedTier = tiers.find(t =>
+        Array.isArray(t.matchKeywords) && t.matchKeywords.some(kw => compName.includes(kw.toLowerCase()))
+      );
+
+      if (!matchedTier) {
+        matchedTier = tiers.find(t => teamSize >= t.minMembers && teamSize <= t.maxMembers);
+      }
+
+      if (!matchedTier) {
+        matchedTier = teamSize === 1 ? tiers[0] : (tiers.find(t => t.minMembers > 1) || tiers[0]);
+      }
+
+      if (matchedTier) {
+        if (grade === 'A+') gradePoints = matchedTier.pointsAPlus;
+        else if (grade === 'A') gradePoints = matchedTier.pointsA;
+        else if (grade === 'B+' || grade === 'B') gradePoints = matchedTier.pointsB;
+        else if (grade === 'C+' || grade === 'C') gradePoints = matchedTier.pointsC;
+        else if (grade === '-' || grade === 'No Grade' || !grade) gradePoints = matchedTier.pointsNoGrade ?? 0;
+      }
     } else {
-      if (m >= 95) return 10;
-      if (m >= 90) return 9;
-      if (m >= 85) return 8;
-      if (m >= 80) return 7;
-      if (m >= 75) return 6;
-      if (m >= 70) return 5;
-      if (m >= 65) return 4;
-      if (m >= 55) return 3;
-      if (m >= 50) return 2;
-      if (m >= 40) return 1;
-      return 0;
+      let matrix = (settings?.gradeMatrix && Array.isArray(settings.gradeMatrix) && settings.gradeMatrix.length > 0)
+        ? settings.gradeMatrix
+        : DEFAULT_GRADE_MATRIX;
+      if (pointDistributionMode === 'category_wise' && catId && settings?.categoryGradeMatrices?.[catId] && Array.isArray(settings.categoryGradeMatrices[catId]) && settings.categoryGradeMatrices[catId].length > 0) {
+        matrix = settings.categoryGradeMatrices[catId];
+      }
+
+      const sorted = [...matrix].sort((a, b) => Number(b.minMark) - Number(a.minMark));
+      for (const row of sorted) {
+        if (m >= Number(row.minMark)) {
+          if (!isGroup || teamSize === 1) {
+            gradePoints = Number(row.indPoints) || 0;
+          } else if (teamSize === 2) {
+            gradePoints = (row.group2Points !== undefined && row.group2Points !== null) ? Number(row.group2Points) : (Number(row.groupPoints) || 0);
+          } else if (teamSize === 3) {
+            gradePoints = (row.group3Points !== undefined && row.group3Points !== null) ? Number(row.group3Points) : (Number(row.groupPoints) || 0);
+          } else if (teamSize === 4 || teamSize === 5) {
+            gradePoints = (row.group4_5Points !== undefined && row.group4_5Points !== null) ? Number(row.group4_5Points) : (Number(row.groupPoints) || 0);
+          } else if (teamSize >= 10) {
+            gradePoints = (row.group10Points !== undefined && row.group10Points !== null) ? Number(row.group10Points) : (row.group4_5Points !== undefined ? Number(row.group4_5Points) : (Number(row.groupPoints) || 0));
+          } else {
+            gradePoints = (row.group4_5Points !== undefined && row.group4_5Points !== null) ? Number(row.group4_5Points) : (Number(row.groupPoints) || 0);
+          }
+          break;
+        }
+      }
     }
   }
 
-  // Normal rank-based points if grade pointing system is disabled:
-  const numRank = Number(r.rank);
-  if (numRank === 1) return Number(eventSettings?.globalPointsRank1 ?? 20);
-  if (numRank === 2) return Number(eventSettings?.globalPointsRank2 ?? 14);
-  if (numRank === 3) return Number(eventSettings?.globalPointsRank3 ?? 7);
-  if (r.points !== undefined && r.points !== null && !r.rank) return Number(r.points);
-  return 0;
+  // 2. Calculate Rank Points
+  let rankPoints = 0;
+  if (!gradeSystemEnabled || combineGradeAndRankPoints) {
+    const numRank = Number(r.rank);
+    if (numRank >= 1 && numRank <= 10) {
+      const settingsKey = `globalPointsRank${numRank}`;
+      const settingsVal = settings?.[settingsKey] ?? settings?.[`pointsRank${numRank}`];
+      if (settingsVal !== undefined && settingsVal !== null && !isNaN(Number(settingsVal))) {
+        rankPoints = Number(settingsVal);
+      } else {
+        const defaultMap = { 1: 5, 2: 3, 3: 1 };
+        rankPoints = defaultMap[numRank] || 0;
+      }
+    }
+  }
+
+  // 3. Return total points
+  if (gradeSystemEnabled && combineGradeAndRankPoints) {
+    return gradePoints + rankPoints;
+  }
+  if (gradeSystemEnabled) {
+    return gradePoints;
+  }
+  return rankPoints;
 }
+
+const calculatePoints = calculateResultPoints;
 
 // Public Published Results
 app.get('/api/public/results', async (req, res) => {
@@ -662,8 +749,10 @@ app.get('/api/public/results', async (req, res) => {
 
       const totalMarks = getNormalizedMark(r);
       const isGroup = comp?.participationType === 'group' || !!r.teamId;
-      const grade = calculateGrade(totalMarks, isGroup);
-      const points = calculatePoints(r, comp, eventSettings);
+      const grade = (r.grade && r.grade !== '-' && r.grade !== '') ? r.grade : (totalMarks > 0 ? calculateGrade(totalMarks, isGroup, eventSettings, r.categoryId || comp?.categoryId) : '');
+      const points = (r.points !== undefined && r.points !== null && !isNaN(Number(r.points)))
+        ? Number(r.points)
+        : calculateResultPoints(r, comp, eventSettings);
       const categoryName = cat?.name || r.category || r.categoryName || 'General';
       const eventName = comp?.name || r.eventName || r.competitionName || r.program || 'Competition';
 
@@ -728,13 +817,14 @@ function computeLiveStandings(dbState) {
   );
 
   const standings = validUnits.map(unit => {
-    const normTarget = unit.name.toLowerCase().replace(/[-_]/g, '');
+    const normTarget = unit.id ? unit.id.toLowerCase().replace(/[-_]/g, '') : unit.name.toLowerCase().replace(/[-_]/g, '');
+    const normNameTarget = unit.name ? unit.name.toLowerCase().replace(/[-_]/g, '') : normTarget;
 
     const isUnitMatch = (uId, uName) => {
       if (!uId && !uName) return false;
       const normId = uId ? String(uId).toLowerCase().replace(/[-_]/g, '') : '';
       const normName = uName ? String(uName).toLowerCase().replace(/[-_]/g, '') : '';
-      if (normId === normTarget || normName === normTarget) return true;
+      if (normId === normTarget || normName === normTarget || normId === normNameTarget || normName === normNameTarget) return true;
       if (normTarget.includes('shukr') && (normId.includes('shukr') || normName.includes('shukr'))) return true;
       if (normTarget.includes('sabr') && (normId.includes('sabr') || normName.includes('sabr'))) return true;
       return false;
@@ -743,7 +833,7 @@ function computeLiveStandings(dbState) {
     const unitParticipants = participants.filter(p => (isUnitMatch(p.unitId) || p.unitId === unit.id) && !p.deletedAt);
     const participantIds = unitParticipants.map(p => p.id);
 
-    const individualResults = results.filter(r => {
+    const rawIndResults = results.filter(r => {
       if (r.deletedAt) return false;
       const isPub = r.publishedStatus === true || r.isPublished === true || publishedSheetCompIds.has(r.competitionId);
       if (!isPub) return false;
@@ -755,10 +845,19 @@ function computeLiveStandings(dbState) {
       return false;
     });
 
+    const uniqueIndMap = new Map();
+    rawIndResults.forEach(r => {
+      const key = `${r.competitionId}_${r.participantId || r.id}`;
+      if (!uniqueIndMap.has(key)) {
+        uniqueIndMap.set(key, r);
+      }
+    });
+    const individualResults = Array.from(uniqueIndMap.values());
+
     const unitTeams = teams.filter(t => (isUnitMatch(t.unitId) || t.unitId === unit.id) && !t.deletedAt);
     const teamIds = unitTeams.map(t => t.id);
 
-    const groupResults = results.filter(r => {
+    const rawGroupResults = results.filter(r => {
       if (r.deletedAt) return false;
       const isPub = r.publishedStatus === true || r.isPublished === true || publishedSheetCompIds.has(r.competitionId);
       if (!isPub) return false;
@@ -769,6 +868,15 @@ function computeLiveStandings(dbState) {
       if (r.teamId && isUnitMatch(r.unitId, r.unitName || r.department)) return true;
       return false;
     });
+
+    const uniqueGrpMap = new Map();
+    rawGroupResults.forEach(r => {
+      const key = `${r.competitionId}_${r.teamId || r.id}`;
+      if (!uniqueGrpMap.has(key)) {
+        uniqueGrpMap.set(key, r);
+      }
+    });
+    const groupResults = Array.from(uniqueGrpMap.values());
 
     const allUnitResults = [...individualResults, ...groupResults];
 
@@ -786,8 +894,11 @@ function computeLiveStandings(dbState) {
     });
 
     const overallPoints = allUnitResults.reduce((sum, r) => {
+      if (r.points !== undefined && r.points !== null && !isNaN(Number(r.points))) {
+        return sum + Number(r.points);
+      }
       const comp = competitions.find(c => c.id === r.competitionId);
-      return sum + calculatePoints(r, comp, eventSettings);
+      return sum + calculateResultPoints(r, comp, eventSettings);
     }, 0);
     const overallMarks = Math.round(allUnitResults.reduce((sum, r) => sum + getNormalizedMark(r), 0) * 100) / 100;
 
@@ -839,15 +950,16 @@ app.get('/api/public/standings', async (req, res) => {
     } catch (_) {}
   }
 
-  // Strictly return published snapshot only. If not published yet, return empty list!
+  // Strictly return published snapshot if available
   if (publishedSnapshot && Array.isArray(publishedSnapshot.standings) && publishedSnapshot.standings.length > 0) {
     res.setHeader('x-standings-results-count', String(publishedSnapshot.resultsCount || 0));
     res.setHeader('x-standings-published-at', String(publishedSnapshot.publishedAt || ''));
     return res.json(publishedSnapshot.standings);
   }
 
-  // Not yet published to public: Keep team points hidden until admin explicitly publishes
-  res.json([]);
+  // Fallback to live calculated standings when no frozen snapshot is published
+  const liveStandings = computeLiveStandings(dbState);
+  res.json(liveStandings);
 });
 
 // Publish Standings snapshot (called from Admin panel)
@@ -1048,9 +1160,11 @@ function buildParticipantPortalData(participant, cNum, cleanChest, dbState) {
         program: comp ? comp.name : (r.eventName || r.program || 'Competition'),
         category: cat ? cat.name : (r.category || 'General'),
         rank: r.rank,
-        grade: calculateGrade(normMark, isGroup),
+        grade: (r.grade && r.grade !== '-' && r.grade !== '') ? r.grade : (normMark > 0 ? calculateGrade(normMark, isGroup, eventSettings, r.categoryId || comp?.categoryId) : ''),
         totalMarks: normMark,
-        points: calculatePoints(r, comp, eventSettings),
+        points: (r.points !== undefined && r.points !== null && !isNaN(Number(r.points)))
+          ? Number(r.points)
+          : calculateResultPoints(r, comp, eventSettings),
         publishedStatus: !!(r.publishedStatus || r.isPublished),
         participantName: participant.fullName,
         codeNumber: cNum ? (cNum.chestNumber || cNum.codeNumber) : (participant.profilePhoto || cleanChest),
